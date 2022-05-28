@@ -1,4 +1,4 @@
 import 'package:flutter/material.dart';
 
-/// 通知触发一次观察
+/// The Notification for Triggering an observation
 class ListViewOnceObserveNotification extends Notification {}
