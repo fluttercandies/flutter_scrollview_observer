@@ -67,7 +67,9 @@ ListViewObserver(
 )
 ```
 
-默认是 `ListView` 在滚动的时候才会观察到相关数据，如果需要，可以使用 `ListViewOnceObserveNotification` 进行手动触发一次观察
+默认是 `ListView` 在滚动的时候才会观察到相关数据。
+
+如果需要，可以使用 `ListViewOnceObserveNotification` 进行手动触发一次观察
 
 ```dart
 ListViewOnceObserveNotification().dispatch(_sliverListViewContext);

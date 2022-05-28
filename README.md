@@ -68,7 +68,9 @@ ListViewObserver(
 )
 ```
 
-By default, `ListView` relevant data will only be observed when rolling. If needed, you can use `ListViewOnceObserveNotification` triggered an observation manually.
+By default, `ListView` relevant data will only be observed when rolling.
+
+If needed, you can use `ListViewOnceObserveNotification` triggered an observation manually.
 
 ```dart
 ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
