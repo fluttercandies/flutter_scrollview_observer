@@ -18,6 +18,16 @@ class _SliverListViewDemoPageState extends State<SliverListViewDemoPage> {
   int _hitIndexForCtx2 = 0;
 
   @override
+  void initState() {
+    super.initState();
+
+    // Trigger an observation manually
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      ListViewOnceObserveNotification().dispatch(_sliverListViewCtx1);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("SliverListView")),
@@ -38,7 +48,7 @@ class _SliverListViewDemoPageState extends State<SliverListViewDemoPage> {
           final model1 = resultMap[_sliverListViewCtx1];
           if (model1 != null) {
             print('1 firstChild.index -- ${model1.firstChild.index}');
-            print('1 showing -- ${model1.showingChildIndexList}');
+            print('1 displaying -- ${model1.displayingChildIndexList}');
             setState(() {
               _hitIndexForCtx1 = model1.firstChild.index;
             });
@@ -47,7 +57,7 @@ class _SliverListViewDemoPageState extends State<SliverListViewDemoPage> {
           final model2 = resultMap[_sliverListViewCtx2];
           if (model2 != null) {
             print('2 firstChild.index -- ${model2.firstChild.index}');
-            print('2 showing -- ${model2.showingChildIndexList}');
+            print('2 displaying -- ${model2.displayingChildIndexList}');
             setState(() {
               _hitIndexForCtx2 = model2.firstChild.index;
             });

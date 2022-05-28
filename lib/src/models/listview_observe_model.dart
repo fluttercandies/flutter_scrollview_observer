@@ -3,19 +3,19 @@ import 'package:flutter/foundation.dart';
 import 'listview_observe_displaying_child_model.dart';
 
 class ListViewObserveModel {
-  /// 目标子组件的下标
+  /// The first child widget that is displaying.
   final ListViewObserveDisplayingChildModel firstChild;
 
-  /// 正在显示的子组件的renderObject
-  final List<ListViewObserveDisplayingChildModel> showingChildModelList;
+  /// Stores model list for children widgets those are displaying.
+  final List<ListViewObserveDisplayingChildModel> displayingChildModelList;
 
-  /// 正在显示的子组件的下标集
-  List<int> get showingChildIndexList =>
-      showingChildModelList.map((e) => e.index).toList();
+  /// Stores index list for children widgets those are displaying.
+  List<int> get displayingChildIndexList =>
+      displayingChildModelList.map((e) => e.index).toList();
 
   ListViewObserveModel({
     required this.firstChild,
-    required this.showingChildModelList,
+    required this.displayingChildModelList,
   });
 
   @override
@@ -23,7 +23,7 @@ class ListViewObserveModel {
     if (identical(this, other)) return true;
     if (other is ListViewObserveModel) {
       return firstChild == other.firstChild &&
-          listEquals(showingChildModelList, other.showingChildModelList);
+          listEquals(displayingChildModelList, other.displayingChildModelList);
     } else {
       return false;
     }
@@ -31,6 +31,6 @@ class ListViewObserveModel {
 
   @override
   int get hashCode {
-    return firstChild.hashCode + showingChildModelList.hashCode;
+    return firstChild.hashCode + displayingChildModelList.hashCode;
   }
 }

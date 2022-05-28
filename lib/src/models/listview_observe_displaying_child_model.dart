@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ListViewObserveDisplayingChildModel {
-  /// 下标
+  /// The index of child widget.
   final int index;
 
-  /// Render对象
+  /// The renderObject [RenderBox] of child widget.
   final RenderBox renderObject;
 
   ListViewObserveDisplayingChildModel({

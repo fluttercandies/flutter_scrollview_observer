@@ -14,6 +14,16 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
   int _hitIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+
+    // Trigger an observation manually
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("ListView")),
@@ -27,7 +37,7 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
           if (model == null) return;
 
           print('firstChild.index -- ${model.firstChild.index}');
-          print('showing -- ${model.showingChildIndexList}');
+          print('displaying -- ${model.displayingChildIndexList}');
           setState(() {
             _hitIndex = model.firstChild.index;
           });
@@ -41,14 +51,18 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
     //   padding: EdgeInsets.zero,
     //   itemCount: 200,
     //   itemBuilder: (ctx, index) {
-    //     _ctx1 = ctx;
+    //     if (_sliverListViewContext != ctx) {
+    //       _sliverListViewContext = ctx;
+    //     }
     //     return _buildListItemView(index);
     //   },
     // );
 
     return ListView.separated(
       itemBuilder: (ctx, index) {
-        _sliverListViewContext = ctx;
+        if (_sliverListViewContext != ctx) {
+          _sliverListViewContext = ctx;
+        }
         return _buildListItemView(index);
       },
       separatorBuilder: (ctx, index) {

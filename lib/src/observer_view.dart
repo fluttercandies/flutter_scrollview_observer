@@ -18,7 +18,7 @@ class ListViewObserver extends StatefulWidget {
   final double leadingOffset;
 
   /// Calculate offset dynamically
-  /// If this callback is implemented, the [leadingOffset] property will be 
+  /// If this callback is implemented, the [leadingOffset] property will be
   /// invalid.
   final double Function()? dynamicLeadingOffset;
 
@@ -91,6 +91,7 @@ class _ListViewObserverState extends State<ListViewObserver> {
   ListViewObserveModel? _handleObserve(BuildContext ctx) {
     final _obj = ctx.findRenderObject();
     if (_obj is! RenderSliverList) return null;
+    if (!(_obj.geometry?.visible ?? true)) return null;
     var firstChild = _obj.firstChild;
     if (firstChild == null) return null;
 
@@ -160,7 +161,7 @@ class _ListViewObserverState extends State<ListViewObserver> {
         index: targetFirstChild.index,
         renderObject: targetFirstChild,
       ),
-      showingChildModelList: showingChildModelList,
+      displayingChildModelList: showingChildModelList,
     );
   }
 }
