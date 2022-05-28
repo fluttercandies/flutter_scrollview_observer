@@ -72,3 +72,9 @@ ListViewObserver(
 ```dart
 ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
 ```
+
+## 示例
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/1.gif)
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/2.gif)

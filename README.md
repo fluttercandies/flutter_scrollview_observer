@@ -73,3 +73,9 @@ By default, `ListView` relevant data will only be observed when rolling. If need
 ```dart
 ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
 ```
+
+## Example
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/1.gif)
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/2.gif)
