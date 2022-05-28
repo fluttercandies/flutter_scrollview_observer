@@ -1,6 +1,6 @@
 # Flutter ScrollView Observer
 
-This is a Widget designed for 'ListView' and 'SliverListView' to listen for which parts are being displayed.
+This is a widget designed for `ListView` and `SliverListView` to listen for which parts are being displayed.
 
 ## Installing
 
