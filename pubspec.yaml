@@ -1,0 +1,17 @@
+name: scrollview_observer
+description: Gets all the child widgets those are displaying in listView.
+version: 0.0.1
+homepage: https://github.com/LinXunFeng/flutter_scrollview_observer
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^1.0.0
+
