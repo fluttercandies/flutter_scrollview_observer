@@ -1,30 +1,29 @@
 # Flutter ScrollView Observer
 
-This is a Widget designed for 'ListView' and 'SliverListView' to listen for which parts are being displayed.
+这是针对 `ListView` 和 `SliverListView` 而设计的一个组件，可用于监听正在显示的是那些部件。
 
-## Installing
+## 安装
 
-Add `scrollview_observer` to your pubspec.yaml file:
-
+在你的 `pubspec.yaml` 文件中添加 `scrollview_observer` 依赖:
 
 ```yaml
 dependencies:
   scrollview_observer: ^0.0.1
 ```
 
-Import `scrollview_observer` in files that it will be used:
+在需要使用的地方导入 `scrollview_observer` :
 
 ```dart
 import 'package:scrollview_observer/scrollview_observer.dart';
 ```
 
-## Getting Started
+## 使用
 
 ```dart
 BuildContext? _sliverListViewContext;
 ```
 
-Create a `ListView` and record `BuildContext` in its builder callback
+创建 `ListView`，并在其 `builder` 回调中，将 `BuildContext` 记录起来
 
 ```dart
 ListView _buildListView() {
@@ -43,11 +42,11 @@ ListView _buildListView() {
 }
 ```
 
-Create `ListViewObserver`
+构建 `ListViewObserver`
 
-- `child`: Create `ListView` as a child of `ListViewObserver`
-- `sliverListContexts`: In this callback, we need to return all `BuildContext` of the ListView those needs to be observed
-- `onObserve`: This callback can listen for information about the child widgets those are currently being displayed
+- `child`: 将构建的 `ListView` 做为 `ListViewObserver` 的子部件
+- `sliverListContexts`: 该回调中返回需要被观察的 `ListView` 的 `BuildContext`
+- `onObserve`: 该回调可以监听到当前正在显示中的子部件的相关信息
 
 ```dart
 ListViewObserver(
@@ -59,16 +58,16 @@ ListViewObserver(
     final model = resultMap[_sliverListViewContext];
     if (model == null) return;
 
-    // Prints the first child widget that is currently being displayed
+    // 打印当前正在显示中的第一个子部件
     print('firstChild.index -- ${model.firstChild.index}');
 
-    // Prints the index of all child widgets those are currently being displayed
+    // 打印当前正在显示中的第一个子部件
     print('displaying -- ${model.displayingChildIndexList}');
   },
 )
 ```
 
-By default, `ListView` relevant data will only be observed when rolling. If needed, you can use `ListViewOnceObserveNotification` triggered an observation manually.
+默认是 `ListView` 在滚动的时候才会观察到相关数据，如果需要，可以使用 `ListViewOnceObserveNotification` 进行手动触发一次观察
 
 ```dart
 ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
