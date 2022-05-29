@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer_example/features/listview/anchor_demo/anchor_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_demo/listview_demo_page.dart';
+import 'package:scrollview_observer_example/features/listview/listview_dynamic_offset/listview_dynamic_offset_page.dart';
 import 'package:scrollview_observer_example/features/listview/sliver_list_demo/sliver_list_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/video_auto_play_list/video_list_auto_play_page.dart';
 import 'package:tuple/tuple.dart';
 
-enum HomeListRowType {
-  listView,
-  sliverListView,
-  videoAutoPlayList,
-}
+typedef PageBuilder = Widget Function();
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -24,12 +21,12 @@ class HomePage extends StatelessWidget {
         itemBuilder: (context, index) {
           final rowData = rowDataArr[index];
           return ListTile(
-            title: Text(rowData.item2),
+            title: Text(rowData.item1),
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) {
-                    return rowData.item3;
+                    return rowData.item2();
                   },
                 ),
               );
@@ -43,29 +40,39 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  List<Tuple3<HomeListRowType, String, Widget>> _buildListViewRows(
+  List<Tuple2<String, PageBuilder>> _buildListViewRows(
     BuildContext context,
   ) {
     return [
-      const Tuple3<HomeListRowType, String, Widget>(
-        HomeListRowType.listView,
+      Tuple2<String, PageBuilder>(
         "ListView",
-        ListViewDemoPage(),
+        () {
+          return const ListViewDemoPage();
+        },
       ),
-      const Tuple3<HomeListRowType, String, Widget>(
-        HomeListRowType.sliverListView,
+      Tuple2<String, PageBuilder>(
+        "ListView Dynamic Offset",
+        () {
+          return const ListViewDynamicOffsetPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
         "SliverListView",
-        SliverListViewDemoPage(),
+        () {
+          return const SliverListViewDemoPage();
+        },
       ),
-      const Tuple3<HomeListRowType, String, Widget>(
-        HomeListRowType.videoAutoPlayList,
+      Tuple2<String, PageBuilder>(
         "VideoList AutoPlay",
-        VideoListAutoPlayPage(),
+        () {
+          return const VideoListAutoPlayPage();
+        },
       ),
-      const Tuple3<HomeListRowType, String, Widget>(
-        HomeListRowType.videoAutoPlayList,
+      Tuple2<String, PageBuilder>(
         "AnchorList",
-        AnchorListPage(),
+        () {
+          return const AnchorListPage();
+        },
       ),
     ];
   }
