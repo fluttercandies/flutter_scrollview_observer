@@ -12,7 +12,7 @@ class _AnchorListPageState extends State<AnchorListPage>
     with SingleTickerProviderStateMixin {
   BuildContext? _sliverListViewContext;
   late TabController _tabController;
-  List tabs = ["News", "History", "Picture"];
+  List tabs = ["News(0)", "History(5)", "Picture(10)"];
   List<int> tabIndexs = [0, 5, 10];
 
   @override
@@ -25,7 +25,7 @@ class _AnchorListPageState extends State<AnchorListPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("ListView"),
+        title: const Text("Anchor ListView"),
         bottom: PreferredSize(
           preferredSize: const Size(double.infinity, 44),
           child: IgnorePointer(
