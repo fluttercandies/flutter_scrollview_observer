@@ -22,8 +22,10 @@ class ListViewObserver extends StatefulWidget {
   /// invalid.
   final double Function()? dynamicLeadingOffset;
 
-  /// Looking for the next child widget when the current child widget itself
-  /// shows more than this percentage.
+  /// After the internal logic figure out the first child widget, if the
+  /// proportion of the size of the child widget blocked to its own size exceeds
+  /// the value [toNextOverPercent], the next child widget will be the first
+  /// child widget.
   final double toNextOverPercent;
 
   const ListViewObserver({
