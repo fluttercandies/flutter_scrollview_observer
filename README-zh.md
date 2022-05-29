@@ -1,5 +1,9 @@
 # Flutter ScrollView Observer
 
+[![author](https://img.shields.io/badge/author-LinXunFeng-blue.svg?style=flat-square&logo=Iconify)](https://github.com/LinXunFeng/) [![pub](https://img.shields.io/pub/v/scrollview_observer?&style=flat-square&label=pub&logo=dart)](https://pub.dev/packages/scrollview_observer) [![stars](https://img.shields.io/github/stars/LinXunFeng/flutter_scrollview_observer?style=flat-square&logo=github)](https://github.com/LinXunFeng/flutter_scrollview_observer)
+
+Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_observer) | [文章](https://juejin.cn/post/7103058155692621837/)
+
 这是针对 `ListView` 和 `SliverListView` 而设计的一个组件，可用于监听正在显示的是那些部件。
 
 ## 安装
@@ -58,10 +62,10 @@ ListViewObserver(
     final model = resultMap[_sliverListViewContext];
     if (model == null) return;
 
-    // 打印当前正在显示中的第一个子部件
+    // 打印当前正在显示的第一个子部件
     print('firstChild.index -- ${model.firstChild.index}');
 
-    // 打印当前正在显示中的第一个子部件
+    // 打印当前正在显示的所有子部件下标
     print('displaying -- ${model.displayingChildIndexList}');
   },
 )

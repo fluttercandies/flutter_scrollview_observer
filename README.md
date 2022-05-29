@@ -1,5 +1,10 @@
 # Flutter ScrollView Observer
 
+[![author](https://img.shields.io/badge/author-LinXunFeng-blue.svg?style=flat-square&logo=Iconify)](https://github.com/LinXunFeng/) [![pub](https://img.shields.io/pub/v/scrollview_observer?&style=flat-square&label=pub&logo=dart)](https://pub.dev/packages/scrollview_observer) [![stars](https://img.shields.io/github/stars/LinXunFeng/flutter_scrollview_observer?style=flat-square&logo=github)](https://github.com/LinXunFeng/flutter_scrollview_observer)
+
+Language: English | [中文](https://github.com/LinXunFeng/flutter_scrollview_observer/blob/main/README-zh.md) | [Article](https://juejin.cn/post/7103058155692621837/)
+
+
 This is a widget designed for `ListView` and `SliverListView` to listen for which parts are being displayed.
 
 ## Installing
@@ -59,7 +64,7 @@ ListViewObserver(
     final model = resultMap[_sliverListViewContext];
     if (model == null) return;
 
-    // Prints the first child widget that is currently being displayed
+    // Prints the first child widget index that is currently being displayed
     print('firstChild.index -- ${model.firstChild.index}');
 
     // Prints the index of all child widgets those are currently being displayed
