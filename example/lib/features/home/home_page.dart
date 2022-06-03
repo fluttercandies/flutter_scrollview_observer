@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer_example/features/listview/anchor_demo/anchor_page.dart';
+import 'package:scrollview_observer_example/features/listview/horizontal_listview_demo/horizontal_listview_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_demo/listview_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_dynamic_offset/listview_dynamic_offset_page.dart';
 import 'package:scrollview_observer_example/features/listview/sliver_list_demo/sliver_list_demo_page.dart';
@@ -48,6 +49,12 @@ class HomePage extends StatelessWidget {
         "ListView",
         () {
           return const ListViewDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "Horizontal ListView",
+        () {
+          return const HorizontalListViewPage();
         },
       ),
       Tuple2<String, PageBuilder>(
