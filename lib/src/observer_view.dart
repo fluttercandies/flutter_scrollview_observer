@@ -94,6 +94,7 @@ class _ListViewObserverState extends State<ListViewObserver> {
     final _obj = ctx.findRenderObject();
     if (_obj is! RenderSliverList) return null;
     if (!(_obj.geometry?.visible ?? true)) return null;
+    final scrollDirection = _obj.constraints.axis;
     var firstChild = _obj.firstChild;
     if (firstChild == null) return null;
 
@@ -110,12 +111,12 @@ class _ListViewObserverState extends State<ListViewObserver> {
 
     // find out the first child which is displaying
     var targetFirstChild = firstChild;
-    var targetFistChildData =
-        targetFirstChild.parentData as SliverMultiBoxAdaptorParentData;
 
-    while (listViewOffset >
-        targetFirstChild.size.height * widget.toNextOverPercent +
-            (targetFistChildData.layoutOffset ?? 0)) {
+    while (!_isTargetFirstWidget(
+      listViewOffset: listViewOffset,
+      scrollDirection: scrollDirection,
+      targetFirstChild: targetFirstChild,
+    )) {
       index = index + 1;
       var nextChild = _obj.childAfter(targetFirstChild);
       if (nextChild == null) break;
@@ -126,8 +127,6 @@ class _ListViewObserverState extends State<ListViewObserver> {
       }
       if (nextChild == null) break;
       targetFirstChild = nextChild;
-      targetFistChildData =
-          targetFirstChild.parentData as SliverMultiBoxAdaptorParentData;
     }
     if (targetFirstChild is! RenderIndexedSemantics) return null;
 
@@ -138,24 +137,26 @@ class _ListViewObserverState extends State<ListViewObserver> {
     ));
 
     // find the remaining children that are being displayed
-    var listViewBottomOffset =
+    final listViewBottomOffset =
         rawListViewOffset + _obj.constraints.remainingPaintExtent;
-    var showingChild = _obj.childAfter(targetFirstChild);
-    while (showingChild != null &&
-        showingChild.parentData is SliverMultiBoxAdaptorParentData &&
-        ((showingChild.parentData as SliverMultiBoxAdaptorParentData)
-                    .layoutOffset ??
-                0) <
-            listViewBottomOffset) {
-      if (showingChild is! RenderIndexedSemantics) {
-        showingChild = _obj.childAfter(showingChild);
+    var displayingChild = _obj.childAfter(targetFirstChild);
+    while (_isDisplayingChild(
+      targetChild: displayingChild,
+      listViewBottomOffset: listViewBottomOffset,
+    )) {
+      if (displayingChild == null) {
+        break;
+      }
+      if (displayingChild is! RenderIndexedSemantics) {
+        // it is separator
+        displayingChild = _obj.childAfter(displayingChild);
         continue;
       }
       showingChildModelList.add(ListViewObserveDisplayingChildModel(
-        index: showingChild.index,
-        renderObject: showingChild,
+        index: displayingChild.index,
+        renderObject: displayingChild,
       ));
-      showingChild = _obj.childAfter(showingChild);
+      displayingChild = _obj.childAfter(displayingChild);
     }
 
     return ListViewObserveModel(
@@ -165,5 +166,41 @@ class _ListViewObserverState extends State<ListViewObserver> {
       ),
       displayingChildModelList: showingChildModelList,
     );
+  }
+
+  /// Determines whether the target child widget is the first widget being 
+  /// displayed
+  bool _isTargetFirstWidget({
+    required double listViewOffset,
+    required Axis scrollDirection,
+    required RenderBox targetFirstChild,
+  }) {
+    final parentData = targetFirstChild.parentData;
+    if (parentData is! SliverMultiBoxAdaptorParentData) {
+      return false;
+    }
+    final targetFirstChildOffset = parentData.layoutOffset ?? 0;
+    final targetFirstChildSize = scrollDirection == Axis.vertical
+        ? targetFirstChild.size.height
+        : targetFirstChild.size.width;
+    return listViewOffset <=
+        targetFirstChildSize * widget.toNextOverPercent +
+            targetFirstChildOffset;
+  }
+
+  /// Determines whether the target child widget is being displayed
+  bool _isDisplayingChild({
+    required RenderBox? targetChild,
+    required double listViewBottomOffset,
+  }) {
+    if (targetChild == null) {
+      return false;
+    }
+    final parentData = targetChild.parentData;
+    if (parentData is! SliverMultiBoxAdaptorParentData) {
+      return false;
+    }
+    final targetChildLayoutOffset = parentData.layoutOffset ?? 0;
+    return targetChildLayoutOffset < listViewBottomOffset;
   }
 }
