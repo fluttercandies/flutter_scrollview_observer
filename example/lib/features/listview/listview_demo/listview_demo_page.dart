@@ -36,10 +36,11 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
           final model = resultMap[_sliverListViewContext];
           if (model == null) return;
 
-          print('firstChild.index -- ${model.firstChild.index}');
+          print('visible -- ${model.visible}');
+          print('firstChild.index -- ${model.firstChild?.index}');
           print('displaying -- ${model.displayingChildIndexList}');
           setState(() {
-            _hitIndex = model.firstChild.index;
+            _hitIndex = model.firstChild?.index ?? 0;
           });
         },
       ),
@@ -59,6 +60,8 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
     // );
 
     return ListView.separated(
+      padding: const EdgeInsets.only(top: 1000, bottom: 1000),
+      controller: ScrollController(initialScrollOffset: 1000),
       itemBuilder: (ctx, index) {
         if (_sliverListViewContext != ctx) {
           _sliverListViewContext = ctx;

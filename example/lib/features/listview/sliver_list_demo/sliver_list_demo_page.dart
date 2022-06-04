@@ -46,29 +46,24 @@ class _SliverListViewDemoPageState extends State<SliverListViewDemoPage> {
         },
         onObserve: (resultMap) {
           final model1 = resultMap[_sliverListViewCtx1];
-          if (model1 != null) {
-            print('1 firstChild.index -- ${model1.firstChild.index}');
+          if (model1 != null && model1.visible) {
+            print('1 visible -- ${model1.visible}');
+            print('1 firstChild.index -- ${model1.firstChild?.index}');
             print('1 displaying -- ${model1.displayingChildIndexList}');
             setState(() {
-              _hitIndexForCtx1 = model1.firstChild.index;
+              _hitIndexForCtx1 = model1.firstChild?.index ?? 0;
             });
           }
 
           final model2 = resultMap[_sliverListViewCtx2];
-          if (model2 != null) {
-            print('2 firstChild.index -- ${model2.firstChild.index}');
+          if (model2 != null && model2.visible) {
+            print('2 visible -- ${model2.visible}');
+            print('2 firstChild.index -- ${model2.firstChild?.index}');
             print('2 displaying -- ${model2.displayingChildIndexList}');
             setState(() {
-              _hitIndexForCtx2 = model2.firstChild.index;
+              _hitIndexForCtx2 = model2.firstChild?.index ?? 0;
             });
           }
-        },
-      ),
-      // body: _buildSliverListView(),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          ListViewOnceObserveNotification().dispatch(_sliverListViewCtx1);
         },
       ),
     );
@@ -76,50 +71,51 @@ class _SliverListViewDemoPageState extends State<SliverListViewDemoPage> {
 
   SliverList _buildSliverListView1() {
     return SliverList(
-        delegate: SliverChildBuilderDelegate(
-      (ctx, index) {
-        if (_sliverListViewCtx1 != ctx) {
-          _sliverListViewCtx1 = ctx;
-        }
-        return Container(
-          height: (index % 2 == 0) ? 80 : 50,
-          color: _hitIndexForCtx1 == index ? Colors.red : Colors.black12,
-          child: Center(
-            child: Text(
-              "index -- $index",
-              style: TextStyle(
-                color: _hitIndexForCtx1 == index ? Colors.white : Colors.black,
+      delegate: SliverChildBuilderDelegate(
+        (ctx, index) {
+          if (_sliverListViewCtx1 != ctx) {
+            _sliverListViewCtx1 = ctx;
+          }
+          return Container(
+            height: (index % 2 == 0) ? 80 : 50,
+            color: _hitIndexForCtx1 == index ? Colors.red : Colors.black12,
+            child: Center(
+              child: Text(
+                "index -- $index",
+                style: TextStyle(
+                  color:
+                      _hitIndexForCtx1 == index ? Colors.white : Colors.black,
+                ),
               ),
             ),
-          ),
-        );
-        ;
-      },
-      childCount: 30,
-    ));
+          );
+        },
+        childCount: 30,
+      ),
+    );
   }
 
   SliverList _buildSliverListView2() {
     return SliverList(
-        key: _sliverListView2Key,
-        delegate: SliverChildBuilderDelegate(
-          (ctx, index) {
-            return Container(
-              height: (index % 2 == 0) ? 80 : 50,
-              color: _hitIndexForCtx2 == index ? Colors.amber : Colors.blue[50],
-              child: Center(
-                child: Text(
-                  "index -- $index",
-                  style: TextStyle(
-                    color:
-                        _hitIndexForCtx2 == index ? Colors.white : Colors.black,
-                  ),
+      key: _sliverListView2Key,
+      delegate: SliverChildBuilderDelegate(
+        (ctx, index) {
+          return Container(
+            height: (index % 2 == 0) ? 80 : 50,
+            color: _hitIndexForCtx2 == index ? Colors.amber : Colors.blue[50],
+            child: Center(
+              child: Text(
+                "index -- $index",
+                style: TextStyle(
+                  color:
+                      _hitIndexForCtx2 == index ? Colors.white : Colors.black,
                 ),
               ),
-            );
-            ;
-          },
-          childCount: 30,
-        ));
+            ),
+          );
+        },
+        childCount: 30,
+      ),
+    );
   }
 }

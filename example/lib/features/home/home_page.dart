@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:scrollview_observer_example/features/gridview/gridview_demo/gridview_demo_page.dart';
+import 'package:scrollview_observer_example/features/gridview/horizontal_gridview_demo/horizontal_gridview_demo_page.dart';
+import 'package:scrollview_observer_example/features/gridview/sliver_grid_demo/sliver_grid_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/anchor_demo/anchor_page.dart';
 import 'package:scrollview_observer_example/features/listview/horizontal_listview_demo/horizontal_listview_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_demo/listview_demo_page.dart';
@@ -16,7 +19,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var rowDataArr = _buildListViewRows(context);
     return Scaffold(
-      appBar: AppBar(title: const Text("ListView Observer Example")),
+      appBar: AppBar(title: const Text("ScrollView Observer Example")),
       body: ListView.separated(
         itemCount: rowDataArr.length,
         itemBuilder: (context, index) {
@@ -79,6 +82,24 @@ class HomePage extends StatelessWidget {
         "AnchorList",
         () {
           return const AnchorListPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "GridView",
+        () {
+          return const GridViewDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "Horizontal GridView",
+        () {
+          return const HorizontalGridViewDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "SliverGridView",
+        () {
+          return const SliverGridViewDemoPage();
         },
       ),
     ];

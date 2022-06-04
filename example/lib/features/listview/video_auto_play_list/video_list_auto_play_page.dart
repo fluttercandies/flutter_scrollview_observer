@@ -27,8 +27,8 @@ class _VideoListAutoPlayPageState extends State<VideoListAutoPlayPage> {
           final model = resultMap[_ctx1];
           if (model == null) return;
 
-          if (_hitIndex != model.firstChild.index) {
-            _hitIndex = model.firstChild.index;
+          if (_hitIndex != model.firstChild?.index) {
+            _hitIndex = model.firstChild?.index ?? 0;
             setState(() {});
           }
         },

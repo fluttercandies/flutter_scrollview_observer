@@ -46,7 +46,7 @@ class _AnchorListPageState extends State<AnchorListPage>
           final model = resultMap[_sliverListViewContext];
           if (model == null) return;
 
-          final topIndex = model.firstChild.index;
+          final topIndex = model.firstChild?.index ?? 0;
           final index = tabIndexs.indexOf(topIndex);
           if (index != -1) {
             _tabController.index = index;

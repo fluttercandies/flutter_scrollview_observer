@@ -36,10 +36,10 @@ class _HorizontalListViewPageState extends State<HorizontalListViewPage> {
           final model = resultMap[_sliverListViewContext];
           if (model == null) return;
 
-          print('firstChild.index -- ${model.firstChild.index}');
+          print('firstChild.index -- ${model.firstChild?.index ?? 0}');
           print('displaying -- ${model.displayingChildIndexList}');
           setState(() {
-            _hitIndex = model.firstChild.index;
+            _hitIndex = model.firstChild?.index ?? 0;
           });
         },
       ),
