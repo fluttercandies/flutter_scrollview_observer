@@ -3,8 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'listview_observe_displaying_child_model.dart';
 
 class ListViewObserveModel {
+  /// Whether this sliver should be painted.
+  final bool visible;
+
   /// The first child widget that is displaying.
-  final ListViewObserveDisplayingChildModel firstChild;
+  final ListViewObserveDisplayingChildModel? firstChild;
 
   /// Stores model list for children widgets those are displaying.
   final List<ListViewObserveDisplayingChildModel> displayingChildModelList;
@@ -14,6 +17,7 @@ class ListViewObserveModel {
       displayingChildModelList.map((e) => e.index).toList();
 
   ListViewObserveModel({
+    required this.visible,
     required this.firstChild,
     required this.displayingChildModelList,
   });
