@@ -68,7 +68,7 @@ ListViewObserver(
     if (model == null) return;
 
     // 打印当前正在显示的第一个子部件
-    print('firstChild.index -- ${model.firstChild.index}');
+    print('firstChild.index -- ${model.firstChild?.index}');
 
     // 打印当前正在显示的所有子部件下标
     print('displaying -- ${model.displayingChildIndexList}');

@@ -70,7 +70,7 @@ ListViewObserver(
     if (model == null) return;
 
     // Prints the first child widget index that is currently being displayed
-    print('firstChild.index -- ${model.firstChild.index}');
+    print('firstChild.index -- ${model.firstChild?.index}');
 
     // Prints the index of all child widgets those are currently being displayed
     print('displaying -- ${model.displayingChildIndexList}');
