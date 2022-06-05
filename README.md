@@ -5,7 +5,13 @@
 Language: English | [中文](https://github.com/LinXunFeng/flutter_scrollview_observer/blob/main/README-zh.md) | [Article](https://juejin.cn/post/7103058155692621837/)
 
 
-This is a widget designed for `ListView` and `SliverListView` to listen for which parts are being displayed.
+This is a library of widget that can be used to listen for child widgets those are being displayed in the scroll view.
+
+## Support
+- [x] `ListView`
+- [x] `SliverList`
+- [x] `GridView`
+- [x] `SliverGrid` 
 
 ## Installing
 
@@ -14,7 +20,7 @@ Add `scrollview_observer` to your pubspec.yaml file:
 
 ```yaml
 dependencies:
-  scrollview_observer: ^0.0.1
+  scrollview_observer: latest_version
 ```
 
 Import `scrollview_observer` in files that it will be used:
@@ -24,6 +30,8 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 ```
 
 ## Getting Started
+
+> Take `ListView` as an example
 
 ```dart
 BuildContext? _sliverListViewContext;
@@ -38,12 +46,9 @@ ListView _buildListView() {
       if (_sliverListViewContext != ctx) {
         _sliverListViewContext = ctx;
       }
-      return _buildListItemView(index);
+      ...
     },
-    separatorBuilder: (ctx, index) {
-      return _buildSeparatorView();
-    },
-    itemCount: 50,
+    ...
   );
 }
 ```
@@ -86,3 +91,5 @@ ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/1.gif)
 
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/2.gif)
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/3.gif)

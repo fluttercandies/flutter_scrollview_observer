@@ -4,7 +4,13 @@
 
 Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_observer) | [文章](https://juejin.cn/post/7103058155692621837/)
 
-这是针对 `ListView` 和 `SliverListView` 而设计的一个组件，可用于监听正在显示的是那些部件。
+这是一个可用于监听滚动视图中正在显示的子部件的组件库。
+
+## 支持
+- [x] `ListView`
+- [x] `SliverList`
+- [x] `GridView`
+- [x] `SliverGrid` 
 
 ## 安装
 
@@ -12,7 +18,7 @@ Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_ob
 
 ```yaml
 dependencies:
-  scrollview_observer: ^0.0.1
+  scrollview_observer: latest_version
 ```
 
 在需要使用的地方导入 `scrollview_observer` :
@@ -22,6 +28,8 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 ```
 
 ## 使用
+
+> 以 `ListView` 为例
 
 ```dart
 BuildContext? _sliverListViewContext;
@@ -36,12 +44,9 @@ ListView _buildListView() {
       if (_sliverListViewContext != ctx) {
         _sliverListViewContext = ctx;
       }
-      return _buildListItemView(index);
+      ...
     },
-    separatorBuilder: (ctx, index) {
-      return _buildSeparatorView();
-    },
-    itemCount: 50,
+    ...
   );
 }
 ```
@@ -84,3 +89,5 @@ ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/1.gif)
 
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/2.gif)
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/3.gif)
