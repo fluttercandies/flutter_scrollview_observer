@@ -9,7 +9,7 @@ class ListViewObserver extends StatefulWidget {
   final Widget child;
 
   /// The callback of getting all sliverList's buildContext.
-  final List<BuildContext> Function() sliverListContexts;
+  final List<BuildContext> Function()? sliverListContexts;
 
   /// The callback of geting observed result map.
   final Function(Map<BuildContext, ListViewObserveModel>) onObserve;
@@ -31,7 +31,7 @@ class ListViewObserver extends StatefulWidget {
   const ListViewObserver({
     Key? key,
     required this.child,
-    required this.sliverListContexts,
+    this.sliverListContexts,
     required this.onObserve,
     this.leadingOffset = 0,
     this.dynamicLeadingOffset,
@@ -44,6 +44,9 @@ class ListViewObserver extends StatefulWidget {
 }
 
 class _ListViewObserverState extends State<ListViewObserver> {
+  /// Target SliverList BuildContext
+  List<BuildContext> targetSliverListContexts = [];
+
   /// The last observation result
   Map<BuildContext, ListViewObserveModel> lastResultMap = {};
 
@@ -66,8 +69,27 @@ class _ListViewObserverState extends State<ListViewObserver> {
 
   /// Handle all buildContext
   _handleContexts() {
-    final sliverListContexts = widget.sliverListContexts;
-    var ctxs = sliverListContexts();
+    List<BuildContext> ctxs = targetSliverListContexts;
+    if (ctxs.isEmpty) {
+      final sliverListContexts = widget.sliverListContexts;
+      if (sliverListContexts != null) {
+        ctxs = sliverListContexts();
+      } else {
+        List<BuildContext> _ctxs = [];
+        void visitor(Element element) {
+          if (element.renderObject is RenderSliverList) {
+            /// Find the target sliverList context
+            _ctxs.add(element);
+            return;
+          }
+          element.visitChildren(visitor);
+        }
+
+        context.visitChildElements(visitor);
+        ctxs = _ctxs;
+      }
+    }
+
     Map<BuildContext, ListViewObserveModel> resultMap = {};
     Map<BuildContext, ListViewObserveModel> changeResultMap = {};
     for (var ctx in ctxs) {
