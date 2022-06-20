@@ -117,6 +117,7 @@ class _ListViewObserverState extends State<ListViewObserver> {
     if (_obj is! RenderSliverList) return null;
     if (!(_obj.geometry?.visible ?? true)) {
       return ListViewObserveModel(
+        sliverList: _obj,
         visible: false,
         firstChild: null,
         displayingChildModelList: [],
@@ -160,6 +161,7 @@ class _ListViewObserverState extends State<ListViewObserver> {
 
     List<ListViewObserveDisplayingChildModel> displayingChildModelList = [
       ListViewObserveDisplayingChildModel(
+        sliverList: _obj,
         index: targetFirstChild.index,
         renderObject: targetFirstChild,
       ),
@@ -182,6 +184,7 @@ class _ListViewObserverState extends State<ListViewObserver> {
         continue;
       }
       displayingChildModelList.add(ListViewObserveDisplayingChildModel(
+        sliverList: _obj,
         index: displayingChild.index,
         renderObject: displayingChild,
       ));
@@ -189,8 +192,10 @@ class _ListViewObserverState extends State<ListViewObserver> {
     }
 
     return ListViewObserveModel(
+      sliverList: _obj,
       visible: true,
       firstChild: ListViewObserveDisplayingChildModel(
+        sliverList: _obj,
         index: targetFirstChild.index,
         renderObject: targetFirstChild,
       ),

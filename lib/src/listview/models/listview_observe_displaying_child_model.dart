@@ -1,13 +1,20 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class ListViewObserveDisplayingChildModel {
+  /// The target sliverList
+  RenderSliverList sliverList;
+
   /// The index of child widget.
   final int index;
 
   /// The renderObject [RenderBox] of child widget.
   final RenderBox renderObject;
 
+  /// Size of child
+  Size get size => renderObject.size;
+
   ListViewObserveDisplayingChildModel({
+    required this.sliverList,
     required this.index,
     required this.renderObject,
   });
