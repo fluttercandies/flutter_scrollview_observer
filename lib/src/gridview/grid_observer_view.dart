@@ -9,10 +9,13 @@ class GridViewObserver extends StatefulWidget {
   final Widget child;
 
   /// The callback of getting all sliverGrid's buildContext.
-  final List<BuildContext> Function() sliverGridContexts;
+  final List<BuildContext> Function()? sliverGridContexts;
 
   /// The callback of geting observed result map.
-  final Function(Map<BuildContext, GridViewObserveModel>) onObserve;
+  final Function(Map<BuildContext, GridViewObserveModel>)? onObserveAll;
+
+  /// The callback of geting observed result for first sliverGrid.
+  final Function(GridViewObserveModel)? onObserve;
 
   /// Calculate offset.
   final double leadingOffset;
@@ -31,8 +34,9 @@ class GridViewObserver extends StatefulWidget {
   const GridViewObserver({
     Key? key,
     required this.child,
-    required this.sliverGridContexts,
-    required this.onObserve,
+    this.sliverGridContexts,
+    this.onObserveAll,
+    this.onObserve,
     this.leadingOffset = 0,
     this.dynamicLeadingOffset,
     this.toNextOverPercent = 1,
@@ -44,6 +48,9 @@ class GridViewObserver extends StatefulWidget {
 }
 
 class _GridViewObserverState extends State<GridViewObserver> {
+  /// Target SliverGrid BuildContext
+  List<BuildContext> targetSliverGridContexts = [];
+
   /// The last observation result
   Map<BuildContext, GridViewObserveModel> lastResultMap = {};
 
@@ -66,11 +73,36 @@ class _GridViewObserverState extends State<GridViewObserver> {
 
   /// Handle all buildContext
   _handleContexts() {
-    final sliverListContexts = widget.sliverGridContexts;
-    var ctxs = sliverListContexts();
+    final onObserve = widget.onObserve;
+    final onObserveAll = widget.onObserveAll;
+    if (onObserve == null && onObserveAll == null) return;
+
+    List<BuildContext> ctxs = targetSliverGridContexts;
+    if (ctxs.isEmpty) {
+      final sliverListContexts = widget.sliverGridContexts;
+      if (sliverListContexts != null) {
+        ctxs = sliverListContexts();
+      } else {
+        List<BuildContext> _ctxs = [];
+        void visitor(Element element) {
+          if (element.renderObject is RenderSliverGrid) {
+            /// Find the target sliverGrid context
+            _ctxs.add(element);
+            return;
+          }
+          element.visitChildren(visitor);
+        }
+
+        context.visitChildElements(visitor);
+        ctxs = _ctxs;
+      }
+    }
+
     Map<BuildContext, GridViewObserveModel> resultMap = {};
     Map<BuildContext, GridViewObserveModel> changeResultMap = {};
-    for (var ctx in ctxs) {
+    GridViewObserveModel? changeResultModel;
+    for (var i = 0; i < ctxs.length; i++) {
+      final ctx = ctxs[i];
       final targetObserveModel = _handleObserve(ctx);
       if (targetObserveModel == null) continue;
       resultMap[ctx] = targetObserveModel;
@@ -81,12 +113,21 @@ class _GridViewObserverState extends State<GridViewObserver> {
       } else if (lastResultModel != targetObserveModel) {
         changeResultMap[ctx] = targetObserveModel;
       }
+
+      // Geting observed result for first gridtView
+      if (i == 0 && changeResultMap[ctx] != null) {
+        changeResultModel = changeResultMap[ctx];
+      }
     }
 
     lastResultMap = resultMap;
 
-    if (changeResultMap.isNotEmpty) {
-      widget.onObserve(changeResultMap);
+    if (onObserve != null && changeResultModel != null) {
+      onObserve(changeResultModel);
+    }
+
+    if (onObserveAll != null && changeResultMap.isNotEmpty) {
+      onObserveAll(changeResultMap);
     }
   }
 
@@ -95,6 +136,7 @@ class _GridViewObserverState extends State<GridViewObserver> {
     if (_obj is! RenderSliverGrid) return null;
     if (!(_obj.geometry?.visible ?? true)) {
       return GridViewObserveModel(
+        sliverGrid: _obj,
         visible: false,
         firstGroupChildList: [],
         displayingChildModelList: [],
@@ -157,6 +199,7 @@ class _GridViewObserverState extends State<GridViewObserver> {
 
     List<GridViewObserveDisplayingChildModel> firstGroupChildModelList = [
       GridViewObserveDisplayingChildModel(
+        sliverGrid: _obj,
         index: targetFirstChild.index,
         renderObject: targetFirstChild,
       ),
@@ -182,6 +225,7 @@ class _GridViewObserverState extends State<GridViewObserver> {
       }
 
       firstGroupChildModelList.add(GridViewObserveDisplayingChildModel(
+        sliverGrid: _obj,
         index: nextChild.index,
         renderObject: nextChild,
       ));
@@ -208,6 +252,7 @@ class _GridViewObserverState extends State<GridViewObserver> {
         break;
       }
       showingChildModelList.add(GridViewObserveDisplayingChildModel(
+        sliverGrid: _obj,
         index: displayingChild.index,
         renderObject: displayingChild,
       ));
@@ -215,6 +260,7 @@ class _GridViewObserverState extends State<GridViewObserver> {
     }
 
     return GridViewObserveModel(
+      sliverGrid: _obj,
       visible: true,
       firstGroupChildList: firstGroupChildModelList,
       displayingChildModelList: showingChildModelList,

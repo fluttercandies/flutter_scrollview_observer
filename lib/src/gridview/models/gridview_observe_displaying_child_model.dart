@@ -1,16 +1,17 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:scrollview_observer/src/common/models/observe_displaying_child_model.dart';
+import 'package:scrollview_observer/src/common/models/observe_displaying_child_model_mixin.dart';
 
-class GridViewObserveDisplayingChildModel {
-  /// The index of child widget.
-  final int index;
-
-  /// The renderObject [RenderBox] of child widget.
-  final RenderBox renderObject;
-
+class GridViewObserveDisplayingChildModel extends ObserveDisplayingChildModel
+    with ObserveDisplayingChildModelMixin {
   GridViewObserveDisplayingChildModel({
-    required this.index,
-    required this.renderObject,
-  });
+    required this.sliverGrid,
+    required int index,
+    required RenderBox renderObject,
+  }) : super(sliver: sliverGrid, index: index, renderObject: renderObject);
+
+  /// The target sliverGrid
+  RenderSliverGrid sliverGrid;
 
   @override
   bool operator ==(Object other) {

@@ -1,11 +1,19 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
+import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer/src/common/models/observe_model.dart';
 
-import 'listview_observe_displaying_child_model.dart';
-
-class ListViewObserveModel {
-  /// Whether this sliver should be painted.
-  final bool visible;
+class ListViewObserveModel extends ObserveModel {
+  ListViewObserveModel({
+    required this.sliverList,
+    required this.firstChild,
+    required this.displayingChildModelList,
+    required bool visible,
+  }) : super(
+          visible: visible,
+          sliver: sliverList,
+          innerDisplayingChildModelList: displayingChildModelList,
+        );
 
   /// The target sliverList
   RenderSliverList sliverList;
@@ -15,23 +23,6 @@ class ListViewObserveModel {
 
   /// Stores model list for children widgets those are displaying.
   final List<ListViewObserveDisplayingChildModel> displayingChildModelList;
-
-  /// Stores index list for children widgets those are displaying.
-  List<int> get displayingChildIndexList =>
-      displayingChildModelList.map((e) => e.index).toList();
-
-  /// The axis of sliverList
-  Axis get axis => sliverList.constraints.axis;
-
-  /// The scroll offset of sliverList
-  double get scrollOffset => sliverList.constraints.scrollOffset;
-
-  ListViewObserveModel({
-    required this.sliverList,
-    required this.visible,
-    required this.firstChild,
-    required this.displayingChildModelList,
-  });
 
   @override
   bool operator ==(Object other) {

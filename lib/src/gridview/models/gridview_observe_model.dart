@@ -1,26 +1,29 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
+import 'package:scrollview_observer/src/common/models/observe_model.dart';
 
 import 'gridview_observe_displaying_child_model.dart';
 
-class GridViewObserveModel {
-  /// Whether this sliver should be painted.
-  final bool visible;
+class GridViewObserveModel extends ObserveModel {
+  GridViewObserveModel({
+    required this.sliverGrid,
+    required this.firstGroupChildList,
+    required this.displayingChildModelList,
+    required bool visible,
+  }) : super(
+          visible: visible,
+          sliver: sliverGrid,
+          innerDisplayingChildModelList: displayingChildModelList,
+        );
+
+  /// The target sliverGrid
+  RenderSliverGrid sliverGrid;
 
   /// The first group child widgets those are displaying.
   final List<GridViewObserveDisplayingChildModel> firstGroupChildList;
 
   /// Stores model list for children widgets those are displaying.
   final List<GridViewObserveDisplayingChildModel> displayingChildModelList;
-
-  /// Stores index list for children widgets those are displaying.
-  List<int> get displayingChildIndexList =>
-      displayingChildModelList.map((e) => e.index).toList();
-
-  GridViewObserveModel({
-    required this.visible,
-    required this.firstGroupChildList,
-    required this.displayingChildModelList,
-  });
 
   @override
   bool operator ==(Object other) {

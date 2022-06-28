@@ -12,7 +12,10 @@ class ListViewObserver extends StatefulWidget {
   final List<BuildContext> Function()? sliverListContexts;
 
   /// The callback of geting observed result map.
-  final Function(Map<BuildContext, ListViewObserveModel>) onObserve;
+  final Function(Map<BuildContext, ListViewObserveModel>)? onObserveAll;
+
+  /// The callback of geting observed result for first listView.
+  final Function(ListViewObserveModel)? onObserve;
 
   /// Calculate offset.
   final double leadingOffset;
@@ -32,7 +35,8 @@ class ListViewObserver extends StatefulWidget {
     Key? key,
     required this.child,
     this.sliverListContexts,
-    required this.onObserve,
+    this.onObserveAll,
+    this.onObserve,
     this.leadingOffset = 0,
     this.dynamicLeadingOffset,
     this.toNextOverPercent = 1,
@@ -69,6 +73,10 @@ class _ListViewObserverState extends State<ListViewObserver> {
 
   /// Handle all buildContext
   _handleContexts() {
+    final onObserve = widget.onObserve;
+    final onObserveAll = widget.onObserveAll;
+    if (onObserve == null && onObserveAll == null) return;
+
     List<BuildContext> ctxs = targetSliverListContexts;
     if (ctxs.isEmpty) {
       final sliverListContexts = widget.sliverListContexts;
@@ -92,7 +100,9 @@ class _ListViewObserverState extends State<ListViewObserver> {
 
     Map<BuildContext, ListViewObserveModel> resultMap = {};
     Map<BuildContext, ListViewObserveModel> changeResultMap = {};
-    for (var ctx in ctxs) {
+    ListViewObserveModel? changeResultModel;
+    for (var i = 0; i < ctxs.length; i++) {
+      final ctx = ctxs[i];
       final targetObserveModel = _handleObserve(ctx);
       if (targetObserveModel == null) continue;
       resultMap[ctx] = targetObserveModel;
@@ -103,12 +113,21 @@ class _ListViewObserverState extends State<ListViewObserver> {
       } else if (lastResultModel != targetObserveModel) {
         changeResultMap[ctx] = targetObserveModel;
       }
+
+      // Geting observed result for first listView
+      if (i == 0 && changeResultMap[ctx] != null) {
+        changeResultModel = changeResultMap[ctx];
+      }
     }
 
     lastResultMap = resultMap;
 
-    if (changeResultMap.isNotEmpty) {
-      widget.onObserve(changeResultMap);
+    if (onObserve != null && changeResultModel != null) {
+      onObserve(changeResultModel);
+    }
+
+    if (onObserveAll != null && changeResultMap.isNotEmpty) {
+      onObserveAll(changeResultMap);
     }
   }
 
