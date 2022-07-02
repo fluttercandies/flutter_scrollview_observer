@@ -1,137 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:scrollview_observer/src/common/observer_widget.dart';
 import 'package:scrollview_observer/src/notification.dart';
 
 import 'models/gridview_observe_displaying_child_model.dart';
 import 'models/gridview_observe_model.dart';
 
-class GridViewObserver extends StatefulWidget {
-  final Widget child;
-
+class GridViewObserver extends ObserverWidget<GridViewObserveModel,
+    GridViewOnceObserveNotification, RenderSliverGrid> {
   /// The callback of getting all sliverGrid's buildContext.
   final List<BuildContext> Function()? sliverGridContexts;
 
-  /// The callback of geting observed result map.
-  final Function(Map<BuildContext, GridViewObserveModel>)? onObserveAll;
-
-  /// The callback of geting observed result for first sliverGrid.
-  final Function(GridViewObserveModel)? onObserve;
-
-  /// Calculate offset.
-  final double leadingOffset;
-
-  /// Calculate offset dynamically
-  /// If this callback is implemented, the [leadingOffset] property will be
-  /// invalid.
-  final double Function()? dynamicLeadingOffset;
-
-  /// After the internal logic figure out the first child widget, if the
-  /// proportion of the size of the child widget blocked to its own size exceeds
-  /// the value [toNextOverPercent], the next child widget will be the first
-  /// child widget.
-  final double toNextOverPercent;
-
   const GridViewObserver({
     Key? key,
-    required this.child,
+    required Widget child,
     this.sliverGridContexts,
-    this.onObserveAll,
-    this.onObserve,
-    this.leadingOffset = 0,
-    this.dynamicLeadingOffset,
-    this.toNextOverPercent = 1,
-  })  : assert(toNextOverPercent > 0 && toNextOverPercent <= 1),
-        super(key: key);
+    Function(Map<BuildContext, GridViewObserveModel>)? onObserveAll,
+    Function(GridViewObserveModel)? onObserve,
+    double leadingOffset = 0,
+    double Function()? dynamicLeadingOffset,
+    double toNextOverPercent = 1,
+  }) : super(
+          key: key,
+          child: child,
+          sliverContexts: sliverGridContexts,
+          onObserveAll: onObserveAll,
+          onObserve: onObserve,
+          leadingOffset: leadingOffset,
+          dynamicLeadingOffset: dynamicLeadingOffset,
+          toNextOverPercent: toNextOverPercent,
+        );
 
   @override
   State<GridViewObserver> createState() => _GridViewObserverState();
 }
 
-class _GridViewObserverState extends State<GridViewObserver> {
-  /// Target SliverGrid BuildContext
-  List<BuildContext> targetSliverGridContexts = [];
-
-  /// The last observation result
-  Map<BuildContext, GridViewObserveModel> lastResultMap = {};
-
+class _GridViewObserverState extends ObserverWidgetState<GridViewObserver,
+    GridViewObserveModel, GridViewOnceObserveNotification, RenderSliverGrid> {
   @override
-  Widget build(BuildContext context) {
-    return NotificationListener<GridViewOnceObserveNotification>(
-      onNotification: (_) {
-        _handleContexts();
-        return true;
-      },
-      child: NotificationListener<ScrollNotification>(
-        onNotification: (notification) {
-          _handleContexts();
-          return false;
-        },
-        child: widget.child,
-      ),
-    );
-  }
-
-  /// Handle all buildContext
-  _handleContexts() {
-    final onObserve = widget.onObserve;
-    final onObserveAll = widget.onObserveAll;
-    if (onObserve == null && onObserveAll == null) return;
-
-    List<BuildContext> ctxs = targetSliverGridContexts;
-    if (ctxs.isEmpty) {
-      final sliverListContexts = widget.sliverGridContexts;
-      if (sliverListContexts != null) {
-        ctxs = sliverListContexts();
-      } else {
-        List<BuildContext> _ctxs = [];
-        void visitor(Element element) {
-          if (element.renderObject is RenderSliverGrid) {
-            /// Find the target sliverGrid context
-            _ctxs.add(element);
-            return;
-          }
-          element.visitChildren(visitor);
-        }
-
-        context.visitChildElements(visitor);
-        ctxs = _ctxs;
-      }
-    }
-
-    Map<BuildContext, GridViewObserveModel> resultMap = {};
-    Map<BuildContext, GridViewObserveModel> changeResultMap = {};
-    GridViewObserveModel? changeResultModel;
-    for (var i = 0; i < ctxs.length; i++) {
-      final ctx = ctxs[i];
-      final targetObserveModel = _handleObserve(ctx);
-      if (targetObserveModel == null) continue;
-      resultMap[ctx] = targetObserveModel;
-
-      final lastResultModel = lastResultMap[ctx];
-      if (lastResultModel == null) {
-        changeResultMap[ctx] = targetObserveModel;
-      } else if (lastResultModel != targetObserveModel) {
-        changeResultMap[ctx] = targetObserveModel;
-      }
-
-      // Geting observed result for first gridtView
-      if (i == 0 && changeResultMap[ctx] != null) {
-        changeResultModel = changeResultMap[ctx];
-      }
-    }
-
-    lastResultMap = resultMap;
-
-    if (onObserve != null && changeResultModel != null) {
-      onObserve(changeResultModel);
-    }
-
-    if (onObserveAll != null && changeResultMap.isNotEmpty) {
-      onObserveAll(changeResultMap);
-    }
-  }
-
-  GridViewObserveModel? _handleObserve(BuildContext ctx) {
+  GridViewObserveModel? handleObserve(BuildContext ctx) {
     final _obj = ctx.findRenderObject();
     if (_obj is! RenderSliverGrid) return null;
     if (!(_obj.geometry?.visible ?? true)) {
@@ -161,7 +68,7 @@ class _GridViewObserverState extends State<GridViewObserver> {
     var targetFirstChild = firstChild;
     var lastFirstGroupChildWidget = targetFirstChild;
 
-    while (!_isTargetFirstWidget(
+    while (!isTargetFirstWidget(
       listViewOffset: listViewOffset,
       scrollDirection: scrollDirection,
       targetFirstChild: targetFirstChild,
@@ -243,7 +150,7 @@ class _GridViewObserverState extends State<GridViewObserver> {
     final listViewBottomOffset =
         rawListViewOffset + _obj.constraints.remainingPaintExtent;
     var displayingChild = _obj.childAfter(lastFirstGroupChildWidget);
-    while (_isDisplayingChild(
+    while (isDisplayingChild(
       targetChild: displayingChild,
       listViewBottomOffset: listViewBottomOffset,
     )) {
@@ -265,41 +172,5 @@ class _GridViewObserverState extends State<GridViewObserver> {
       firstGroupChildList: firstGroupChildModelList,
       displayingChildModelList: showingChildModelList,
     );
-  }
-
-  /// Determines whether the target child widget is the first widget being
-  /// displayed
-  bool _isTargetFirstWidget({
-    required double listViewOffset,
-    required Axis scrollDirection,
-    required RenderBox targetFirstChild,
-  }) {
-    final parentData = targetFirstChild.parentData;
-    if (parentData is! SliverMultiBoxAdaptorParentData) {
-      return false;
-    }
-    final targetFirstChildOffset = parentData.layoutOffset ?? 0;
-    final targetFirstChildSize = scrollDirection == Axis.vertical
-        ? targetFirstChild.size.height
-        : targetFirstChild.size.width;
-    return listViewOffset <=
-        targetFirstChildSize * widget.toNextOverPercent +
-            targetFirstChildOffset;
-  }
-
-  /// Determines whether the target child widget is being displayed
-  bool _isDisplayingChild({
-    required RenderBox? targetChild,
-    required double listViewBottomOffset,
-  }) {
-    if (targetChild == null) {
-      return false;
-    }
-    final parentData = targetChild.parentData;
-    if (parentData is! SliverMultiBoxAdaptorParentData) {
-      return false;
-    }
-    final targetChildLayoutOffset = parentData.layoutOffset ?? 0;
-    return targetChildLayoutOffset < listViewBottomOffset;
   }
 }
