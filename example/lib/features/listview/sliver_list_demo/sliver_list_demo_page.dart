@@ -44,7 +44,7 @@ class _SliverListViewDemoPageState extends State<SliverListViewDemoPage> {
             if (_sliverListViewCtx2 != null) _sliverListViewCtx2!,
           ];
         },
-        onObserve: (resultMap) {
+        onObserveAll: (resultMap) {
           final model1 = resultMap[_sliverListViewCtx1];
           if (model1 != null && model1.visible) {
             print('1 visible -- ${model1.visible}');

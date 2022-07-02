@@ -23,7 +23,7 @@ class _VideoListAutoPlayPageState extends State<VideoListAutoPlayPage> {
         sliverListContexts: () {
           return [if (_ctx1 != null) _ctx1!];
         },
-        onObserve: (resultMap) {
+        onObserveAll: (resultMap) {
           final model = resultMap[_ctx1];
           if (model == null) return;
 

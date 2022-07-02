@@ -42,7 +42,7 @@ class _AnchorListPageState extends State<AnchorListPage>
         sliverListContexts: () {
           return [if (_sliverListViewContext != null) _sliverListViewContext!];
         },
-        onObserve: (resultMap) {
+        onObserveAll: (resultMap) {
           final model = resultMap[_sliverListViewContext];
           if (model == null) return;
 

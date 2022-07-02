@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
-class HorizontalGridViewDemoPage extends StatefulWidget {
-  const HorizontalGridViewDemoPage({Key? key}) : super(key: key);
+class GridViewCtxDemoPage extends StatefulWidget {
+  const GridViewCtxDemoPage({Key? key}) : super(key: key);
 
   @override
-  State<HorizontalGridViewDemoPage> createState() =>
-      _HorizontalGridViewDemoPageState();
+  State<GridViewCtxDemoPage> createState() => _GridViewCtxDemoPageState();
 }
 
-class _HorizontalGridViewDemoPageState
-    extends State<HorizontalGridViewDemoPage> {
+class _GridViewCtxDemoPageState extends State<GridViewCtxDemoPage> {
   BuildContext? _sliverGridViewContext;
 
   List<int> _hitIndexs = [];
@@ -36,7 +34,6 @@ class _HorizontalGridViewDemoPageState
         onObserveAll: (resultMap) {
           final model = resultMap[_sliverGridViewContext];
           if (model == null) return;
-
           setState(() {
             _hitIndexs = model.firstGroupChildList.map((e) => e.index).toList();
           });
@@ -52,14 +49,19 @@ class _HorizontalGridViewDemoPageState
 
   Widget _buildGridView() {
     return GridView.builder(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.only(left: 400, right: 1000),
-      controller: ScrollController(initialScrollOffset: 400),
+      padding: const EdgeInsets.only(top: 1000, bottom: 1000),
+      controller: ScrollController(initialScrollOffset: 1000),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
+        crossAxisCount: 2,
         crossAxisSpacing: 2,
         mainAxisSpacing: 5,
       ),
+      // gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+      //   maxCrossAxisExtent: 140.0,
+      //   childAspectRatio: 0.6,
+      //   crossAxisSpacing: 2,
+      //   mainAxisSpacing: 5,
+      // ),
       itemBuilder: (context, index) {
         if (_sliverGridViewContext != context) {
           _sliverGridViewContext = context;
@@ -71,7 +73,7 @@ class _HorizontalGridViewDemoPageState
           ),
         );
       },
-      itemCount: 100,
+      itemCount: 50,
     );
   }
 }

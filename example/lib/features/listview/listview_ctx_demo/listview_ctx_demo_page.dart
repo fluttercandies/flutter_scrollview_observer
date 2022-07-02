@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
-class HorizontalListViewPage extends StatefulWidget {
-  const HorizontalListViewPage({Key? key}) : super(key: key);
+class ListViewCtxDemoPage extends StatefulWidget {
+  const ListViewCtxDemoPage({Key? key}) : super(key: key);
 
   @override
-  State<HorizontalListViewPage> createState() => _HorizontalListViewPageState();
+  State<ListViewCtxDemoPage> createState() => _ListViewCtxDemoPageState();
 }
 
-class _HorizontalListViewPageState extends State<HorizontalListViewPage> {
+class _ListViewCtxDemoPageState extends State<ListViewCtxDemoPage> {
   BuildContext? _sliverListViewContext;
 
   int _hitIndex = 0;
@@ -36,7 +36,8 @@ class _HorizontalListViewPageState extends State<HorizontalListViewPage> {
           final model = resultMap[_sliverListViewContext];
           if (model == null) return;
 
-          print('firstChild.index -- ${model.firstChild?.index ?? 0}');
+          print('visible -- ${model.visible}');
+          print('firstChild.index -- ${model.firstChild?.index}');
           print('displaying -- ${model.displayingChildIndexList}');
           setState(() {
             _hitIndex = model.firstChild?.index ?? 0;
@@ -47,7 +48,20 @@ class _HorizontalListViewPageState extends State<HorizontalListViewPage> {
   }
 
   ListView _buildListView() {
+    // return ListView.builder(
+    //   padding: EdgeInsets.zero,
+    //   itemCount: 200,
+    //   itemBuilder: (ctx, index) {
+    //     if (_sliverListViewContext != ctx) {
+    //       _sliverListViewContext = ctx;
+    //     }
+    //     return _buildListItemView(index);
+    //   },
+    // );
+
     return ListView.separated(
+      padding: const EdgeInsets.only(top: 1000, bottom: 1000),
+      controller: ScrollController(initialScrollOffset: 1000),
       itemBuilder: (ctx, index) {
         if (_sliverListViewContext != ctx) {
           _sliverListViewContext = ctx;
@@ -58,13 +72,12 @@ class _HorizontalListViewPageState extends State<HorizontalListViewPage> {
         return _buildSeparatorView();
       },
       itemCount: 50,
-      scrollDirection: Axis.horizontal,
     );
   }
 
   Widget _buildListItemView(int index) {
     return Container(
-      width: (index % 2 == 0) ? 180 : 150,
+      height: (index % 2 == 0) ? 80 : 50,
       color: _hitIndex == index ? Colors.red : Colors.black12,
       child: Center(
         child: Text(
@@ -80,7 +93,7 @@ class _HorizontalListViewPageState extends State<HorizontalListViewPage> {
   Container _buildSeparatorView() {
     return Container(
       color: Colors.white,
-      width: 5,
+      height: 5,
     );
   }
 }

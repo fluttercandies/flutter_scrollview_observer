@@ -9,31 +9,15 @@ class GridViewDemoPage extends StatefulWidget {
 }
 
 class _GridViewDemoPageState extends State<GridViewDemoPage> {
-  BuildContext? _sliverGridViewContext;
-
-  List<int> _hitIndexs = [];
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Trigger an observation manually
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      GridViewOnceObserveNotification().dispatch(_sliverGridViewContext);
-    });
-  }
+  List<int> _hitIndexs = [0, 1];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("GridView")),
       body: GridViewObserver(
-        sliverGridContexts: () {
-          return [if (_sliverGridViewContext != null) _sliverGridViewContext!];
-        },
-        onObserve: (resultMap) {
-          final model = resultMap[_sliverGridViewContext];
-          if (model == null) return;
+        onObserve: (result) {
+          final model = result;
           setState(() {
             _hitIndexs = model.firstGroupChildList.map((e) => e.index).toList();
           });
@@ -56,16 +40,7 @@ class _GridViewDemoPageState extends State<GridViewDemoPage> {
         crossAxisSpacing: 2,
         mainAxisSpacing: 5,
       ),
-      // gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-      //   maxCrossAxisExtent: 140.0,
-      //   childAspectRatio: 0.6,
-      //   crossAxisSpacing: 2,
-      //   mainAxisSpacing: 5,
-      // ),
       itemBuilder: (context, index) {
-        if (_sliverGridViewContext != context) {
-          _sliverGridViewContext = context;
-        }
         return Container(
           color: (_hitIndexs.contains(index)) ? Colors.red : Colors.blue[100],
           child: Center(

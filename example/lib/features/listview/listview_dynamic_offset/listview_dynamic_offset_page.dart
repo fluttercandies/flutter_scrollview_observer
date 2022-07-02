@@ -61,13 +61,13 @@ class _ListViewDynamicOffsetPageState extends State<ListViewDynamicOffsetPage> {
               }
               return _safeAreaPaddingTop + _navContentHeight;
             },
-            onObserve: (resultMap) {
+            onObserveAll: (resultMap) {
               final model = resultMap[_sliverListViewContext];
               if (model == null) return;
 
               print('firstChild.index -- ${model.firstChild?.index}');
               print('displaying -- ${model.displayingChildIndexList}');
-              
+
               setState(() {
                 _hitIndex = model.firstChild?.index ?? 0;
               });

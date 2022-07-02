@@ -9,18 +9,11 @@ class ListViewDemoPage extends StatefulWidget {
 }
 
 class _ListViewDemoPageState extends State<ListViewDemoPage> {
-  BuildContext? _sliverListViewContext;
-
   int _hitIndex = 0;
 
   @override
   void initState() {
     super.initState();
-
-    // Trigger an observation manually
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
-    });
   }
 
   @override
@@ -29,18 +22,12 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
       appBar: AppBar(title: const Text("ListView")),
       body: ListViewObserver(
         child: _buildListView(),
-        sliverListContexts: () {
-          return [if (_sliverListViewContext != null) _sliverListViewContext!];
-        },
-        onObserve: (resultMap) {
-          final model = resultMap[_sliverListViewContext];
-          if (model == null) return;
-
-          print('visible -- ${model.visible}');
-          print('firstChild.index -- ${model.firstChild?.index}');
-          print('displaying -- ${model.displayingChildIndexList}');
+        onObserve: (resultModel) {
+          print('visible -- ${resultModel.visible}');
+          print('firstChild.index -- ${resultModel.firstChild?.index}');
+          print('displaying -- ${resultModel.displayingChildIndexList}');
           setState(() {
-            _hitIndex = model.firstChild?.index ?? 0;
+            _hitIndex = resultModel.firstChild?.index ?? 0;
           });
         },
       ),
@@ -48,24 +35,10 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
   }
 
   ListView _buildListView() {
-    // return ListView.builder(
-    //   padding: EdgeInsets.zero,
-    //   itemCount: 200,
-    //   itemBuilder: (ctx, index) {
-    //     if (_sliverListViewContext != ctx) {
-    //       _sliverListViewContext = ctx;
-    //     }
-    //     return _buildListItemView(index);
-    //   },
-    // );
-
     return ListView.separated(
       padding: const EdgeInsets.only(top: 1000, bottom: 1000),
       controller: ScrollController(initialScrollOffset: 1000),
       itemBuilder: (ctx, index) {
-        if (_sliverListViewContext != ctx) {
-          _sliverListViewContext = ctx;
-        }
         return _buildListItemView(index);
       },
       separatorBuilder: (ctx, index) {

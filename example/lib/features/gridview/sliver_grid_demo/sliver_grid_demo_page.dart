@@ -36,7 +36,7 @@ class _SliverGridViewDemoPageState extends State<SliverGridViewDemoPage> {
             if (_sliverGridViewContext2 != null) _sliverGridViewContext2!
           ];
         },
-        onObserve: (resultMap) {
+        onObserveAll: (resultMap) {
           final model1 = resultMap[_sliverGridViewContext1];
           if (model1 != null && model1.visible) {
             setState(() {
