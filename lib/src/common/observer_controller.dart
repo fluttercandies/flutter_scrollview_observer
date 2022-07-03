@@ -13,14 +13,6 @@ class ObserverController {
     notification.dispatch(_sliverContext);
   }
 
-  jumpTo({
-    required int index,
-    BuildContext? sliverContext,
-  }) {
-    BuildContext? _sliverContext = fetchSliverContext(sliverContext);
-    
-  }
-
   BuildContext? fetchSliverContext(BuildContext? sliverContext) {
     BuildContext? _sliverContext = sliverContext;
     if (_sliverContext == null && sliverContexts.isNotEmpty) {
