@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:scrollview_observer/src/common/observer_controller.dart';
 
 import 'models/observe_model.dart';
 
-class ObserverWidget<M extends ObserveModel, N extends Notification,
-    S extends RenderSliver> extends StatefulWidget {
+class ObserverWidget<C extends ObserverController, M extends ObserveModel,
+    N extends Notification, S extends RenderSliver> extends StatefulWidget {
   final Widget child;
+
+  /// An object that can be used to dispatch a [ListViewOnceObserveNotification]
+  /// or [GridViewOnceObserveNotification].
+  final C? sliverController;
 
   /// The callback of getting all sliver's buildContext.
   final List<BuildContext> Function()? sliverContexts;
@@ -33,6 +38,7 @@ class ObserverWidget<M extends ObserveModel, N extends Notification,
   const ObserverWidget({
     Key? key,
     required this.child,
+    this.sliverController,
     this.sliverContexts,
     this.onObserveAll,
     this.onObserve,
@@ -44,19 +50,32 @@ class ObserverWidget<M extends ObserveModel, N extends Notification,
 
   @override
   State<ObserverWidget> createState() =>
-      ObserverWidgetState<ObserverWidget<M, N, S>, M, N, S>();
+      ObserverWidgetState<C, M, N, S, ObserverWidget<C, M, N, S>>();
 }
 
 class ObserverWidgetState<
-    T extends ObserverWidget<M, N, S>,
+    C extends ObserverController,
     M extends ObserveModel,
     N extends Notification,
-    S extends RenderSliver> extends State<T> {
+    S extends RenderSliver,
+    T extends ObserverWidget<C, M, N, S>> extends State<T> {
   /// Target sliver [BuildContext]
   List<BuildContext> targetSliverContexts = [];
 
   /// The last observation result
   Map<BuildContext, M> lastResultMap = {};
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.sliverController != null) {
+      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+        targetSliverContexts = fetchTargetSliverContexts();
+        widget.sliverController?.sliverContexts = targetSliverContexts;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +95,7 @@ class ObserverWidgetState<
   }
 
   /// Featch target sliver [BuildContext]s
-  List<BuildContext> _fetchTargetSliverContexts() {
+  List<BuildContext> fetchTargetSliverContexts() {
     List<BuildContext> ctxs = targetSliverContexts;
     if (ctxs.isEmpty) {
       final sliverListContexts = widget.sliverContexts;
@@ -92,7 +111,6 @@ class ObserverWidgetState<
           }
           element.visitChildren(visitor);
         }
-
         context.visitChildElements(visitor);
         ctxs = _ctxs;
       }
@@ -106,7 +124,7 @@ class ObserverWidgetState<
     final onObserveAll = widget.onObserveAll;
     if (onObserve == null && onObserveAll == null) return;
 
-    List<BuildContext> ctxs = _fetchTargetSliverContexts();
+    List<BuildContext> ctxs = fetchTargetSliverContexts();
 
     Map<BuildContext, M> resultMap = {};
     Map<BuildContext, M> changeResultMap = {};

@@ -11,9 +11,21 @@ class ListViewDemoPage extends StatefulWidget {
 class _ListViewDemoPageState extends State<ListViewDemoPage> {
   int _hitIndex = 0;
 
+  ListObserverController controller = ListObserverController();
+
   @override
   void initState() {
     super.initState();
+
+    // Trigger an observation manually
+    WidgetsBinding.instance?.endOfFrame.then(
+      (_) {
+        // After layout
+        if (mounted) {
+          controller.dispatchOnceObserve();
+        }
+      },
+    );
   }
 
   @override
@@ -22,6 +34,7 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
       appBar: AppBar(title: const Text("ListView")),
       body: ListViewObserver(
         child: _buildListView(),
+        controller: controller,
         onObserve: (resultModel) {
           print('visible -- ${resultModel.visible}');
           print('firstChild.index -- ${resultModel.firstChild?.index}');

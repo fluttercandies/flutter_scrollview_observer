@@ -3,18 +3,22 @@ import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/common/observer_widget.dart';
 import 'package:scrollview_observer/src/notification.dart';
 
+import 'grid_observer_controller.dart';
 import 'models/gridview_observe_displaying_child_model.dart';
 import 'models/gridview_observe_model.dart';
 
-class GridViewObserver extends ObserverWidget<GridViewObserveModel,
-    GridViewOnceObserveNotification, RenderSliverGrid> {
+class GridViewObserver extends ObserverWidget<GridObserverController,
+    GridViewObserveModel, GridViewOnceObserveNotification, RenderSliverGrid> {
   /// The callback of getting all sliverGrid's buildContext.
   final List<BuildContext> Function()? sliverGridContexts;
+
+  final GridObserverController? controller;
 
   const GridViewObserver({
     Key? key,
     required Widget child,
     this.sliverGridContexts,
+    this.controller,
     Function(Map<BuildContext, GridViewObserveModel>)? onObserveAll,
     Function(GridViewObserveModel)? onObserve,
     double leadingOffset = 0,
@@ -24,6 +28,7 @@ class GridViewObserver extends ObserverWidget<GridViewObserveModel,
           key: key,
           child: child,
           sliverContexts: sliverGridContexts,
+          sliverController: controller,
           onObserveAll: onObserveAll,
           onObserve: onObserve,
           leadingOffset: leadingOffset,
@@ -35,8 +40,12 @@ class GridViewObserver extends ObserverWidget<GridViewObserveModel,
   State<GridViewObserver> createState() => _GridViewObserverState();
 }
 
-class _GridViewObserverState extends ObserverWidgetState<GridViewObserver,
-    GridViewObserveModel, GridViewOnceObserveNotification, RenderSliverGrid> {
+class _GridViewObserverState extends ObserverWidgetState<
+    GridObserverController,
+    GridViewObserveModel,
+    GridViewOnceObserveNotification,
+    RenderSliverGrid,
+    GridViewObserver> {
   @override
   GridViewObserveModel? handleObserve(BuildContext ctx) {
     final _obj = ctx.findRenderObject();

@@ -11,11 +11,29 @@ class GridViewDemoPage extends StatefulWidget {
 class _GridViewDemoPageState extends State<GridViewDemoPage> {
   List<int> _hitIndexs = [0, 1];
 
+  GridObserverController controller = GridObserverController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Trigger an observation manually
+    WidgetsBinding.instance?.endOfFrame.then(
+      (_) {
+        if (mounted) {
+          // After layout
+          controller.dispatchOnceObserve();
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("GridView")),
       body: GridViewObserver(
+        controller: controller,
         onObserve: (result) {
           final model = result;
           setState(() {
