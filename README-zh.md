@@ -135,9 +135,6 @@ ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
   
 </details>
 
-
-###
-
 ## 示例
 
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/1.gif)
@@ -145,3 +142,13 @@ ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/2.gif)
 
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/3.gif)
+
+## 关于我
+
+- GitHub: [https://github.com/LinXunFeng](https://github.com/LinXunFeng)
+- Email: [linxunfeng@yeah.net](mailto:linxunfeng@yeah.net)
+- Blogs: 
+  - 全栈行动: [https://fullstackaction.com](https://fullstackaction.com)
+  - 掘金: [https://juejin.cn/user/1820446984512392](https://juejin.cn/user/1820446984512392) 
+
+<img height="267.5" width="481.5" src="https://github.com/LinXunFeng/LinXunFeng/raw/master/static/img/FSAQR.png"/>
