@@ -3,7 +3,6 @@ import 'package:flutter/rendering.dart';
 import 'observe_displaying_child_model.dart';
 
 mixin ObserveDisplayingChildModelMixin on ObserveDisplayingChildModel {
-  
   /// The axis of sliver
   Axis get axis => sliver.constraints.axis;
 
