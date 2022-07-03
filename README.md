@@ -33,6 +33,60 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 
 > Take `ListView` as an example
 
+Parameter description of `ListViewObserver`:
+
+|`Parameter`|`Required`|`Description`|
+|-|-|-|
+|`child`|`yes`|Create `[ListView]` as a child of `[ListViewObserver]`|
+|`sliverListContexts`|`no`|In this callback, we need to return all `[BuildContext]` of the `[ListView]` those needs to be observed. This property is only used when `BuildContext` needs to be specified exactly|
+|`onObserve`|`no`|This callback can listen for information about the child widgets those are currently being displayed in the current first `[Sliver]`|
+|`onObserveAll`|`no`|This callback can listen for information about all the children of slivers that are currently being displayed. This callback is only needed when there are more than one `[Sliver]`|
+
+
+### Method 1: General (Recommended)
+
+> It is relatively simple to use and has a wide application range. In general, only this method is needed
+
+Build `ListViewObserver` and pass the `ListView` instance to the `child` parameter
+
+```dart
+ListViewObserver(
+  child: _buildListView(),
+  onObserve: (resultModel) {
+    print('firstChild.index -- ${resultModel.firstChild?.index}');
+    print('displaying -- ${resultModel.displayingChildIndexList}');
+  },
+)
+```
+
+By default, `ListView` relevant data will only be observed when scrolling.
+
+If needed, you can use `ListObserverController` triggered an observation manually.
+
+```dart
+// Create an instance of [ListObserverController]
+ListObserverController controller = ListObserverController();
+...
+
+// Pass the controller instance to the 'controller' parameter of 'ListViewObserver'
+ListViewObserver(
+  ...
+  controller: controller,
+  ...
+)
+...
+
+// Trigger an observation manually.
+controller.dispatchOnceObserve();
+```
+
+### Method 2: specify `BuildContext` for `Sliver`
+
+> Relatively complex to use, the scope of application is small, there are more than one `Sliver` is possible to use this method
+
+<details>
+  <summary>Detailed instructions</summary>
+
 ```dart
 BuildContext? _sliverListViewContext;
 ```
@@ -55,10 +109,6 @@ ListView _buildListView() {
 
 Create `ListViewObserver`
 
-- `child`: Create `ListView` as a child of `ListViewObserver`
-- `sliverListContexts`: In this callback, we need to return all `BuildContext` of the ListView those needs to be observed
-- `onObserve`: This callback can listen for information about the child widgets those are currently being displayed
-
 ```dart
 ListViewObserver(
   child: _buildListView(),
@@ -78,13 +128,15 @@ ListViewObserver(
 )
 ```
 
-By default, `ListView` relevant data will only be observed when rolling.
+By default, `ListView` relevant data will only be observed when scrolling.
 
 If needed, you can use `ListViewOnceObserveNotification` triggered an observation manually.
 
 ```dart
 ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
 ```
+  
+</details>
 
 ## Example
 

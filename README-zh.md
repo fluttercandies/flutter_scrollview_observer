@@ -31,6 +31,59 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 
 > 以 `ListView` 为例
 
+`ListViewObserver` 的参数说明：
+
+|参数|必传|说明|
+|-|-|-|
+|`child`|是|将构建的 `ListView` 做为 `ListViewObserver` 的子部件|
+|`sliverListContexts`|否|该回调中返回需要被观察的 `ListView` 的 `BuildContext`，在需要精确指定 `BuildContext` 时才会用到该参数|
+|`onObserve`|否|该回调可以监听到当前 `第一个` `Sliver` 中正在显示中的子部件的相关信息|
+|`onObserveAll`|否|该回调可以监听到当前 `所有` `Sliver` 正在显示中的子部件的相关信息，当有多个 `Sliver` 时才需要使用到这个回调|
+
+### 方式一：常规（推荐）
+
+> 使用上比较简单，应用范围广，一般情况下只需要使用该方式
+
+构建 `ListViewObserver`，将 `ListView` 实例传递给 `child` 参数
+
+```dart
+ListViewObserver(
+  child: _buildListView(),
+  onObserve: (resultModel) {
+    print('firstChild.index -- ${resultModel.firstChild?.index}');
+    print('displaying -- ${resultModel.displayingChildIndexList}');
+  },
+)
+```
+
+默认是 `ListView` 在滚动的时候才会观察到相关数据。
+
+如果需要，可以使用 `ListObserverController` 进行手动触发一次观察
+
+```dart
+// 创建 `ListObserverController` 实例
+ListObserverController controller = ListObserverController();
+...
+
+// 传递给 `ListViewObserver` 的 `controller` 参数
+ListViewObserver(
+  ...
+  controller: controller,
+  ...
+)
+...
+
+// 手动触发一次观察
+controller.dispatchOnceObserve();
+```
+
+### 方式二：指明 `Sliver` 的 `BuildContext`
+
+> 使用上相对复杂，应用范围小，存在多个 `Sliver` 时才有可能会用到该方式
+
+<details>
+  <summary>具体说明</summary>
+
 ```dart
 BuildContext? _sliverListViewContext;
 ```
@@ -52,10 +105,6 @@ ListView _buildListView() {
 ```
 
 构建 `ListViewObserver`
-
-- `child`: 将构建的 `ListView` 做为 `ListViewObserver` 的子部件
-- `sliverListContexts`: 该回调中返回需要被观察的 `ListView` 的 `BuildContext`
-- `onObserve`: 该回调可以监听到当前正在显示中的子部件的相关信息
 
 ```dart
 ListViewObserver(
@@ -83,6 +132,11 @@ ListViewObserver(
 ```dart
 ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
 ```
+  
+</details>
+
+
+###
 
 ## 示例
 
