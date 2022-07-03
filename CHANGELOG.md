@@ -1,3 +1,6 @@
+## 1.0.1
+- Delete useless code
+
 ## 1.0.0
 
 - Implements a way to use without sliver [BuildContext]
