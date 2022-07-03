@@ -35,12 +35,12 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 
 Parameter description of `ListViewObserver`:
 
-|`Parameter`|`Required`|`Description`|
-|-|-|-|
-|`child`|`yes`|Create `[ListView]` as a child of `[ListViewObserver]`|
-|`sliverListContexts`|`no`|In this callback, we need to return all `[BuildContext]` of the `[ListView]` those needs to be observed. This property is only used when `BuildContext` needs to be specified exactly|
-|`onObserve`|`no`|This callback can listen for information about the child widgets those are currently being displayed in the current first `[Sliver]`|
-|`onObserveAll`|`no`|This callback can listen for information about all the children of slivers that are currently being displayed. This callback is only needed when there are more than one `[Sliver]`|
+| `Parameter`          | `Required` | `Description`                                                                                                                                                                           |
+| -------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `child`              | `yes`      | Create `[ListView]` as a child of `[ListViewObserver]`                                                                                                                                  |
+| `sliverListContexts` | `no`       | In this callback, we need to return all `[BuildContext]` of the `[ListView]` those needs to be observed. This property is only used when `[BuildContext]` needs to be specified exactly |
+| `onObserve`          | `no`       | This callback can listen for information about the child widgets those are currently being displayed in the current first `[Sliver]`                                                    |
+| `onObserveAll`       | `no`       | This callback can listen for information about all the children of slivers that are currently being displayed. This callback is only needed when there are more than one `[Sliver]`     |
 
 
 ### Method 1: General (Recommended)
@@ -80,7 +80,7 @@ ListViewObserver(
 controller.dispatchOnceObserve();
 ```
 
-### Method 2: specify `BuildContext` for `Sliver`
+### Method 2: Specify `BuildContext` for `Sliver`
 
 > Relatively complex to use, the scope of application is small, there are more than one `Sliver` is possible to use this method
 
