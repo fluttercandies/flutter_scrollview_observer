@@ -11,18 +11,23 @@ class ListViewDemoPage extends StatefulWidget {
 class _ListViewDemoPageState extends State<ListViewDemoPage> {
   int _hitIndex = 0;
 
-  ListObserverController controller = ListObserverController();
+  ScrollController scrollController =
+      ScrollController(initialScrollOffset: 1000);
+
+  late ListObserverController observerController;
 
   @override
   void initState() {
     super.initState();
+
+    observerController = ListObserverController(controller: scrollController);
 
     // Trigger an observation manually
     WidgetsBinding.instance?.endOfFrame.then(
       (_) {
         // After layout
         if (mounted) {
-          controller.dispatchOnceObserve();
+          observerController.dispatchOnceObserve();
         }
       },
     );
@@ -34,7 +39,7 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
       appBar: AppBar(title: const Text("ListView")),
       body: ListViewObserver(
         child: _buildListView(),
-        controller: controller,
+        controller: observerController,
         onObserve: (resultModel) {
           print('visible -- ${resultModel.visible}');
           print('firstChild.index -- ${resultModel.firstChild?.index}');
@@ -44,20 +49,31 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
           });
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.airline_stops_outlined),
+        onPressed: () {
+          // observerController.jumpTo(index: 100);
+          observerController.animateTo(
+            index: 100,
+            duration: const Duration(seconds: 1),
+            curve: Curves.ease,
+          );
+        },
+      ),
     );
   }
 
   ListView _buildListView() {
     return ListView.separated(
       padding: const EdgeInsets.only(top: 1000, bottom: 1000),
-      controller: ScrollController(initialScrollOffset: 1000),
+      controller: scrollController,
       itemBuilder: (ctx, index) {
         return _buildListItemView(index);
       },
       separatorBuilder: (ctx, index) {
         return _buildSeparatorView();
       },
-      itemCount: 50,
+      itemCount: 500,
     );
   }
 

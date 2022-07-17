@@ -10,7 +10,9 @@ class AnchorListPage extends StatefulWidget {
 
 class _AnchorListPageState extends State<AnchorListPage>
     with SingleTickerProviderStateMixin {
-  BuildContext? _sliverListViewContext;
+  ScrollController scrollController = ScrollController();
+
+  late ListObserverController observerController;
   late TabController _tabController;
   List tabs = ["News(0)", "History(5)", "Picture(10)"];
   List<int> tabIndexs = [0, 5, 10];
@@ -18,6 +20,7 @@ class _AnchorListPageState extends State<AnchorListPage>
   @override
   void initState() {
     super.initState();
+    observerController = ListObserverController(controller: scrollController);
     _tabController = TabController(length: tabs.length, vsync: this);
   }
 
@@ -28,25 +31,25 @@ class _AnchorListPageState extends State<AnchorListPage>
         title: const Text("Anchor ListView"),
         bottom: PreferredSize(
           preferredSize: const Size(double.infinity, 44),
-          child: IgnorePointer(
-            child: TabBar(
-              controller: _tabController,
-              tabs: tabs.map((e) => Tab(text: e)).toList(),
-              onTap: (index) {},
-            ),
+          child: TabBar(
+            controller: _tabController,
+            tabs: tabs.map((e) => Tab(text: e)).toList(),
+            onTap: (index) {
+              observerController.animateTo(
+                index: tabIndexs[index],
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.ease,
+              );
+            },
           ),
         ),
       ),
       body: ListViewObserver(
+        controller: observerController,
         child: _buildListView(),
-        sliverListContexts: () {
-          return [if (_sliverListViewContext != null) _sliverListViewContext!];
-        },
-        onObserveAll: (resultMap) {
-          final model = resultMap[_sliverListViewContext];
-          if (model == null) return;
-
-          final topIndex = model.firstChild?.index ?? 0;
+        onObserve: (resultModel) {
+          if (observerController.isHandlingScroll) return;
+          final topIndex = resultModel.firstChild?.index ?? 0;
           final index = tabIndexs.indexOf(topIndex);
           if (index != -1) {
             _tabController.index = index;
@@ -71,8 +74,8 @@ class _AnchorListPageState extends State<AnchorListPage>
 
   ListView _buildListView() {
     return ListView.separated(
+      controller: scrollController,
       itemBuilder: (ctx, index) {
-        _sliverListViewContext = ctx;
         return _buildListItemView(index);
       },
       separatorBuilder: (ctx, index) {

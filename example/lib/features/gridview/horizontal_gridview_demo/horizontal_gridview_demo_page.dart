@@ -11,13 +11,20 @@ class HorizontalGridViewDemoPage extends StatefulWidget {
 
 class _HorizontalGridViewDemoPageState
     extends State<HorizontalGridViewDemoPage> {
+  static const double _leadingPadding = 1000;
   BuildContext? _sliverGridViewContext;
 
   List<int> _hitIndexs = [];
 
+  ScrollController scrollController =
+      ScrollController(initialScrollOffset: _leadingPadding);
+
+  late GridObserverController observerController;
+
   @override
   void initState() {
     super.initState();
+    observerController = GridObserverController(controller: scrollController);
 
     // Trigger an observation manually
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
@@ -30,6 +37,7 @@ class _HorizontalGridViewDemoPageState
     return Scaffold(
       appBar: AppBar(title: const Text("GridView")),
       body: GridViewObserver(
+        controller: observerController,
         sliverGridContexts: () {
           return [if (_sliverGridViewContext != null) _sliverGridViewContext!];
         },
@@ -47,14 +55,33 @@ class _HorizontalGridViewDemoPageState
         },
         child: _buildGridView(),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.airline_stops_outlined),
+        onPressed: () {
+          if (_sliverGridViewContext != null) {
+            observerController.jumpTo(
+              index: 87,
+              sliverContext: _sliverGridViewContext,
+            );
+          }
+          // observerController.jumpTo(
+          //   index: 87,
+          // );
+          // observerController.animateTo(
+          //   index: 49,
+          //   duration: const Duration(seconds: 1),
+          //   curve: Curves.ease,
+          // );
+        },
+      ),
     );
   }
 
   Widget _buildGridView() {
     return GridView.builder(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.only(left: 400, right: 1000),
-      controller: ScrollController(initialScrollOffset: 400),
+      padding: const EdgeInsets.only(left: _leadingPadding, right: 1000),
+      controller: scrollController,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         crossAxisSpacing: 2,

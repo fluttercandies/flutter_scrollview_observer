@@ -9,20 +9,27 @@ class GridViewDemoPage extends StatefulWidget {
 }
 
 class _GridViewDemoPageState extends State<GridViewDemoPage> {
+  static const double _leadingPadding = 1000;
+
   List<int> _hitIndexs = [0, 1];
 
-  GridObserverController controller = GridObserverController();
+  ScrollController scrollController =
+      ScrollController(initialScrollOffset: _leadingPadding);
+
+  late GridObserverController observerController;
 
   @override
   void initState() {
     super.initState();
+
+    observerController = GridObserverController(controller: scrollController);
 
     // Trigger an observation manually
     WidgetsBinding.instance?.endOfFrame.then(
       (_) {
         if (mounted) {
           // After layout
-          controller.dispatchOnceObserve();
+          observerController.dispatchOnceObserve();
         }
       },
     );
@@ -33,7 +40,7 @@ class _GridViewDemoPageState extends State<GridViewDemoPage> {
     return Scaffold(
       appBar: AppBar(title: const Text("GridView")),
       body: GridViewObserver(
-        controller: controller,
+        controller: observerController,
         onObserve: (result) {
           final model = result;
           setState(() {
@@ -46,13 +53,26 @@ class _GridViewDemoPageState extends State<GridViewDemoPage> {
         },
         child: _buildGridView(),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.airline_stops_outlined),
+        onPressed: () {
+          observerController.jumpTo(
+            index: 49,
+          );
+          // observerController.animateTo(
+          //   index: 49,
+          //   duration: const Duration(seconds: 1),
+          //   curve: Curves.ease,
+          // );
+        },
+      ),
     );
   }
 
   Widget _buildGridView() {
     return GridView.builder(
-      padding: const EdgeInsets.only(top: 1000, bottom: 1000),
-      controller: ScrollController(initialScrollOffset: 1000),
+      padding: const EdgeInsets.only(top: _leadingPadding, bottom: 0),
+      controller: scrollController,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 2,
