@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/common/observer_controller.dart';
+import 'package:scrollview_observer/src/common/typedefs.dart';
 
 import 'models/observe_model.dart';
 
@@ -68,13 +69,7 @@ class ObserverWidgetState<
   @override
   void initState() {
     super.initState();
-
-    if (widget.sliverController != null) {
-      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-        targetSliverContexts = fetchTargetSliverContexts();
-        widget.sliverController?.sliverContexts = targetSliverContexts;
-      });
-    }
+    _setupSliverController();
   }
 
   @override
@@ -94,6 +89,20 @@ class ObserverWidgetState<
     );
   }
 
+  /// Setup sliver controller
+  _setupSliverController() {
+    final sliverController = widget.sliverController;
+    if (sliverController == null) return;
+    sliverController.innerReset();
+    sliverController.innerNeedOnceObserveCallBack = () {
+      _handleContexts();
+    };
+    ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
+      targetSliverContexts = fetchTargetSliverContexts();
+      sliverController.sliverContexts = targetSliverContexts;
+    });
+  }
+
   /// Featch target sliver [BuildContext]s
   List<BuildContext> fetchTargetSliverContexts() {
     List<BuildContext> ctxs = targetSliverContexts;
@@ -111,6 +120,7 @@ class ObserverWidgetState<
           }
           element.visitChildren(visitor);
         }
+
         context.visitChildElements(visitor);
         ctxs = _ctxs;
       }
@@ -123,6 +133,9 @@ class ObserverWidgetState<
     final onObserve = widget.onObserve;
     final onObserveAll = widget.onObserveAll;
     if (onObserve == null && onObserveAll == null) return;
+
+    final isHandlingScroll = widget.sliverController?.isHandlingScroll ?? false;
+    if (isHandlingScroll) return;
 
     List<BuildContext> ctxs = fetchTargetSliverContexts();
 
@@ -170,6 +183,7 @@ class ObserverWidgetState<
     required Axis scrollDirection,
     required RenderBox targetFirstChild,
   }) {
+    if (targetFirstChild is! RenderIndexedSemantics) return false;
     final parentData = targetFirstChild.parentData;
     if (parentData is! SliverMultiBoxAdaptorParentData) {
       return false;
