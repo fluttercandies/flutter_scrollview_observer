@@ -6,6 +6,10 @@ Language: English | [中文](https://github.com/LinXunFeng/flutter_scrollview_ob
 
 
 This is a library of widget that can be used to listen for child widgets those are being displayed in the scroll view.
+## Feature
+
+- [x] Observing child widgets those are being displayed in the scroll view
+- [x] Supports scrolling to the specified index location
 
 ## Support
 - [x] `ListView`
@@ -33,17 +37,21 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 
 > Take `ListView` as an example
 
+### 1、Observing child widgets those are being displayed in the scroll view
+
 Parameter description of `ListViewObserver`:
 
-| `Parameter`          | `Required` | `Description`                                                                                                                                                                           |
-| -------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `child`              | `yes`      | Create `[ListView]` as a child of `[ListViewObserver]`                                                                                                                                  |
-| `sliverListContexts` | `no`       | In this callback, we need to return all `[BuildContext]` of the `[ListView]` those needs to be observed. This property is only used when `[BuildContext]` needs to be specified exactly |
-| `onObserve`          | `no`       | This callback can listen for information about the child widgets those are currently being displayed in the current first `[Sliver]`                                                    |
-| `onObserveAll`       | `no`       | This callback can listen for information about all the children of slivers that are currently being displayed. This callback is only needed when there are more than one `[Sliver]`     |
+| `Parameter`            | `Required` | `Description`                                                                                                                                                                           |
+| ---------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `child`                | `yes`      | Create `[ListView]` as a child of `[ListViewObserver]`                                                                                                                                  |
+| `sliverListContexts`   | `no`       | In this callback, we need to return all `[BuildContext]` of the `[ListView]` those needs to be observed. This property is only used when `[BuildContext]` needs to be specified exactly |
+| `onObserve`            | `no`       | This callback can listen for information about the child widgets those are currently being displayed in the current first `[Sliver]`                                                    |
+| `onObserveAll`         | `no`       | This callback can listen for information about all the children of slivers that are currently being displayed. This callback is only needed when there are more than one `[Sliver]`     |
+| `leadingOffset`        | `no`       | The offset of the head of scroll view. Find the first child start at this offset.                                                                                                      |
+| `dynamicLeadingOffset` | `no`       | This is a callback that provides `[leadingOffset]`, used when the leading offset in the head of the scroll view is dynamic. It has a higher priority than `[leadingOffset]`                                                                                             |
+| `toNextOverPercent`    | `no`       | When the percentage of the first child widget is blocked reaches this value, the next child widget will be the first child that is displaying. The default value is `1`                                                                                                            |
 
-
-### Method 1: General (Recommended)
+#### Method 1: General (Recommended)
 
 > It is relatively simple to use and has a wide application range. In general, only this method is needed
 
@@ -80,7 +88,7 @@ ListViewObserver(
 controller.dispatchOnceObserve();
 ```
 
-### Method 2: Specify `BuildContext` for `Sliver`
+#### Method 2: Specify `BuildContext` for `Sliver`
 
 > Relatively complex to use, the scope of application is small, there are more than one `Sliver` is possible to use this method
 
@@ -137,6 +145,48 @@ ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
 ```
   
 </details>
+
+
+### 2、Scrolling to the specified index location
+
+Create and use instance of `ScrollController` normally.
+
+```dart
+ScrollController scrollController = ScrollController();
+
+ListView _buildListView() {
+  return ListView.separated(
+    controller: scrollController,
+    ...
+  );
+}
+```
+
+Create an instance of `ListObserverController` pass it to `ListViewObserver`
+
+```dart
+ListObserverController observerController = ListObserverController(controller: scrollController);
+
+ListViewObserver(
+  controller: observerController,
+  child: _buildListView(),
+  ...
+)
+```
+
+Now you can scroll to the specified index position
+
+```dart
+// Jump to the specified index position without animation.
+observerController.jumpTo(index: 1)
+
+// Jump to the specified index position with animation.
+observerController.animateTo(
+  index: 1,
+  duration: const Duration(milliseconds: 250),
+  curve: Curves.ease,
+);
+```
 
 ## Example
 

@@ -5,6 +5,10 @@
 Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_observer) | [文章](https://juejin.cn/post/7103058155692621837/)
 
 这是一个可用于监听滚动视图中正在显示的子部件的组件库。
+## 功能点
+
+- [x] 监听滚动视图中正在显示的子部件
+- [x] 支持滚动到指定下标位置
 
 ## 支持
 - [x] `ListView`
@@ -31,16 +35,21 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 
 > 以 `ListView` 为例
 
+### 1、监听滚动视图中正在显示的子部件
+
 `ListViewObserver` 的参数说明：
 
-|参数|必传|说明|
-|-|-|-|
-|`child`|是|将构建的 `ListView` 做为 `ListViewObserver` 的子部件|
-|`sliverListContexts`|否|该回调中返回需要被观察的 `ListView` 的 `BuildContext`，在需要精确指定 `BuildContext` 时才会用到该参数|
-|`onObserve`|否|该回调可以监听到当前 `第一个` `Sliver` 中正在显示中的子部件的相关信息|
-|`onObserveAll`|否|该回调可以监听到当前 `所有` `Sliver` 正在显示中的子部件的相关信息，当有多个 `Sliver` 时才需要使用到这个回调|
+| 参数                   | 必传 | 说明                                                                                                        |
+| ---------------------- | ---- | ----------------------------------------------------------------------------------------------------------- |
+| `child`                | 是   | 将构建的 `ListView` 做为 `ListViewObserver` 的子部件                                                        |
+| `sliverListContexts`   | 否   | 该回调中返回需要被观察的 `ListView` 的 `BuildContext`，在需要精确指定 `BuildContext` 时才会用到该参数       |
+| `onObserve`            | 否   | 该回调可以监听到当前 `第一个` `Sliver` 中正在显示中的子部件的相关信息                                       |
+| `onObserveAll`         | 否   | 该回调可以监听到当前 `所有` `Sliver` 正在显示中的子部件的相关信息，当有多个 `Sliver` 时才需要使用到这个回调 |
+| `leadingOffset`        | 否   | 列表头部的计算偏移量，从该偏移量开始计算首个子部件                                                          |
+| `dynamicLeadingOffset` | 否   | `leadingOffset` 的动态版本，在列表头部的计算偏移量不确定时使用，优先级高于 `leadingOffset`                  |
+| `toNextOverPercent`    | 否   | 首个子部件被遮挡的百分比达到该值时，则下一个子部件为首个子部件，默认值为 `1`                                |
 
-### 方式一：常规（推荐）
+#### 方式一：常规（推荐）
 
 > 使用上比较简单，应用范围广，一般情况下只需要使用该方式
 
@@ -77,7 +86,7 @@ ListViewObserver(
 controller.dispatchOnceObserve();
 ```
 
-### 方式二：指明 `Sliver` 的 `BuildContext`
+#### 方式二：指明 `Sliver` 的 `BuildContext`
 
 > 使用上相对复杂，应用范围小，存在多个 `Sliver` 时才有可能会用到该方式
 
@@ -134,6 +143,47 @@ ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
 ```
   
 </details>
+
+### 2、滚动到指定下标位置
+
+正常创建和使用 `ScrollController` 实例
+
+```dart
+ScrollController scrollController = ScrollController();
+
+ListView _buildListView() {
+  return ListView.separated(
+    controller: scrollController,
+    ...
+  );
+}
+```
+
+创建 `ListObserverController` 实例并将其传递给 `ListViewObserver`
+
+```dart
+ListObserverController observerController = ListObserverController(controller: scrollController);
+
+ListViewObserver(
+  controller: observerController,
+  child: _buildListView(),
+  ...
+)
+```
+
+现在即可滚动到指定下标位置了
+
+```dart
+// 无动画滚动至下标位置
+observerController.jumpTo(index: 1)
+
+// 动画滚动至下标位置
+observerController.animateTo(
+  index: 1,
+  duration: const Duration(milliseconds: 250),
+  curve: Curves.ease,
+);
+```
 
 ## 示例
 

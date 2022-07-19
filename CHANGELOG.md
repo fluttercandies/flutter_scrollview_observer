@@ -1,3 +1,6 @@
+## 1.1.0
+- Supports scrolling to the specified index location
+
 ## 1.0.1
 - Delete useless code
 
