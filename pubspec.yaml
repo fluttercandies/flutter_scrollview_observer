@@ -1,5 +1,5 @@
 name: scrollview_observer
-description: Gets all the child widgets those are displaying in listView.
+description: A widget for observing data related to the child widgets being displayed in a scrollview.
 version: 1.1.0
 homepage: https://github.com/LinXunFeng/flutter_scrollview_observer
 
