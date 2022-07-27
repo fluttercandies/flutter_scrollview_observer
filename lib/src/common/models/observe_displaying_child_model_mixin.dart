@@ -15,15 +15,28 @@ mixin ObserveDisplayingChildModelMixin on ObserveDisplayingChildModel {
   /// The scroll offset of sliver
   double get scrollOffset => sliver.constraints.scrollOffset;
 
+  /// The layout offset of child
+  double get layoutOffset {
+    final parentData = renderObject.parentData;
+    if (parentData is! SliverLogicalParentData) return 0;
+    return parentData.layoutOffset ?? 0;
+  }
+
+  /// The margin from the top of the child widget to the sliver.
+  double get leadingAxisMarginToViewport => layoutOffset - scrollOffset;
+
+  /// The margin from the bottom of the child widget to the sliver.
+  double get trailingAxisMarginToViewport =>
+      sliver.constraints.viewportMainAxisExtent -
+      leadingAxisMarginToViewport -
+      mainAxisSize;
+
   /// The display percentage of the current widget
   double get displayPercentage => calculateDisplayPercentage();
 
   /// Calculates the display percentage of the current widget
   double calculateDisplayPercentage() {
-    final parentData = renderObject.parentData;
-    if (parentData is! SliverMultiBoxAdaptorParentData) return 0;
-
-    final currentChildLayoutOffset = parentData.layoutOffset ?? 0;
+    final currentChildLayoutOffset = layoutOffset;
     double remainingMainAxisSize = mainAxisSize;
     if (scrollOffset > currentChildLayoutOffset) {
       remainingMainAxisSize =
