@@ -23,12 +23,12 @@ mixin ObserveDisplayingChildModelMixin on ObserveDisplayingChildModel {
   }
 
   /// The margin from the top of the child widget to the sliver.
-  double get leadingAxisMarginToViewport => layoutOffset - scrollOffset;
+  double get leadingMarginToViewport => layoutOffset - scrollOffset;
 
   /// The margin from the bottom of the child widget to the sliver.
-  double get trailingAxisMarginToViewport =>
+  double get trailingMarginToViewport =>
       sliver.constraints.viewportMainAxisExtent -
-      leadingAxisMarginToViewport -
+      leadingMarginToViewport -
       mainAxisSize;
 
   /// The display percentage of the current widget
