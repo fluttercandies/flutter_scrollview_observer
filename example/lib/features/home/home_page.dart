@@ -8,6 +8,7 @@ import 'package:scrollview_observer_example/features/listview/horizontal_listvie
 import 'package:scrollview_observer_example/features/listview/listview_ctx_demo/listview_ctx_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_demo/listview_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_dynamic_offset/listview_dynamic_offset_page.dart';
+import 'package:scrollview_observer_example/features/listview/listview_fixed_height_demo/listview_fixed_height_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/sliver_list_demo/sliver_list_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/video_auto_play_list/video_list_auto_play_page.dart';
 import 'package:tuple/tuple.dart';
@@ -60,6 +61,12 @@ class HomePage extends StatelessWidget {
         "ListView - Context",
         () {
           return const ListViewCtxDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "ListView - Fixed Height",
+        () {
+          return const ListViewFixedHeightDemoPage();
         },
       ),
       Tuple2<String, PageBuilder>(

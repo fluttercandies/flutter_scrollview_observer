@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
-class ListViewDemoPage extends StatefulWidget {
-  const ListViewDemoPage({Key? key}) : super(key: key);
+class ListViewFixedHeightDemoPage extends StatefulWidget {
+  const ListViewFixedHeightDemoPage({Key? key}) : super(key: key);
 
   @override
-  State<ListViewDemoPage> createState() => _ListViewDemoPageState();
+  State<ListViewFixedHeightDemoPage> createState() =>
+      _ListViewFixedHeightDemoPageState();
 }
 
-class _ListViewDemoPageState extends State<ListViewDemoPage> {
+class _ListViewFixedHeightDemoPageState
+    extends State<ListViewFixedHeightDemoPage> {
   int _hitIndex = 0;
 
   ScrollController scrollController =
@@ -41,15 +43,22 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
         child: _buildListView(),
         controller: observerController,
         onObserve: (resultModel) {
-          print('visible -- ${resultModel.visible}');
-          print('firstChild.index -- ${resultModel.firstChild?.index}');
-          print('displaying -- ${resultModel.displayingChildIndexList}');
+          // print('visible -- ${resultModel.visible}');
+          // print('firstChild.index -- ${resultModel.firstChild?.index}');
+          // print('displaying -- ${resultModel.displayingChildIndexList}');
+          // print(
+          //     'leadingAxisMarginToViewport1 -- ${resultModel.firstChild?.leadingAxisMarginToViewport}');
+          // print(
+          //     'leadingAxisMarginToViewport2 -- ${resultModel.displayingChildModelList.last.leadingAxisMarginToViewport}');
+          // print(
+          //     'trailingAxisMarginToViewport1 -- ${resultModel.firstChild?.trailingAxisMarginToViewport}');
+          // print(
+          //     'trailingAxisMarginToViewport2 -- ${resultModel.displayingChildModelList.last.trailingAxisMarginToViewport}');
 
           for (var item in resultModel.displayingChildModelList) {
             print(
                 'item - ${item.index} - ${item.leadingMarginToViewport} - ${item.trailingMarginToViewport}');
           }
-
           setState(() {
             _hitIndex = resultModel.firstChild?.index ?? 0;
           });
@@ -58,12 +67,13 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.airline_stops_outlined),
         onPressed: () {
-          // observerController.jumpTo(index: 100);
-          observerController.animateTo(
-            index: 100,
-            duration: const Duration(seconds: 1),
-            curve: Curves.ease,
-          );
+          observerController.jumpTo(index: 100, isFixedHeight: true);
+          // observerController.animateTo(
+          //   index: 100,
+          //   isFixedHeight: true,
+          //   duration: const Duration(seconds: 1),
+          //   curve: Curves.ease,
+          // );
         },
       ),
     );
@@ -85,7 +95,7 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
 
   Widget _buildListItemView(int index) {
     return Container(
-      height: (index % 2 == 0) ? 80 : 50,
+      height: 80,
       color: _hitIndex == index ? Colors.red : Colors.black12,
       child: Center(
         child: Text(
