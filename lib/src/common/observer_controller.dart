@@ -54,25 +54,39 @@ mixin ObserverControllerForScroll on ObserverController {
   static const Curve _findingCurve = Curves.ease;
 
   /// Jump to the specified index position without animation.
+  ///
+  /// If the height of the child widget and the height of the separator are
+  /// fixed, please pass the [isFixedHeight] parameter.
+  ///
+  /// If you do not pass the [isFixedHeight] parameter, the package will
+  /// automatically gradually scroll around the target location before
+  /// locating, which will produce an animation.
   jumpTo({
     required int index,
     BuildContext? sliverContext,
+    bool isFixedHeight = false,
   }) async {
     await _scrollToIndex(
       index: index,
+      isFixedHeight: isFixedHeight,
       sliverContext: sliverContext,
     );
   }
 
   /// Jump to the specified index position with animation.
+  ///
+  /// If the height of the child widget and the height of the separator are
+  /// fixed, please pass the [isFixedHeight] parameter.
   animateTo({
     required int index,
     required Duration duration,
     required Curve curve,
     BuildContext? sliverContext,
+    bool isFixedHeight = false,
   }) async {
     await _scrollToIndex(
       index: index,
+      isFixedHeight: isFixedHeight,
       sliverContext: sliverContext,
       duration: duration,
       curve: curve,
@@ -81,6 +95,7 @@ mixin ObserverControllerForScroll on ObserverController {
 
   _scrollToIndex({
     required int index,
+    required bool isFixedHeight,
     BuildContext? sliverContext,
     Duration? duration,
     Curve? curve,
@@ -118,7 +133,22 @@ mixin ObserverControllerForScroll on ObserverController {
           isHandlingScroll = false;
           innerNeedOnceObserveCallBack!();
         });
+      } else {
+        isHandlingScroll = false;
       }
+      return;
+    }
+
+    // Because it is fixed height, the offset can be directly calculated for
+    // locating.
+    if (isFixedHeight) {
+      _handleScrollToIndexForFixedHeight(
+        obj: obj,
+        index: index,
+        leadingPadding: leadingPadding,
+        duration: duration,
+        curve: curve,
+      );
       return;
     }
 
@@ -142,6 +172,73 @@ mixin ObserverControllerForScroll on ObserverController {
     );
   }
 
+  /// Scrolling to the specified index location when the child widgets have a
+  /// fixed height.
+  _handleScrollToIndexForFixedHeight({
+    required RenderSliverMultiBoxAdaptor obj,
+    required int index,
+    required double leadingPadding,
+    Duration? duration,
+    Curve? curve,
+  }) async {
+    assert(controller != null);
+    var _controller = controller;
+    if (_controller == null || !_controller.hasClients) return;
+    isHandlingScroll = true;
+    bool isAnimateTo = (duration != null) && (curve != null);
+
+    final targetChild = _findCurrentFirstChild(obj);
+    if (targetChild == null) return;
+    final isHorizontal = obj.constraints.axis == Axis.horizontal;
+    final nextChild = obj.childAfter(targetChild);
+    double separatorTotalHeight = 0;
+    if (nextChild != null && nextChild is! RenderIndexedSemantics) {
+      // It is separator
+      final nextChildPaintBounds = nextChild.paintBounds;
+      final nextChildSize = isHorizontal
+          ? nextChildPaintBounds.width
+          : nextChildPaintBounds.height;
+      separatorTotalHeight = index * nextChildSize;
+    }
+    final childPaintBounds = targetChild.paintBounds;
+    final childSize =
+        isHorizontal ? childPaintBounds.width : childPaintBounds.height;
+    double childLayoutOffset = childSize * index + separatorTotalHeight;
+    // Getting safety layout offset.
+    childLayoutOffset = _calculateTargetLayoutOffset(
+      obj: obj,
+      childLayoutOffset: childLayoutOffset,
+      childSize: childSize,
+    );
+    indexOffsetMap[index] = ObserveScrollChildModel(
+      layoutOffset: childLayoutOffset,
+      size: childSize,
+    );
+    childLayoutOffset += leadingPadding;
+    if (isAnimateTo) {
+      Duration _duration =
+          isAnimateTo ? duration : const Duration(milliseconds: 1);
+      Curve _curve = isAnimateTo ? curve : Curves.linear;
+      await _controller.animateTo(
+        childLayoutOffset,
+        duration: _duration,
+        curve: _curve,
+      );
+    } else {
+      _controller.jumpTo(childLayoutOffset);
+    }
+    if (innerNeedOnceObserveCallBack != null) {
+      ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
+        isHandlingScroll = false;
+        innerNeedOnceObserveCallBack!();
+      });
+    } else {
+      isHandlingScroll = false;
+    }
+  }
+
+  /// Scrolling to the specified index location by gradually scrolling around
+  /// the target index location.
   _handleScrollToIndex({
     required RenderSliverMultiBoxAdaptor obj,
     required int index,
@@ -289,6 +386,8 @@ mixin ObserverControllerForScroll on ObserverController {
               isHandlingScroll = false;
               innerNeedOnceObserveCallBack!();
             });
+          } else {
+            isHandlingScroll = false;
           }
         }
         break;
@@ -296,7 +395,8 @@ mixin ObserverControllerForScroll on ObserverController {
     }
   }
 
-  /// Getting target layout offset for scrolling to index
+  /// Getting target safety layout offset for scrolling to index.
+  /// This can avoid jitter.
   double _calculateTargetLayoutOffset({
     required RenderSliverMultiBoxAdaptor obj,
     required double childLayoutOffset,
