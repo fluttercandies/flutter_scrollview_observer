@@ -192,7 +192,7 @@ class ObserverWidgetState<
     final targetFirstChildSize = scrollDirection == Axis.vertical
         ? targetFirstChild.size.height
         : targetFirstChild.size.width;
-    return listViewOffset <=
+    return listViewOffset <
         targetFirstChildSize * widget.toNextOverPercent +
             targetFirstChildOffset;
   }
