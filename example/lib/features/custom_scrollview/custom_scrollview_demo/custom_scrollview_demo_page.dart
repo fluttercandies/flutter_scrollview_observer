@@ -86,6 +86,10 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
           children: [
             IconButton(
               onPressed: () {
+                _showSnackBar(
+                  context: context,
+                  text: 'SliverList - Jumping to row 29',
+                );
                 observerController.animateTo(
                   sliverContext: _sliverViewCtx1,
                   index: 29,
@@ -97,9 +101,13 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
             ),
             IconButton(
               onPressed: () {
+                _showSnackBar(
+                  context: context,
+                  text: 'SliverGrid - Jumping to item 10',
+                );
                 observerController.animateTo(
                   sliverContext: _sliverViewCtx2,
-                  index: 3,
+                  index: 10,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                 );
@@ -108,6 +116,19 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  _showSnackBar({
+    required BuildContext context,
+    required String text,
+  }) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(text),
+        duration: const Duration(milliseconds: 2000),
       ),
     );
   }
