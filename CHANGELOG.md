@@ -1,3 +1,8 @@
+## 1.2.0
+- The `jumpTo` and `animateTo` methods add an `isFixedHeight` parameter to optimize performance when the child widget is of fixed height
+- Add the properties `[leadingMarginToViewport]` and `[trailingMarginToViewport]`
+- Support mixing usage of `SliverList` and `SliverGrid`
+
 ## 1.1.0
 - Supports scrolling to the specified index location
 
@@ -12,7 +17,7 @@
 
 ## 0.1.0
 
-- Support GridView
+- Support `GridView`
 - Support the horizontal
 
 ## 0.0.1
