@@ -308,6 +308,10 @@ observerController.animateTo(
 
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/3.gif)
 
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/4.gif)
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/5.gif)
+
 ## About Me
 
 - GitHub: [https://github.com/LinXunFeng](https://github.com/LinXunFeng)
