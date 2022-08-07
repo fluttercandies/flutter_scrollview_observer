@@ -7,6 +7,8 @@ Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_ob
 这是一个可用于监听滚动视图中正在显示的子部件的组件库。
 ## 功能点
 
+> 不需要改变你当前所使用视图，只需要在视图外包裹一层即可实现如下功能点
+
 - [x] 监听滚动视图中正在显示的子部件
 - [x] 支持滚动到指定下标位置
 
@@ -15,6 +17,7 @@ Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_ob
 - [x] `SliverList`
 - [x] `GridView`
 - [x] `SliverGrid` 
+- [x] 支持 `SliverList` 和 `SliverGrid` 混合使用
 
 ## 安装
 
@@ -184,6 +187,113 @@ observerController.animateTo(
   curve: Curves.ease,
 );
 ```
+
+如果列表子部件的高度是固定的，则建议使用 `isFixedHeight` 参数提升性能
+
+⚠ 目前仅支持 `ListView` 或 `SliverList`
+
+```dart
+// 无动画滚动至下标位置
+observerController.jumpTo(index: 150, isFixedHeight: true)
+
+// 动画滚动至下标位置
+observerController.animateTo(
+  index: 150, 
+  isFixedHeight: true
+  duration: const Duration(milliseconds: 250),
+  curve: Curves.ease,
+);
+```
+
+如果你的视图是 `CustomScrollView`，其 `slivers` 中包含了 `SliverList` 和 `SliverGrid`，这种情况也是支持的，只不过需要使用 `SliverViewObserver`，并在调用滚动方法时传入对应的 `BuildContext` 以区分对应的 `Sliver`。
+
+```dart
+SliverViewObserver(
+  controller: observerController,
+  child: CustomScrollView(
+    controller: scrollController,
+    slivers: [
+      _buildSliverListView1(),
+      _buildSliverListView2(),
+    ],
+  ),
+  sliverListContexts: () {
+    return [
+      if (_sliverViewCtx1 != null) _sliverViewCtx1!,
+      if (_sliverViewCtx2 != null) _sliverViewCtx2!,
+    ];
+  },
+  ...
+)
+```
+
+```dart
+observerController.animateTo(
+  sliverContext: _sliverViewCtx2, // _sliverViewCtx1
+  index: 10,
+  duration: const Duration(milliseconds: 300),
+  curve: Curves.easeInOut,
+);
+```
+
+### 3、模型属性
+
+#### `ObserveModel`
+
+> 监听模型的基类
+
+|属性|类型|描述|
+|-|-|-|
+|`sliver`|`RenderSliver`|当前 `sliver`|
+|`visible`|`bool`|`sliver` 是否可见|
+|`displayingChildIndexList`|`List<int>`|当前现在显示的子部件的下标|
+|`axis`|`Axis`|`sliver` 的方向|
+|`scrollOffset`|`double`|`sliver` 的偏移量|
+
+#### `ListViewObserveModel`
+
+> 继承自 `ObserveModel`，`ListView` 和 `SliverList` 专用的监听模型
+
+|属性|类型|描述|
+|-|-|-|
+|`sliver`|`RenderSliver`|当前 `sliver`|
+|`firstChild`|`ListViewObserveDisplayingChildModel`|当前第一个正在显示的子部件数据模型|
+|`displayingChildModelList`|`List<ListViewObserveDisplayingChildModel>`|当前正在显示的所有子部件数据模型|
+
+#### `GridViewObserveModel`
+
+> 继承自 `ObserveModel`，`GridView` 和 `SliverGrid` 专用的监听模型
+
+|属性|类型|描述|
+|-|-|-|
+|`sliverGrid`|`RenderSliverGrid`|当前 `sliver`|
+|`firstGroupChildList`|`List<GridViewObserveDisplayingChildModel>`|当前第一排正在显示的所有子部件数据模型|
+|`displayingChildModelList`|`List<GridViewObserveDisplayingChildModel>`|当前正在显示的所有子部件数据模型|
+
+#### `ObserveDisplayingChildModel`
+
+> 当前正在显示的子部件的数据信息
+
+|属性|类型|描述|
+|-|-|-|
+|`sliver`|`RenderSliver`|当前 `sliver`|
+|`index`|`int`|子部件的下标|
+|`renderObject`|`RenderBox`|子部件对应的 `RenderBox` 实例|
+
+#### `ObserveDisplayingChildModelMixin`
+
+> 当前正在显示的子部件的数据信息，是对 `ObserveDisplayingChildModel` 的补充
+
+|属性|类型|描述|
+|-|-|-|
+|`axis`|`Axis`|`sliver` 的方向|
+|`size`|`Size`|子部件的大小|
+|`mainAxisSize`|`double`|子部件主轴方向上的大小|
+|`scrollOffset`|`double`|`sliver` 的偏移量|
+|`layoutOffset`|`double`|子部件相应于 `sliver` 的偏移量|
+|`leadingMarginToViewport`|`double`|子部件距离视口顶部的距离|
+|`trailingMarginToViewport`|`double`|子部件距离视口尾部部的距离|
+|`displayPercentage`|`double`|子部件自身大小显示的占比|
 
 ## 示例
 

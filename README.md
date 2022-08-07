@@ -8,14 +8,18 @@ Language: English | [中文](https://github.com/LinXunFeng/flutter_scrollview_ob
 This is a library of widget that can be used to listen for child widgets those are being displayed in the scroll view.
 ## Feature
 
+> You do not need to change the view you are currently using, just wrap a `ViewObserver` around the view to achieve the following features.
+
 - [x] Observing child widgets those are being displayed in the scroll view
 - [x] Supports scrolling to the specified index location
 
 ## Support
+
 - [x] `ListView`
 - [x] `SliverList`
 - [x] `GridView`
 - [x] `SliverGrid` 
+- [x] Mixing usage of `SliverList` and `SliverGrid`
 
 ## Installing
 
@@ -187,6 +191,114 @@ observerController.animateTo(
   curve: Curves.ease,
 );
 ```
+
+If the height of a list child widget is fixed, it is recommended to use the 'isFixedHeight' parameter to improve performance.
+
+⚠ Currently only `ListView` or `SliverList` is supported.
+
+```dart
+// Jump to the specified index position without animation.
+observerController.jumpTo(index: 150, isFixedHeight: true)
+
+// Jump to the specified index position with animation.
+observerController.animateTo(
+  index: 150, 
+  isFixedHeight: true
+  duration: const Duration(milliseconds: 250),
+  curve: Curves.ease,
+);
+```
+
+If you use `CustomScrollView` and its `slivers` contain `SliverList` and `SliverGrid`, this is also supported, but you need to use `SliverViewObserver`, and pass the corresponding `BuildContext` to distinguish the corresponding `Sliver` when calling the scroll method.
+
+```dart
+SliverViewObserver(
+  controller: observerController,
+  child: CustomScrollView(
+    controller: scrollController,
+    slivers: [
+      _buildSliverListView1(),
+      _buildSliverListView2(),
+    ],
+  ),
+  sliverListContexts: () {
+    return [
+      if (_sliverViewCtx1 != null) _sliverViewCtx1!,
+      if (_sliverViewCtx2 != null) _sliverViewCtx2!,
+    ];
+  },
+  ...
+)
+```
+
+```dart
+observerController.animateTo(
+  sliverContext: _sliverViewCtx2, // _sliverViewCtx1
+  index: 10,
+  duration: const Duration(milliseconds: 300),
+  curve: Curves.easeInOut,
+);
+```
+
+### 3、Model Property
+
+#### `ObserveModel`
+
+> The base class of the observing data.
+
+|Property|Type|Desc|
+|-|-|-|
+|`sliver`|`RenderSliver`|The target sliver.|
+|`visible`|`bool`|Whether this sliver should be painted.|
+|`displayingChildIndexList`|`List<int>`|Stores index list for children widgets those are displaying.|
+|`axis`|`Axis`|The axis of sliver.|
+|`scrollOffset`|`double`|The scroll offset of sliver.|
+
+#### `ListViewObserveModel`
+
+> A special observing models which inherits from the `ObserveModel` for `ListView` and `SliverList`.
+
+|Property|Type|Desc|
+|-|-|-|
+|`sliver`|`RenderSliver`|The target sliverList.|
+|`firstChild`|`ListViewObserveDisplayingChildModel`|The observing data of the first child widget that is displaying.|
+|`displayingChildModelList`|`List<ListViewObserveDisplayingChildModel>`|Stores observing model list of displaying children widgets.|
+
+#### `GridViewObserveModel`
+
+> A special observing models which inherits from the `ObserveModel` for `GridView` and `SliverGrid`.
+
+|Property|Type|Desc|
+|-|-|-|
+|`sliverGrid`|`RenderSliverGrid`|The target sliverGrid.|
+|`firstGroupChildList`|`List<GridViewObserveDisplayingChildModel>`|The observing datas of first group displaying child widgets.|
+|`displayingChildModelList`|`List<GridViewObserveDisplayingChildModel>`|Stores observing model list of displaying children widgets.|
+
+#### `ObserveDisplayingChildModel`
+
+> Data information about the child widget that is currently being displayed.
+
+|Property|Type|Desc|
+|-|-|-|
+|`sliver`|`RenderSliver`|The target sliverList.|
+|`index`|`int`|The index of child widget.|
+|`renderObject`|`RenderBox`|The renderObject `[RenderBox]` of child widget.|
+
+#### `ObserveDisplayingChildModelMixin`
+
+> The currently displayed child widgets data information, is for `ObserveDisplayingChildModel` supplement.
+
+|Property|Type|Desc|
+|-|-|-|
+|`axis`|`Axis`|The axis of sliver.|
+|`size`|`Size`|The size of child widget.|
+|`mainAxisSize`|`double`|The size of child widget on the main axis.|
+|`scrollOffset`|`double`|The scroll offset of sliver.|
+|`layoutOffset`|`double`|The layout offset of child widget.|
+|`leadingMarginToViewport`|`double`|The margin from the top of the child widget to the viewport.|
+|`trailingMarginToViewport`|`double`|The margin from the bottom of the child widget to the viewport.|
+|`displayPercentage`|`double`|The display percentage of the current widget.|
+
 
 ## Example
 
