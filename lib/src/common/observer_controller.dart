@@ -18,7 +18,7 @@ class ObserverController {
   Map<int, ObserveScrollChildModel> indexOffsetMap = {};
 
   /// A flag used to ignore unnecessary calculations during scrolling.
-  bool isHandlingScroll = false;
+  bool innerIsHandlingScroll = false;
 
   /// The callback to call [ObserverWidget]'s _handleContexts method.
   Function()? innerNeedOnceObserveCallBack;
@@ -37,7 +37,7 @@ class ObserverController {
   /// Reset all data
   innerReset() {
     indexOffsetMap = {};
-    isHandlingScroll = false;
+    innerIsHandlingScroll = false;
   }
 
   /// Get the target sliver [BuildContext]
@@ -127,7 +127,7 @@ mixin ObserverControllerForScroll on ObserverController {
       final viewportBoundaryExtent =
           viewportSize * 0.5 + (viewport.cacheExtent ?? 0);
       if (leadingPadding > (viewportOffset + viewportBoundaryExtent)) {
-        isHandlingScroll = true;
+        innerIsHandlingScroll = true;
         double targetOffset = leadingPadding - viewportBoundaryExtent;
         final maxScrollExtent = viewportMaxScrollExtent(viewport);
         if (targetOffset > maxScrollExtent) targetOffset = maxScrollExtent;
@@ -144,7 +144,7 @@ mixin ObserverControllerForScroll on ObserverController {
     var targetScrollChildModel = indexOffsetMap[index];
     // There is a cache offset, scroll to the offset directly.
     if (targetScrollChildModel != null) {
-      isHandlingScroll = true;
+      innerIsHandlingScroll = true;
       var targetOffset = _calculateTargetLayoutOffset(
         obj: obj,
         childLayoutOffset: targetScrollChildModel.layoutOffset,
@@ -162,11 +162,11 @@ mixin ObserverControllerForScroll on ObserverController {
       }
       if (innerNeedOnceObserveCallBack != null) {
         ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
-          isHandlingScroll = false;
+          innerIsHandlingScroll = false;
           innerNeedOnceObserveCallBack!();
         });
       } else {
-        isHandlingScroll = false;
+        innerIsHandlingScroll = false;
       }
       return;
     }
@@ -216,7 +216,7 @@ mixin ObserverControllerForScroll on ObserverController {
     assert(controller != null);
     var _controller = controller;
     if (_controller == null || !_controller.hasClients) return;
-    isHandlingScroll = true;
+    innerIsHandlingScroll = true;
     bool isAnimateTo = (duration != null) && (curve != null);
 
     final targetChild = _findCurrentFirstChild(obj);
@@ -262,11 +262,11 @@ mixin ObserverControllerForScroll on ObserverController {
     }
     if (innerNeedOnceObserveCallBack != null) {
       ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
-        isHandlingScroll = false;
+        innerIsHandlingScroll = false;
         innerNeedOnceObserveCallBack!();
       });
     } else {
-      isHandlingScroll = false;
+      innerIsHandlingScroll = false;
     }
   }
 
@@ -292,7 +292,7 @@ mixin ObserverControllerForScroll on ObserverController {
     bool isAnimateTo = (duration != null) && (curve != null);
 
     if (index < firstChildIndex) {
-      isHandlingScroll = true;
+      innerIsHandlingScroll = true;
       final sliverSize =
           isHorizontal ? obj.paintBounds.width : obj.paintBounds.height;
       double childLayoutOffset = 0;
@@ -321,7 +321,7 @@ mixin ObserverControllerForScroll on ObserverController {
         final firstChild = _findCurrentFirstChild(obj);
         final lastChild = _findCurrentLastChild(obj);
         if (firstChild == null || lastChild == null) {
-          isHandlingScroll = false;
+          innerIsHandlingScroll = false;
           return;
         }
         firstChildIndex = firstChild.index;
@@ -337,7 +337,7 @@ mixin ObserverControllerForScroll on ObserverController {
         );
       });
     } else if (index > lastChildIndex) {
-      isHandlingScroll = true;
+      innerIsHandlingScroll = true;
       final lastChild = _findCurrentLastChild(obj);
       final childSize = (isHorizontal
               ? lastChild?.paintBounds.width
@@ -365,7 +365,7 @@ mixin ObserverControllerForScroll on ObserverController {
         final firstChild = _findCurrentFirstChild(obj);
         final lastChild = _findCurrentLastChild(obj);
         if (firstChild == null || lastChild == null) {
-          isHandlingScroll = false;
+          innerIsHandlingScroll = false;
           return;
         }
         firstChildIndex = firstChild.index;
@@ -426,16 +426,16 @@ mixin ObserverControllerForScroll on ObserverController {
           }
           if (innerNeedOnceObserveCallBack != null) {
             ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
-              isHandlingScroll = false;
+              innerIsHandlingScroll = false;
               innerNeedOnceObserveCallBack!();
             });
           } else {
-            isHandlingScroll = false;
+            innerIsHandlingScroll = false;
           }
         }
         break;
       }
-      isHandlingScroll = false;
+      innerIsHandlingScroll = false;
     }
   }
 

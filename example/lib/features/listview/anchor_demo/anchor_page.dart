@@ -48,7 +48,7 @@ class _AnchorListPageState extends State<AnchorListPage>
         controller: observerController,
         child: _buildListView(),
         onObserve: (resultModel) {
-          if (observerController.isHandlingScroll) return;
+          if (observerController.innerIsHandlingScroll) return;
           final topIndex = resultModel.firstChild?.index ?? 0;
           final index = tabIndexs.indexOf(topIndex);
           if (index != -1) {

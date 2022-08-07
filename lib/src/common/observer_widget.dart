@@ -134,7 +134,8 @@ class ObserverWidgetState<
     final onObserveAll = widget.onObserveAll;
     if (onObserve == null && onObserveAll == null) return;
 
-    final isHandlingScroll = widget.sliverController?.isHandlingScroll ?? false;
+    final isHandlingScroll =
+        widget.sliverController?.innerIsHandlingScroll ?? false;
     if (isHandlingScroll) return;
 
     List<BuildContext> ctxs = fetchTargetSliverContexts();
