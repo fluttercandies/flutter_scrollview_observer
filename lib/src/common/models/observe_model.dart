@@ -6,7 +6,7 @@ abstract class ObserveModel {
   /// Whether this sliver should be painted.
   bool visible;
 
-  /// The target sliver
+  /// The target sliver.
   RenderSliver sliver;
 
   /// Stores model list for children widgets those are displaying.
@@ -16,10 +16,10 @@ abstract class ObserveModel {
   List<int> get displayingChildIndexList =>
       innerDisplayingChildModelList.map((e) => e.index).toList();
 
-  /// The axis of sliver
+  /// The axis of sliver.
   Axis get axis => sliver.constraints.axis;
 
-  /// The scroll offset of sliver
+  /// The scroll offset of sliver.
   double get scrollOffset => sliver.constraints.scrollOffset;
 
   ObserveModel({

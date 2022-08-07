@@ -1,7 +1,7 @@
 import 'package:flutter/rendering.dart';
 
 abstract class ObserveDisplayingChildModel {
-  /// The target sliverList
+  /// The target sliverList.
   RenderSliver sliver;
 
   /// The index of child widget.

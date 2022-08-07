@@ -16,13 +16,13 @@ class GridViewObserveModel extends ObserveModel {
           innerDisplayingChildModelList: displayingChildModelList,
         );
 
-  /// The target sliverGrid
+  /// The target sliverGrid.
   RenderSliverGrid sliverGrid;
 
   /// The first group child widgets those are displaying.
   final List<GridViewObserveDisplayingChildModel> firstGroupChildList;
 
-  /// Stores model list for children widgets those are displaying.
+  /// Stores observing model list of displaying children widgets.
   final List<GridViewObserveDisplayingChildModel> displayingChildModelList;
 
   @override

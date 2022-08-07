@@ -3,29 +3,29 @@ import 'package:flutter/rendering.dart';
 import 'observe_displaying_child_model.dart';
 
 mixin ObserveDisplayingChildModelMixin on ObserveDisplayingChildModel {
-  /// The axis of sliver
+  /// The axis of sliver.
   Axis get axis => sliver.constraints.axis;
 
-  /// The size of child
+  /// The size of child widget.
   Size get size => renderObject.size;
 
-  /// The size of child on the main axis
+  /// The size of child widget on the main axis.
   double get mainAxisSize => axis == Axis.vertical ? size.height : size.width;
 
   /// The scroll offset of sliver
   double get scrollOffset => sliver.constraints.scrollOffset;
 
-  /// The layout offset of child
+  /// The layout offset of child widget.
   double get layoutOffset {
     final parentData = renderObject.parentData;
     if (parentData is! SliverLogicalParentData) return 0;
     return parentData.layoutOffset ?? 0;
   }
 
-  /// The margin from the top of the child widget to the sliver.
+  /// The margin from the top of the child widget to the viewport.
   double get leadingMarginToViewport => layoutOffset - scrollOffset;
 
-  /// The margin from the bottom of the child widget to the sliver.
+  /// The margin from the bottom of the child widget to the viewport.
   double get trailingMarginToViewport =>
       sliver.constraints.viewportMainAxisExtent -
       leadingMarginToViewport -

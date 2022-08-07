@@ -15,13 +15,13 @@ class ListViewObserveModel extends ObserveModel {
           innerDisplayingChildModelList: displayingChildModelList,
         );
 
-  /// The target sliverList
+  /// The target sliverList.
   RenderSliverList sliverList;
 
-  /// The first child widget that is displaying.
+  /// The observing data of the first child widget that is displaying.
   final ListViewObserveDisplayingChildModel? firstChild;
 
-  /// Stores model list for children widgets those are displaying.
+  /// Stores observing model list of displaying children widgets.
   final List<ListViewObserveDisplayingChildModel> displayingChildModelList;
 
   @override
