@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
@@ -107,7 +108,38 @@ mixin ObserverControllerForScroll on ObserverController {
     final ctx = fetchSliverContext(sliverContext: sliverContext);
     var obj = ctx?.findRenderObject();
     if (obj is! RenderSliverMultiBoxAdaptor) return;
+
+    final viewport = _findViewport(obj);
+    if (viewport == null) return;
+
+    bool isAnimateTo = (duration != null) && (curve != null);
+
+    // Before the next sliver is shown, it may have an incorrect value for
+    // precedingScrollExtent, so we need to scroll around to get
+    // precedingScrollExtent correctly.
     double leadingPadding = obj.constraints.precedingScrollExtent;
+    final objVisible = obj.geometry?.visible ?? false;
+    if (!objVisible && viewport.offset.hasPixels) {
+      final viewportOffset = viewport.offset.pixels;
+      final isHorizontal = obj.constraints.axis == Axis.horizontal;
+      final viewportSize =
+          isHorizontal ? viewport.size.width : viewport.size.height;
+      final viewportBoundaryExtent =
+          viewportSize * 0.5 + (viewport.cacheExtent ?? 0);
+      if (leadingPadding > (viewportOffset + viewportBoundaryExtent)) {
+        isHandlingScroll = true;
+        double targetOffset = leadingPadding - viewportBoundaryExtent;
+        final maxScrollExtent = viewportMaxScrollExtent(viewport);
+        if (targetOffset > maxScrollExtent) targetOffset = maxScrollExtent;
+        await _controller.animateTo(
+          targetOffset,
+          duration: _findingDuration,
+          curve: _findingCurve,
+        );
+        await Future.delayed(_findingDuration);
+        leadingPadding = obj.constraints.precedingScrollExtent;
+      }
+    }
 
     var targetScrollChildModel = indexOffsetMap[index];
     // There is a cache offset, scroll to the offset directly.
@@ -119,7 +151,7 @@ mixin ObserverControllerForScroll on ObserverController {
         childSize: targetScrollChildModel.size,
       );
       targetOffset += leadingPadding;
-      if (duration != null && curve != null) {
+      if (isAnimateTo) {
         await _controller.animateTo(
           targetOffset,
           duration: duration,
@@ -250,30 +282,38 @@ mixin ObserverControllerForScroll on ObserverController {
   }) async {
     var _controller = controller;
     if (_controller == null || !_controller.hasClients) return;
+
+    final viewport = _findViewport(obj);
+    if (viewport == null) return;
+    final maxScrollExtent = viewportMaxScrollExtent(viewport);
+
+    final isHorizontal = obj.constraints.axis == Axis.horizontal;
     bool isAnimateTo = (duration != null) && (curve != null);
 
     if (index < firstChildIndex) {
       isHandlingScroll = true;
-      final sliverHeight = obj.paintBounds.height;
+      final sliverSize =
+          isHorizontal ? obj.paintBounds.width : obj.paintBounds.height;
       double childLayoutOffset = 0;
       final firstChild = _findCurrentFirstChild(obj);
       final parentData = firstChild?.parentData;
       if (parentData is SliverMultiBoxAdaptorParentData) {
         childLayoutOffset = parentData.layoutOffset ?? 0;
       }
-      var targetOffsetY = childLayoutOffset - sliverHeight;
-      if (targetOffsetY < 0) {
-        targetOffsetY = 0;
+      var targetLeadingOffset = childLayoutOffset - sliverSize;
+      if (targetLeadingOffset < 0) {
+        targetLeadingOffset = 0;
       }
-      final prevPageOffset = targetOffsetY + leadingPadding;
+      double prevPageOffset = targetLeadingOffset + leadingPadding;
+      prevPageOffset = prevPageOffset < 0 ? 0 : prevPageOffset;
       if (isAnimateTo) {
-        _controller.jumpTo(prevPageOffset);
-      } else {
         await _controller.animateTo(
           prevPageOffset,
           duration: _findingDuration,
           curve: _findingCurve,
         );
+      } else {
+        _controller.jumpTo(prevPageOffset);
       }
 
       ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
@@ -298,21 +338,26 @@ mixin ObserverControllerForScroll on ObserverController {
     } else if (index > lastChildIndex) {
       isHandlingScroll = true;
       final lastChild = _findCurrentLastChild(obj);
-      final childHeight = lastChild?.paintBounds.height ?? 0;
+      final childSize = (isHorizontal
+              ? lastChild?.paintBounds.width
+              : lastChild?.paintBounds.height) ??
+          0;
       double childLayoutOffset = 0;
       final parentData = lastChild?.parentData;
       if (parentData is SliverMultiBoxAdaptorParentData) {
         childLayoutOffset = parentData.layoutOffset ?? 0;
       }
-      final nextPageOffset = childLayoutOffset + childHeight + leadingPadding;
+      double nextPageOffset = childLayoutOffset + childSize + leadingPadding;
+      nextPageOffset =
+          nextPageOffset > maxScrollExtent ? maxScrollExtent : nextPageOffset;
       if (isAnimateTo) {
-        _controller.jumpTo(nextPageOffset);
-      } else {
         await _controller.animateTo(
           nextPageOffset,
           duration: _findingDuration,
           curve: _findingCurve,
         );
+      } else {
+        _controller.jumpTo(nextPageOffset);
       }
 
       ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
@@ -336,9 +381,6 @@ mixin ObserverControllerForScroll on ObserverController {
       });
     } else {
       // Target index child is already in viewport
-      if (innerNeedOnceObserveCallBack == null) {
-        isHandlingScroll = false;
-      }
       var targetChild = obj.firstChild;
       while (targetChild != null) {
         if (targetChild is! RenderIndexedSemantics) {
@@ -392,6 +434,7 @@ mixin ObserverControllerForScroll on ObserverController {
         }
         break;
       }
+      isHandlingScroll = false;
     }
   }
 
@@ -408,12 +451,23 @@ mixin ObserverControllerForScroll on ObserverController {
     // The (estimated) total scrollable extent of this sliver.
     final scrollExtent = geometry?.scrollExtent ?? 0;
     final scrollOffset = obj.constraints.scrollOffset;
-    final remainingBottomExtent = scrollExtent - scrollOffset - layoutExtent;
+    double remainingBottomExtent = scrollExtent - scrollOffset - layoutExtent;
     final needScrollExtent = childLayoutOffset - scrollOffset;
+
+    final viewport = _findViewport(obj);
+    if (viewport != null && viewport.offset.hasPixels) {
+      final maxScrollExtent = viewportMaxScrollExtent(viewport);
+      remainingBottomExtent = maxScrollExtent - viewport.offset.pixels;
+    }
     if (remainingBottomExtent < needScrollExtent) {
       targetOffset = scrollExtent - layoutExtent;
     }
     return targetOffset;
+  }
+
+  /// Getting [maxScrollExtent] of viewport
+  double viewportMaxScrollExtent(RenderViewport viewport) {
+    return (viewport.offset as ScrollPositionWithSingleContext).maxScrollExtent;
   }
 
   /// Find out the current first child in sliver
@@ -446,5 +500,20 @@ mixin ObserverControllerForScroll on ObserverController {
       }
     }
     return child;
+  }
+
+  /// Find out the viewport
+  RenderViewport? _findViewport(RenderSliverMultiBoxAdaptor obj) {
+    int maxCycleCount = 10;
+    int currentCycleCount = 1;
+    AbstractNode? parent = obj.parent;
+    while (parent != null && currentCycleCount <= maxCycleCount) {
+      if (parent is RenderViewport) {
+        return parent;
+      }
+      parent = parent.parent;
+      currentCycleCount++;
+    }
+    return null;
   }
 }
