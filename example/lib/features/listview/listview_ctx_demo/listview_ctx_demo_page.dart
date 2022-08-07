@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer_example/typedefs.dart';
 
 class ListViewCtxDemoPage extends StatefulWidget {
   const ListViewCtxDemoPage({Key? key}) : super(key: key);
@@ -18,7 +19,7 @@ class _ListViewCtxDemoPageState extends State<ListViewCtxDemoPage> {
     super.initState();
 
     // Trigger an observation manually
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
       ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
     });
   }

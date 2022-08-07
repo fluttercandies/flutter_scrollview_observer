@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer_example/typedefs.dart';
 
 class SliverGridViewDemoPage extends StatefulWidget {
   const SliverGridViewDemoPage({Key? key}) : super(key: key);
@@ -20,7 +21,7 @@ class _SliverGridViewDemoPageState extends State<SliverGridViewDemoPage> {
     super.initState();
 
     // Trigger an observation manually
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
       GridViewOnceObserveNotification().dispatch(_sliverGridViewContext1);
     });
   }

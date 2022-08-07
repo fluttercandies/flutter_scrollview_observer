@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer_example/typedefs.dart';
 
 class ListViewFixedHeightDemoPage extends StatefulWidget {
   const ListViewFixedHeightDemoPage({Key? key}) : super(key: key);
@@ -25,7 +26,7 @@ class _ListViewFixedHeightDemoPageState
     observerController = ListObserverController(controller: scrollController);
 
     // Trigger an observation manually
-    WidgetsBinding.instance?.endOfFrame.then(
+    ambiguate(WidgetsBinding.instance)?.endOfFrame.then(
       (_) {
         // After layout
         if (mounted) {

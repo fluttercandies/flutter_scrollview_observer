@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer_example/typedefs.dart';
 
 class ListViewDynamicOffsetPage extends StatefulWidget {
   const ListViewDynamicOffsetPage({Key? key}) : super(key: key);
@@ -29,7 +30,7 @@ class _ListViewDynamicOffsetPageState extends State<ListViewDynamicOffsetPage> {
     super.initState();
     _pageController.addListener(_pageDidScroll);
 
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+    ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
       _safeAreaPaddingTop = MediaQuery.of(context).padding.top;
 
       // Trigger an observation manually

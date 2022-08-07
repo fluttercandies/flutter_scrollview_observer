@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer_example/typedefs.dart';
 
 class GridViewDemoPage extends StatefulWidget {
   const GridViewDemoPage({Key? key}) : super(key: key);
@@ -25,7 +26,7 @@ class _GridViewDemoPageState extends State<GridViewDemoPage> {
     observerController = GridObserverController(controller: scrollController);
 
     // Trigger an observation manually
-    WidgetsBinding.instance?.endOfFrame.then(
+    ambiguate(WidgetsBinding.instance)?.endOfFrame.then(
       (_) {
         if (mounted) {
           // After layout
