@@ -57,7 +57,7 @@ class _ListViewFixedHeightDemoPageState
           //     'trailingAxisMarginToViewport2 -- ${resultModel.displayingChildModelList.last.trailingAxisMarginToViewport}');
 
           for (var item in resultModel.displayingChildModelList) {
-            print(
+            debugPrint(
                 'item - ${item.index} - ${item.leadingMarginToViewport} - ${item.trailingMarginToViewport}');
           }
           setState(() {

@@ -42,12 +42,12 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
         child: _buildListView(),
         controller: observerController,
         onObserve: (resultModel) {
-          print('visible -- ${resultModel.visible}');
-          print('firstChild.index -- ${resultModel.firstChild?.index}');
-          print('displaying -- ${resultModel.displayingChildIndexList}');
+          debugPrint('visible -- ${resultModel.visible}');
+          debugPrint('firstChild.index -- ${resultModel.firstChild?.index}');
+          debugPrint('displaying -- ${resultModel.displayingChildIndexList}');
 
           for (var item in resultModel.displayingChildModelList) {
-            print(
+            debugPrint(
                 'item - ${item.index} - ${item.leadingMarginToViewport} - ${item.trailingMarginToViewport}');
           }
 

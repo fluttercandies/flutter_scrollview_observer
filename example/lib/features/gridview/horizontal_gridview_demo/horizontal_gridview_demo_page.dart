@@ -50,9 +50,9 @@ class _HorizontalGridViewDemoPageState
             _hitIndexs = model.firstGroupChildList.map((e) => e.index).toList();
           });
 
-          print(
+          debugPrint(
               'firstGroupChildList -- ${model.firstGroupChildList.map((e) => e.index)}');
-          print('displaying -- ${model.displayingChildIndexList}');
+          debugPrint('displaying -- ${model.displayingChildIndexList}');
         },
         child: _buildGridView(),
       ),

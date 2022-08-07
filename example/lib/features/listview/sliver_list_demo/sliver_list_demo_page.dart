@@ -48,9 +48,9 @@ class _SliverListViewDemoPageState extends State<SliverListViewDemoPage> {
         onObserveAll: (resultMap) {
           final model1 = resultMap[_sliverListViewCtx1];
           if (model1 != null && model1.visible) {
-            print('1 visible -- ${model1.visible}');
-            print('1 firstChild.index -- ${model1.firstChild?.index}');
-            print('1 displaying -- ${model1.displayingChildIndexList}');
+            debugPrint('1 visible -- ${model1.visible}');
+            debugPrint('1 firstChild.index -- ${model1.firstChild?.index}');
+            debugPrint('1 displaying -- ${model1.displayingChildIndexList}');
             setState(() {
               _hitIndexForCtx1 = model1.firstChild?.index ?? 0;
             });
@@ -58,9 +58,9 @@ class _SliverListViewDemoPageState extends State<SliverListViewDemoPage> {
 
           final model2 = resultMap[_sliverListViewCtx2];
           if (model2 != null && model2.visible) {
-            print('2 visible -- ${model2.visible}');
-            print('2 firstChild.index -- ${model2.firstChild?.index}');
-            print('2 displaying -- ${model2.displayingChildIndexList}');
+            debugPrint('2 visible -- ${model2.visible}');
+            debugPrint('2 firstChild.index -- ${model2.firstChild?.index}');
+            debugPrint('2 displaying -- ${model2.displayingChildIndexList}');
             setState(() {
               _hitIndexForCtx2 = model2.firstChild?.index ?? 0;
             });

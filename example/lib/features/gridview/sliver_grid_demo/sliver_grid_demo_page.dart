@@ -45,9 +45,9 @@ class _SliverGridViewDemoPageState extends State<SliverGridViewDemoPage> {
                   model1.firstGroupChildList.map((e) => e.index).toList();
             });
 
-            print(
+            debugPrint(
                 '1 -- firstGroupChildList -- ${model1.firstGroupChildList.map((e) => e.index)}');
-            print('1 -- displaying -- ${model1.displayingChildIndexList}');
+            debugPrint('1 -- displaying -- ${model1.displayingChildIndexList}');
           }
 
           final model2 = resultMap[_sliverGridViewContext2];
@@ -57,9 +57,9 @@ class _SliverGridViewDemoPageState extends State<SliverGridViewDemoPage> {
                   model2.firstGroupChildList.map((e) => e.index).toList();
             });
 
-            print(
+            debugPrint(
                 '2 -- firstGroupChildList -- ${model2.firstGroupChildList.map((e) => e.index)}');
-            print('2 -- displaying -- ${model2.displayingChildIndexList}');
+            debugPrint('2 -- displaying -- ${model2.displayingChildIndexList}');
           }
         },
         child: _buildGridView(),

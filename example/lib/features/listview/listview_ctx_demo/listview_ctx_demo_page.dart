@@ -37,9 +37,9 @@ class _ListViewCtxDemoPageState extends State<ListViewCtxDemoPage> {
           final model = resultMap[_sliverListViewContext];
           if (model == null) return;
 
-          print('visible -- ${model.visible}');
-          print('firstChild.index -- ${model.firstChild?.index}');
-          print('displaying -- ${model.displayingChildIndexList}');
+          debugPrint('visible -- ${model.visible}');
+          debugPrint('firstChild.index -- ${model.firstChild?.index}');
+          debugPrint('displaying -- ${model.displayingChildIndexList}');
           setState(() {
             _hitIndex = model.firstChild?.index ?? 0;
           });

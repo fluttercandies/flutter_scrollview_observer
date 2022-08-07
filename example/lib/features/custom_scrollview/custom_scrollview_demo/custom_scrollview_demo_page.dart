@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
-import 'package:scrollview_observer/src/common/typedefs.dart';
+import 'package:scrollview_observer_example/typedefs.dart';
 
 class CustomScrollViewDemoPage extends StatefulWidget {
   const CustomScrollViewDemoPage({Key? key}) : super(key: key);
@@ -58,9 +58,9 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
           if (model1 != null &&
               model1.visible &&
               model1 is ListViewObserveModel) {
-            print('1 visible -- ${model1.visible}');
-            print('1 firstChild.index -- ${model1.firstChild?.index}');
-            print('1 displaying -- ${model1.displayingChildIndexList}');
+            debugPrint('1 visible -- ${model1.visible}');
+            debugPrint('1 firstChild.index -- ${model1.firstChild?.index}');
+            debugPrint('1 displaying -- ${model1.displayingChildIndexList}');
             setState(() {
               _hitIndexForCtx1 = model1.firstChild?.index ?? 0;
             });
@@ -70,8 +70,8 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
           if (model2 != null &&
               model2.visible &&
               model2 is GridViewObserveModel) {
-            print('2 visible -- ${model2.visible}');
-            print('2 displaying -- ${model2.displayingChildIndexList}');
+            debugPrint('2 visible -- ${model2.visible}');
+            debugPrint('2 displaying -- ${model2.displayingChildIndexList}');
             setState(() {
               _hitIndexsForCtx2 =
                   model2.firstGroupChildList.map((e) => e.index).toList();
