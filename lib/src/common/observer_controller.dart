@@ -222,7 +222,8 @@ mixin ObserverControllerForScroll on ObserverController {
     final targetChild = _findCurrentFirstChild(obj);
     if (targetChild == null) return;
     final isHorizontal = obj.constraints.axis == Axis.horizontal;
-    final nextChild = obj.childAfter(targetChild);
+    var nextChild = obj.childAfter(targetChild);
+    nextChild ??= obj.childBefore(targetChild);
     double separatorTotalHeight = 0;
     if (nextChild != null && nextChild is! RenderIndexedSemantics) {
       // It is separator
