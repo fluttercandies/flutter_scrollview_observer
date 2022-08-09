@@ -11,11 +11,11 @@ class CustomScrollViewDemoPage extends StatefulWidget {
 }
 
 class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
-  BuildContext? _sliverViewCtx1;
-  BuildContext? _sliverViewCtx2;
+  BuildContext? _sliverListCtx;
+  BuildContext? _sliverGridCtx;
 
   int _hitIndexForCtx1 = 0;
-  List<int> _hitIndexsForCtx2 = [];
+  List<int> _hitIndexsForGrid = [];
 
   ScrollController scrollController = ScrollController();
 
@@ -29,7 +29,7 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
 
     // Trigger an observation manually
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
-      ListViewOnceObserveNotification().dispatch(_sliverViewCtx1);
+      ListViewOnceObserveNotification().dispatch(_sliverListCtx);
     });
   }
 
@@ -39,22 +39,15 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
       appBar: AppBar(title: const Text("CustomScrollView")),
       body: SliverViewObserver(
         controller: observerController,
-        child: CustomScrollView(
-          controller: scrollController,
-          // scrollDirection: Axis.horizontal,
-          slivers: [
-            _buildSliverListView1(),
-            _buildSliverListView2(),
-          ],
-        ),
+        child: _buildScrollView(),
         sliverListContexts: () {
           return [
-            if (_sliverViewCtx1 != null) _sliverViewCtx1!,
-            if (_sliverViewCtx2 != null) _sliverViewCtx2!,
+            if (_sliverListCtx != null) _sliverListCtx!,
+            if (_sliverGridCtx != null) _sliverGridCtx!,
           ];
         },
         onObserveAll: (resultMap) {
-          final model1 = resultMap[_sliverViewCtx1];
+          final model1 = resultMap[_sliverListCtx];
           if (model1 != null &&
               model1.visible &&
               model1 is ListViewObserveModel) {
@@ -66,14 +59,14 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
             });
           }
 
-          final model2 = resultMap[_sliverViewCtx2];
+          final model2 = resultMap[_sliverGridCtx];
           if (model2 != null &&
               model2.visible &&
               model2 is GridViewObserveModel) {
             debugPrint('2 visible -- ${model2.visible}');
             debugPrint('2 displaying -- ${model2.displayingChildIndexList}');
             setState(() {
-              _hitIndexsForCtx2 =
+              _hitIndexsForGrid =
                   model2.firstGroupChildList.map((e) => e.index).toList();
             });
           }
@@ -91,7 +84,7 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
                   text: 'SliverList - Jumping to row 29',
                 );
                 observerController.animateTo(
-                  sliverContext: _sliverViewCtx1,
+                  sliverContext: _sliverListCtx,
                   index: 29,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
@@ -106,7 +99,7 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
                   text: 'SliverGrid - Jumping to item 10',
                 );
                 observerController.animateTo(
-                  sliverContext: _sliverViewCtx2,
+                  sliverContext: _sliverGridCtx,
                   index: 10,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
@@ -133,11 +126,22 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
     );
   }
 
-  Widget _buildSliverListView1() {
+  Widget _buildScrollView() {
+    return CustomScrollView(
+      controller: scrollController,
+      // scrollDirection: Axis.horizontal,
+      slivers: [
+        _buildSliverListView(),
+        _buildSliverGridView(),
+      ],
+    );
+  }
+
+  Widget _buildSliverListView() {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (ctx, index) {
-          _sliverViewCtx1 ??= ctx;
+          _sliverListCtx ??= ctx;
           return Container(
             height: (index % 2 == 0) ? 80 : 50,
             color: _hitIndexForCtx1 == index ? Colors.red : Colors.black12,
@@ -157,7 +161,7 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
     );
   }
 
-  Widget _buildSliverListView2() {
+  Widget _buildSliverGridView() {
     return SliverGrid(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2, //Grid按两列显示
@@ -167,9 +171,9 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
-          _sliverViewCtx2 ??= context;
+          _sliverGridCtx ??= context;
           return Container(
-            color: (_hitIndexsForCtx2.contains(index))
+            color: (_hitIndexsForGrid.contains(index))
                 ? Colors.green
                 : Colors.blue[100],
             child: Center(
