@@ -1,3 +1,8 @@
+/*
+ * @Author: LinXunFeng linxunfeng@yeah.net
+ * @Reop: https://github.com/LinXunFeng/flutter_scrollview_observer
+ * @Date: 2022-07-03 15:46:45
+ */
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/listview/video_auto_play_list/widgets/video_widget.dart';

@@ -1,3 +1,8 @@
+/*
+ * @Author: LinXunFeng linxunfeng@yeah.net
+ * @Reop: https://github.com/LinXunFeng/flutter_scrollview_observer
+ * @Date: 2022-07-03 15:46:45
+ */
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/common/models/observe_displaying_child_model.dart';
 import 'package:scrollview_observer/src/common/models/observe_displaying_child_model_mixin.dart';
