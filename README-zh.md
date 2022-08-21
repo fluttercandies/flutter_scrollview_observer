@@ -2,9 +2,15 @@
 
 [![author](https://img.shields.io/badge/author-LinXunFeng-blue.svg?style=flat-square&logo=Iconify)](https://github.com/LinXunFeng/) [![pub](https://img.shields.io/pub/v/scrollview_observer?&style=flat-square&label=pub&logo=dart)](https://pub.dev/packages/scrollview_observer) [![stars](https://img.shields.io/github/stars/LinXunFeng/flutter_scrollview_observer?style=flat-square&logo=github)](https://github.com/LinXunFeng/flutter_scrollview_observer)
 
-Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_observer) | [文章](https://juejin.cn/post/7103058155692621837/)
+Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_observer)
 
 这是一个可用于监听滚动视图中正在显示的子部件的组件库。
+
+## 文章
+
+- [Flutter - 列表滚动定位超强辅助库，墙裂推荐！🔥](https://juejin.cn/post/7129888644290068487)
+- [Flutter - 获取ListView当前正在显示的Widget信息](https://juejin.cn/post/7103058155692621837)
+
 ## 功能点
 
 > 不需要改变你当前所使用视图，只需要在视图外包裹一层即可实现如下功能点

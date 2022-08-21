@@ -2,10 +2,17 @@
 
 [![author](https://img.shields.io/badge/author-LinXunFeng-blue.svg?style=flat-square&logo=Iconify)](https://github.com/LinXunFeng/) [![pub](https://img.shields.io/pub/v/scrollview_observer?&style=flat-square&label=pub&logo=dart)](https://pub.dev/packages/scrollview_observer) [![stars](https://img.shields.io/github/stars/LinXunFeng/flutter_scrollview_observer?style=flat-square&logo=github)](https://github.com/LinXunFeng/flutter_scrollview_observer)
 
-Language: English | [中文](https://github.com/LinXunFeng/flutter_scrollview_observer/blob/main/README-zh.md) | [Article](https://juejin.cn/post/7103058155692621837/)
+Language: English | [中文](https://github.com/LinXunFeng/flutter_scrollview_observer/blob/main/README-zh.md)
 
 
 This is a library of widget that can be used to listen for child widgets those are being displayed in the scroll view.
+
+
+## Article
+
+- [Flutter - 列表滚动定位超强辅助库，墙裂推荐！🔥](https://juejin.cn/post/7129888644290068487)
+- [Flutter - 获取ListView当前正在显示的Widget信息](https://juejin.cn/post/7103058155692621837)
+
 ## Feature
 
 > You do not need to change the view you are currently using, just wrap a `ViewObserver` around the view to achieve the following features.
