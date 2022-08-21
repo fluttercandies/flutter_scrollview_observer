@@ -1,3 +1,9 @@
+## 1.3.0
+- Scrolling to the specified index location supports the `SliverPersistentHeader`.
+- Add `ObserverUtils`
+  - Method `calcPersistentHeaderExtent`: Calculate current extent of `RenderSliverPersistentHeader`.
+  - Method `calcAnchorTabIndex`: Calculate the anchor tab index.
+
 ## 1.2.0
 - The `jumpTo` and `animateTo` methods add an `isFixedHeight` parameter to optimize performance when the child widget is of fixed height
 - Add the properties `[leadingMarginToViewport]` and `[trailingMarginToViewport]`
