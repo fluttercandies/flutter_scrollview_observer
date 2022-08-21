@@ -53,25 +53,11 @@ class _AnchorListPageState extends State<AnchorListPage>
         controller: observerController,
         child: _buildListView(),
         onObserve: (resultModel) {
-          if (observerController.innerIsHandlingScroll) return;
-          final topIndex = resultModel.firstChild?.index ?? 0;
-          final index = tabIndexs.indexOf(topIndex);
-          if (index != -1) {
-            _tabController.index = index;
-          } else {
-            var targetTabIndex = _tabController.index - 1;
-            if (targetTabIndex < 0 || targetTabIndex >= tabIndexs.length) {
-              return;
-            }
-            var curIndex = tabIndexs[_tabController.index];
-            var lastIndex = tabIndexs[_tabController.index - 1];
-            if (curIndex > topIndex && lastIndex < topIndex) {
-              final lastTabIndex = tabIndexs.indexOf(lastIndex);
-              if (lastTabIndex != -1) {
-                _tabController.index = lastTabIndex;
-              }
-            }
-          }
+          _tabController.index = ObserverUtils.calcAnchorTabIndex(
+            observeModel: resultModel,
+            tabIndexs: tabIndexs,
+            currentTabIndex: _tabController.index,
+          );
         },
       ),
     );
