@@ -19,7 +19,7 @@ This is a library of widget that can be used to listen for child widgets those a
 - [x] `SliverList`
 - [x] `GridView`
 - [x] `SliverGrid` 
-- [x] Mixing usage of `SliverList` and `SliverGrid`
+- [x] Mixing usage of `SliverPersistentHeader`, `SliverList` and `SliverGrid`
 
 ## Installing
 
@@ -153,6 +153,8 @@ ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
 
 ### 2、Scrolling to the specified index location
 
+#### 2.1、Basic usage
+
 Create and use instance of `ScrollController` normally.
 
 ```dart
@@ -191,6 +193,8 @@ observerController.animateTo(
   curve: Curves.ease,
 );
 ```
+
+#### 2.2、Property `isFixedHeight` 
 
 If the height of a list child widget is fixed, it is recommended to use the 'isFixedHeight' parameter to improve performance.
 
@@ -237,6 +241,39 @@ observerController.animateTo(
   index: 10,
   duration: const Duration(milliseconds: 300),
   curve: Curves.easeInOut,
+);
+```
+
+
+#### 2.3、Property `offset`
+
+> Used to set the whole scrollView offset when scrolling to a specified index.
+
+For example, in the scene with `SliverAppBar`, its height will change with the scrolling of `ScrollView`. After reaching a certain offset, it will be suspended on the top with a fixed height, and then we must pass this fixed height to the offset property.
+
+```dart
+SliverAppBar(
+  key: appBarKey,
+  pinned: true,
+  expandedHeight: 200,
+  flexibleSpace: FlexibleSpaceBar(
+    title: const Text('AppBar'),
+    background: Container(color: Colors.orange),
+  ),
+);
+```
+
+```dart
+observerController.animateTo(
+  ...
+  offset: (offset) {
+    // The height of the SliverAppBar is calculated base on target offset and is returned in the current callback.
+    // The observerController internally adjusts the appropriate offset based on the return value.
+    return ObserverUtils.calcPersistentHeaderExtent(
+      key: appBarKey,
+      offset: offset,
+    );
+  },
 );
 ```
 

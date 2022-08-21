@@ -17,7 +17,7 @@ Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_ob
 - [x] `SliverList`
 - [x] `GridView`
 - [x] `SliverGrid` 
-- [x] 支持 `SliverList` 和 `SliverGrid` 混合使用
+- [x] 支持 `SliverPersistentHeader`，`SliverList` 和 `SliverGrid` 混合使用
 
 ## 安装
 
@@ -149,6 +149,7 @@ ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
 
 ### 2、滚动到指定下标位置
 
+#### 2.1、基本使用
 正常创建和使用 `ScrollController` 实例
 
 ```dart
@@ -187,6 +188,7 @@ observerController.animateTo(
   curve: Curves.ease,
 );
 ```
+#### 2.2、`isFixedHeight` 参数
 
 如果列表子部件的高度是固定的，则建议使用 `isFixedHeight` 参数提升性能
 
@@ -233,6 +235,38 @@ observerController.animateTo(
   index: 10,
   duration: const Duration(milliseconds: 300),
   curve: Curves.easeInOut,
+);
+```
+
+#### 2.3、`offset` 参数
+
+> 用于在滚动到指定下标位置时，设置整体的偏移量。
+
+如在有 `SliverAppBar` 的场景下，其高度会随着 `ScrollView` 的滚动而变化，到达一定的偏移量后会固定高度悬浮于顶部，这时就需要使用到 `offset` 参数了。
+
+```dart
+SliverAppBar(
+  key: appBarKey,
+  pinned: true,
+  expandedHeight: 200,
+  flexibleSpace: FlexibleSpaceBar(
+    title: const Text('AppBar'),
+    background: Container(color: Colors.orange),
+  ),
+);
+```
+
+```dart
+observerController.animateTo(
+  ...
+  offset: (offset) {
+    // 根据目标偏移量 offset，计算出 SliverAppBar 的高度并返回
+    // observerController 内部会根据该返回值做适当的偏移调整
+    return ObserverUtils.calcPersistentHeaderExtent(
+      key: appBarKey,
+      offset: offset,
+    );
+  },
 );
 ```
 
