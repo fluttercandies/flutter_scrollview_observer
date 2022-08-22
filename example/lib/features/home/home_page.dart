@@ -12,6 +12,7 @@ import 'package:scrollview_observer_example/features/gridview/horizontal_gridvie
 import 'package:scrollview_observer_example/features/gridview/sliver_grid_demo/sliver_grid_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/anchor_demo/anchor_page.dart';
 import 'package:scrollview_observer_example/features/listview/horizontal_listview_demo/horizontal_listview_page.dart';
+import 'package:scrollview_observer_example/features/listview/image_tab_demo/image_tab_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_ctx_demo/listview_ctx_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_demo/listview_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_dynamic_offset/listview_dynamic_offset_page.dart';
@@ -104,6 +105,12 @@ class HomePage extends StatelessWidget {
         "AnchorList",
         () {
           return const AnchorListPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "ImageTab",
+        () {
+          return const ImageTabPage();
         },
       ),
       Tuple2<String, PageBuilder>(
