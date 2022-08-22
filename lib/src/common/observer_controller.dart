@@ -514,7 +514,9 @@ mixin ObserverControllerForScroll on ObserverController {
         targetOffset -= outerOffset - childLeadingMarginToViewport;
       }
     } else {
-      targetOffset -= outerOffset;
+      if (targetOffset >= outerOffset) {
+        targetOffset -= outerOffset;
+      }
     }
 
     return targetOffset;
