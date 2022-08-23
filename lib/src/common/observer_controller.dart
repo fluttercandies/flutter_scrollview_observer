@@ -516,6 +516,8 @@ mixin ObserverControllerForScroll on ObserverController {
     } else {
       if (targetOffset >= outerOffset) {
         targetOffset -= outerOffset;
+      } else {
+        targetOffset = 0;
       }
     }
 
