@@ -44,7 +44,7 @@ class _ImageTabPageState extends State<ImageTabPage> {
     screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("ListView")),
+      appBar: AppBar(title: const Text("ImageTab")),
       body: Column(
         children: [
           SizedBox(

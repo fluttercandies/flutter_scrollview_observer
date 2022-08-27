@@ -5,7 +5,7 @@
  */
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
-import 'package:scrollview_observer_example/features/listview/video_auto_play_list/widgets/video_widget.dart';
+import 'package:scrollview_observer_example/features/scene/video_auto_play_list/widgets/video_widget.dart';
 
 class VideoListAutoPlayPage extends StatefulWidget {
   const VideoListAutoPlayPage({Key? key}) : super(key: key);

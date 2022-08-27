@@ -10,15 +10,15 @@ import 'package:scrollview_observer_example/features/gridview/gridview_ctx_demo/
 import 'package:scrollview_observer_example/features/gridview/gridview_demo/gridview_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/horizontal_gridview_demo/horizontal_gridview_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/sliver_grid_demo/sliver_grid_demo_page.dart';
-import 'package:scrollview_observer_example/features/listview/anchor_demo/anchor_page.dart';
 import 'package:scrollview_observer_example/features/listview/horizontal_listview_demo/horizontal_listview_page.dart';
-import 'package:scrollview_observer_example/features/listview/image_tab_demo/image_tab_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_ctx_demo/listview_ctx_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_demo/listview_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_dynamic_offset/listview_dynamic_offset_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_fixed_height_demo/listview_fixed_height_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/sliver_list_demo/sliver_list_demo_page.dart';
-import 'package:scrollview_observer_example/features/listview/video_auto_play_list/video_list_auto_play_page.dart';
+import 'package:scrollview_observer_example/features/scene/anchor_demo/anchor_page.dart';
+import 'package:scrollview_observer_example/features/scene/image_tab_demo/image_tab_page.dart';
+import 'package:scrollview_observer_example/features/scene/video_auto_play_list/video_list_auto_play_page.dart';
 import 'package:tuple/tuple.dart';
 
 typedef PageBuilder = Widget Function();
@@ -96,24 +96,6 @@ class HomePage extends StatelessWidget {
         },
       ),
       Tuple2<String, PageBuilder>(
-        "VideoList AutoPlay",
-        () {
-          return const VideoListAutoPlayPage();
-        },
-      ),
-      Tuple2<String, PageBuilder>(
-        "AnchorList",
-        () {
-          return const AnchorListPage();
-        },
-      ),
-      Tuple2<String, PageBuilder>(
-        "ImageTab",
-        () {
-          return const ImageTabPage();
-        },
-      ),
-      Tuple2<String, PageBuilder>(
         "GridView",
         () {
           return const GridViewDemoPage();
@@ -147,6 +129,24 @@ class HomePage extends StatelessWidget {
         "SliverAppBar",
         () {
           return const SliverAppBarDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "VideoList AutoPlay",
+        () {
+          return const VideoListAutoPlayPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "AnchorList",
+        () {
+          return const AnchorListPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "ImageTab",
+        () {
+          return const ImageTabPage();
         },
       ),
     ];
