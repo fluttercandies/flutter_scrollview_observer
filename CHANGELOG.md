@@ -1,3 +1,8 @@
+## 1.4.0
+- Scrolling to the specified index location
+  - New `alignment` paramter in the `jumpTo` and `animateTo` methods.
+  - Fixed a bug that caused scrolling to the first child to jitter when using `offset` paramter.
+
 ## 1.3.0
 - Scrolling to the specified index location supports the `SliverPersistentHeader`.
 - Add `ObserverUtils`
