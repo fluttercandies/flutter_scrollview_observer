@@ -201,7 +201,7 @@ observerController.animateTo(
 );
 ```
 
-#### 2.2、Property `isFixedHeight` 
+#### 2.2、Parameter `isFixedHeight` 
 
 If the height of a list child widget is fixed, it is recommended to use the 'isFixedHeight' parameter to improve performance.
 
@@ -252,11 +252,11 @@ observerController.animateTo(
 ```
 
 
-#### 2.3、Property `offset`
+#### 2.3、Parameter `offset`
 
 > Used to set the whole scrollView offset when scrolling to a specified index.
 
-For example, in the scene with `SliverAppBar`, its height will change with the scrolling of `ScrollView`. After reaching a certain offset, it will be suspended on the top with a fixed height, and then we must pass this fixed height to the offset property.
+For example, in the scene with `SliverAppBar`, its height will change with the scrolling of `ScrollView`. After reaching a certain offset, it will be suspended on the top with a fixed height, and then we must pass this fixed height to the `offset` parameter.
 
 ```dart
 SliverAppBar(
@@ -283,6 +283,15 @@ observerController.animateTo(
   },
 );
 ```
+
+#### 2.4、Parameter `alignment`
+
+The `alignment` specifies the desired position for the leading edge of the child widget. It must be a value in the range `[0.0, 1.0]`. Such as:
+
+- `alignment: 0` : Scrolling to the `top` position of the child widget.
+- `alignment: 0.5` : Scrolling to the `middle` position of the child widget.
+- `alignment: 1` : Scrolling to the `tail` position of the child widget.
+
 
 ### 3、Model Property
 
@@ -346,15 +355,31 @@ observerController.animateTo(
 
 ## Example
 
+### 1、ListView / SliverList
+
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/1.gif)
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/4.gif)
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/9.gif)
+
+### 2、GridView / SliverGrid
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/7.gif)
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/8.gif)
+
+### 3、CustomScrollView
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/5.gif)
+
+### 4、Scene
 
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/2.gif)
 
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/3.gif)
 
-![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/4.gif)
-
-![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/5.gif)
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/6.gif)
 
 ## About Me
 

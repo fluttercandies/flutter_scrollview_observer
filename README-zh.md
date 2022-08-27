@@ -276,6 +276,14 @@ observerController.animateTo(
 );
 ```
 
+#### 2.4、`alignment` 参数
+
+`alignment` 参数用于指定你期望定位到子部件的对齐位置，该值需要在 `[0.0, 1.0]` 这个范围之间。默认为 `0`，比如：
+
+- `alignment: 0` : 滚动到子部件的顶部位置
+- `alignment: 0.5` : 滚动到子部件的中间位置
+- `alignment: 1` : 滚动到子部件的尾部位置
+
 ### 3、模型属性
 
 #### `ObserveModel`
@@ -337,15 +345,31 @@ observerController.animateTo(
 
 ## 示例
 
+### 1、ListView / SliverList
+
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/1.gif)
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/4.gif)
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/9.gif)
+
+### 2、GridView / SliverGrid
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/7.gif)
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/8.gif)
+
+### 3、CustomScrollView
+
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/5.gif)
+
+### 4、应用场景
 
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/2.gif)
 
 ![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/3.gif)
 
-![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/4.gif)
-
-![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/5.gif)
+![](https://github.com/LinXunFeng/flutter_assets/raw/main/flutter_scrollview_observer/6.gif)
 
 ## 关于我
 
