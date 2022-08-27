@@ -67,16 +67,21 @@ mixin ObserverControllerForScroll on ObserverController {
   /// If you do not pass the [isFixedHeight] parameter, the package will
   /// automatically gradually scroll around the target location before
   /// locating, which will produce an animation.
+  /// 
+  /// The [alignment] specifies the desired position for the leading edge of the
+  /// child widget. It must be a value in the range [0.0, 1.0].
   jumpTo({
     required int index,
     BuildContext? sliverContext,
     bool isFixedHeight = false,
+    double alignment = 0,
     ObserverLocateIndexOffsetCallback? offset,
   }) async {
     await _scrollToIndex(
       index: index,
       isFixedHeight: isFixedHeight,
       sliverContext: sliverContext,
+      alignment: alignment,
       offset: offset,
     );
   }
@@ -85,12 +90,16 @@ mixin ObserverControllerForScroll on ObserverController {
   ///
   /// If the height of the child widget and the height of the separator are
   /// fixed, please pass the [isFixedHeight] parameter.
+  /// 
+  /// The [alignment] specifies the desired position for the leading edge of the
+  /// child widget. It must be a value in the range [0.0, 1.0].
   animateTo({
     required int index,
     required Duration duration,
     required Curve curve,
     BuildContext? sliverContext,
     bool isFixedHeight = false,
+    double alignment = 0,
     ObserverLocateIndexOffsetCallback? offset,
   }) async {
     await _scrollToIndex(
@@ -99,6 +108,7 @@ mixin ObserverControllerForScroll on ObserverController {
       sliverContext: sliverContext,
       duration: duration,
       curve: curve,
+      alignment: alignment,
       offset: offset,
     );
   }
@@ -106,11 +116,14 @@ mixin ObserverControllerForScroll on ObserverController {
   _scrollToIndex({
     required int index,
     required bool isFixedHeight,
+    required double alignment,
     BuildContext? sliverContext,
     Duration? duration,
     Curve? curve,
     ObserverLocateIndexOffsetCallback? offset,
   }) async {
+    assert(alignment.clamp(0, 1) == alignment,
+        'The [alignment] is expected to be a value in the range [0.0, 1.0]');
     assert(controller != null);
     var _controller = controller;
     if (_controller == null || !_controller.hasClients) return;
@@ -127,7 +140,7 @@ mixin ObserverControllerForScroll on ObserverController {
     // Before the next sliver is shown, it may have an incorrect value for
     // precedingScrollExtent, so we need to scroll around to get
     // precedingScrollExtent correctly.
-    double leadingPadding = obj.constraints.precedingScrollExtent;
+    double precedingScrollExtent = obj.constraints.precedingScrollExtent;
     final objVisible = obj.geometry?.visible ?? false;
     if (!objVisible && viewport.offset.hasPixels) {
       final viewportOffset = viewport.offset.pixels;
@@ -136,9 +149,9 @@ mixin ObserverControllerForScroll on ObserverController {
           isHorizontal ? viewport.size.width : viewport.size.height;
       final viewportBoundaryExtent =
           viewportSize * 0.5 + (viewport.cacheExtent ?? 0);
-      if (leadingPadding > (viewportOffset + viewportBoundaryExtent)) {
+      if (precedingScrollExtent > (viewportOffset + viewportBoundaryExtent)) {
         innerIsHandlingScroll = true;
-        double targetOffset = leadingPadding - viewportBoundaryExtent;
+        double targetOffset = precedingScrollExtent - viewportBoundaryExtent;
         final maxScrollExtent = viewportMaxScrollExtent(viewport);
         if (targetOffset > maxScrollExtent) targetOffset = maxScrollExtent;
         await _controller.animateTo(
@@ -147,7 +160,7 @@ mixin ObserverControllerForScroll on ObserverController {
           curve: _findingCurve,
         );
         await Future.delayed(_findingDuration);
-        leadingPadding = obj.constraints.precedingScrollExtent;
+        precedingScrollExtent = obj.constraints.precedingScrollExtent;
       }
     }
 
@@ -159,6 +172,7 @@ mixin ObserverControllerForScroll on ObserverController {
         obj: obj,
         childLayoutOffset: targetScrollChildModel.layoutOffset,
         childSize: targetScrollChildModel.size,
+        alignment: alignment,
         offset: offset,
       );
       if (isAnimateTo) {
@@ -188,7 +202,7 @@ mixin ObserverControllerForScroll on ObserverController {
         ctx: ctx!,
         obj: obj,
         index: index,
-        leadingPadding: leadingPadding,
+        alignment: alignment,
         duration: duration,
         curve: curve,
         offset: offset,
@@ -209,9 +223,9 @@ mixin ObserverControllerForScroll on ObserverController {
       ctx: ctx!,
       obj: obj,
       index: index,
+      alignment: alignment,
       firstChildIndex: firstChildIndex,
       lastChildIndex: lastChildIndex,
-      leadingPadding: leadingPadding,
       duration: duration,
       curve: curve,
       offset: offset,
@@ -224,7 +238,7 @@ mixin ObserverControllerForScroll on ObserverController {
     required BuildContext ctx,
     required RenderSliverMultiBoxAdaptor obj,
     required int index,
-    required double leadingPadding,
+    required double alignment,
     Duration? duration,
     Curve? curve,
     ObserverLocateIndexOffsetCallback? offset,
@@ -266,6 +280,7 @@ mixin ObserverControllerForScroll on ObserverController {
       obj: obj,
       childLayoutOffset: childLayoutOffset,
       childSize: childSize,
+      alignment: alignment,
       offset: offset,
     );
     if (isAnimateTo) {
@@ -296,9 +311,9 @@ mixin ObserverControllerForScroll on ObserverController {
     required BuildContext ctx,
     required RenderSliverMultiBoxAdaptor obj,
     required int index,
+    required double alignment,
     required int firstChildIndex,
     required int lastChildIndex,
-    required double leadingPadding,
     Duration? duration,
     Curve? curve,
     ObserverLocateIndexOffsetCallback? offset,
@@ -312,6 +327,7 @@ mixin ObserverControllerForScroll on ObserverController {
 
     final isHorizontal = obj.constraints.axis == Axis.horizontal;
     bool isAnimateTo = (duration != null) && (curve != null);
+    final precedingScrollExtent = obj.constraints.precedingScrollExtent;
 
     if (index < firstChildIndex) {
       innerIsHandlingScroll = true;
@@ -327,7 +343,7 @@ mixin ObserverControllerForScroll on ObserverController {
       if (targetLeadingOffset < 0) {
         targetLeadingOffset = 0;
       }
-      double prevPageOffset = targetLeadingOffset + leadingPadding;
+      double prevPageOffset = targetLeadingOffset + precedingScrollExtent;
       prevPageOffset = prevPageOffset < 0 ? 0 : prevPageOffset;
       if (isAnimateTo) {
         await _controller.animateTo(
@@ -352,9 +368,9 @@ mixin ObserverControllerForScroll on ObserverController {
           ctx: ctx,
           obj: obj,
           index: index,
+          alignment: alignment,
           firstChildIndex: firstChildIndex,
           lastChildIndex: lastChildIndex,
-          leadingPadding: leadingPadding,
           duration: duration,
           curve: curve,
           offset: offset,
@@ -372,7 +388,8 @@ mixin ObserverControllerForScroll on ObserverController {
       if (parentData is SliverMultiBoxAdaptorParentData) {
         childLayoutOffset = parentData.layoutOffset ?? 0;
       }
-      double nextPageOffset = childLayoutOffset + childSize + leadingPadding;
+      double nextPageOffset =
+          childLayoutOffset + childSize + precedingScrollExtent;
       nextPageOffset =
           nextPageOffset > maxScrollExtent ? maxScrollExtent : nextPageOffset;
       if (isAnimateTo) {
@@ -398,9 +415,9 @@ mixin ObserverControllerForScroll on ObserverController {
           ctx: ctx,
           obj: obj,
           index: index,
+          alignment: alignment,
           firstChildIndex: firstChildIndex,
           lastChildIndex: lastChildIndex,
-          leadingPadding: leadingPadding,
           duration: duration,
           curve: curve,
           offset: offset,
@@ -438,6 +455,7 @@ mixin ObserverControllerForScroll on ObserverController {
             obj: obj,
             childLayoutOffset: childLayoutOffset,
             childSize: childSize,
+            alignment: alignment,
             offset: offset,
           );
           if (isAnimateTo) {
@@ -473,10 +491,13 @@ mixin ObserverControllerForScroll on ObserverController {
     required RenderSliverMultiBoxAdaptor obj,
     required double childLayoutOffset,
     required double childSize,
+    required double alignment,
     ObserverLocateIndexOffsetCallback? offset,
   }) {
-    double leadingPadding = obj.constraints.precedingScrollExtent;
-    var targetOffset = childLayoutOffset + leadingPadding;
+    double precedingScrollExtent = obj.constraints.precedingScrollExtent;
+    double leadingPadding = childSize * alignment;
+    var targetOffset =
+        childLayoutOffset + precedingScrollExtent + leadingPadding;
     final geometry = obj.geometry;
     final layoutExtent = geometry?.layoutExtent ?? 0;
     // The (estimated) total scrollable extent of this sliver.
@@ -505,8 +526,10 @@ mixin ObserverControllerForScroll on ObserverController {
     if (!isEnoughScroll) {
       // The distance between the target child widget and the leading of the
       // viewport.
-      final childLeadingMarginToViewport =
-          childLayoutOffset + leadingPadding - targetOffset;
+      final childLeadingMarginToViewport = childLayoutOffset +
+          precedingScrollExtent +
+          leadingPadding -
+          targetOffset;
       if (childLeadingMarginToViewport < outerOffset) {
         // The distance between the target child and the leading of the viewport
         // overlaps with the specified offset.
