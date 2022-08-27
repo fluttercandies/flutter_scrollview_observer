@@ -87,16 +87,21 @@ class _ImageTabPageState extends State<ImageTabPage> {
   }
 
   Widget _buildListItemView(int index) {
-    Widget resultWidget = _buildImageWidget(index);
-    resultWidget = Container(
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(
-          Radius.circular(8),
-        ),
-      ),
-      width: 80,
-      height: 50,
-      child: resultWidget,
+    Widget imgWidget = _buildImageWidget(index);
+    Widget resultWidget = ValueListenableBuilder<int>(
+      builder: (BuildContext context, int value, Widget? child) {
+        return Container(
+          decoration: BoxDecoration(
+            border: (selectedIndex.value == index)
+                ? Border.all(color: Colors.orange, width: 3)
+                : null,
+          ),
+          width: 80,
+          height: 50,
+          child: imgWidget,
+        );
+      },
+      valueListenable: selectedIndex,
     );
     resultWidget = GestureDetector(
       child: resultWidget,
@@ -105,10 +110,11 @@ class _ImageTabPageState extends State<ImageTabPage> {
         selectedIndex.value = index;
         observerController.animateTo(
           index: index,
+          alignment: 0.5,
           duration: const Duration(milliseconds: 250),
           curve: Curves.ease,
           offset: (_) {
-            return screenWidth * 0.5 - 40;
+            return screenWidth * 0.5;
           },
         );
       },
