@@ -7,11 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/common/observer_controller.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
+import 'package:scrollview_observer/src/notification.dart';
 
 import 'models/observe_model.dart';
 
-class ObserverWidget<C extends ObserverController, M extends ObserveModel,
-    N extends Notification, S extends RenderSliver> extends StatefulWidget {
+class ObserverWidget<
+    C extends ObserverController,
+    M extends ObserveModel,
+    N extends ScrollViewOnceObserveNotification,
+    S extends RenderSliver> extends StatefulWidget {
   final Widget child;
 
   /// An object that can be used to dispatch a [ListViewOnceObserveNotification]
@@ -62,7 +66,7 @@ class ObserverWidget<C extends ObserverController, M extends ObserveModel,
 class ObserverWidgetState<
     C extends ObserverController,
     M extends ObserveModel,
-    N extends Notification,
+    N extends ScrollViewOnceObserveNotification,
     S extends RenderSliver,
     T extends ObserverWidget<C, M, N, S>> extends State<T> {
   /// Target sliver [BuildContext]
@@ -80,8 +84,8 @@ class ObserverWidgetState<
   @override
   Widget build(BuildContext context) {
     return NotificationListener<N>(
-      onNotification: (_) {
-        _handleContexts();
+      onNotification: (notification) {
+        _handleContexts(isForceObserve: notification.isForce);
         return true;
       },
       child: NotificationListener<ScrollNotification>(
@@ -101,6 +105,10 @@ class ObserverWidgetState<
     sliverController.innerReset();
     sliverController.innerNeedOnceObserveCallBack = () {
       _handleContexts();
+    };
+    sliverController.innerReattachCallBack = () {
+      targetSliverContexts.clear();
+      _setupSliverController();
     };
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
       targetSliverContexts = fetchTargetSliverContexts();
@@ -134,7 +142,9 @@ class ObserverWidgetState<
   }
 
   /// Handle all buildContext
-  _handleContexts() {
+  _handleContexts({
+    bool isForceObserve = false,
+  }) {
     final onObserve = widget.onObserve;
     final onObserveAll = widget.onObserveAll;
     if (onObserve == null && onObserveAll == null) return;
@@ -154,11 +164,15 @@ class ObserverWidgetState<
       if (targetObserveModel == null) continue;
       resultMap[ctx] = targetObserveModel;
 
-      final lastResultModel = lastResultMap[ctx];
-      if (lastResultModel == null) {
+      if (isForceObserve) {
         changeResultMap[ctx] = targetObserveModel;
-      } else if (lastResultModel != targetObserveModel) {
-        changeResultMap[ctx] = targetObserveModel;
+      } else {
+        final lastResultModel = lastResultMap[ctx];
+        if (lastResultModel == null) {
+          changeResultMap[ctx] = targetObserveModel;
+        } else if (lastResultModel != targetObserveModel) {
+          changeResultMap[ctx] = targetObserveModel;
+        }
       }
 
       // Geting observed result for first listView

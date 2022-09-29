@@ -9,7 +9,7 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/observer_controller.dart';
 
 class SliverObserverController extends ObserverController
-    with ObserverControllerForScroll {
+    with ObserverControllerForInfo, ObserverControllerForScroll {
   SliverObserverController({
     ScrollController? controller,
   }) : super(controller: controller);

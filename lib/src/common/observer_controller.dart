@@ -6,6 +6,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:scrollview_observer/src/common/models/observe_find_child_model.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
 
 import 'models/observe_scroll_child_model.dart';
@@ -13,20 +14,27 @@ import 'models/observe_scroll_child_model.dart';
 class ObserverController {
   ObserverController({this.controller});
 
-  /// Target sliver [BuildContext]
-  List<BuildContext> sliverContexts = [];
-
-  /// Target scroll controller
+  /// Target scroll controller.
   final ScrollController? controller;
+
+  /// Whether to cache the offset when jump to a specified index position.
+  /// Default is true.
+  bool cacheJumpIndexOffset = true;
 
   /// The map which stores the offset of child in the sliver
   Map<BuildContext, Map<int, ObserveScrollChildModel>> indexOffsetMap = {};
 
+  /// Target sliver [BuildContext]
+  List<BuildContext> sliverContexts = [];
+
   /// A flag used to ignore unnecessary calculations during scrolling.
   bool innerIsHandlingScroll = false;
 
-  /// The callback to call [ObserverWidget]'s _handleContexts method.
+  /// The callback to call [ObserverWidget]'s [_handleContexts] method.
   Function()? innerNeedOnceObserveCallBack;
+
+  /// The callback to call [ObserverWidget]'s [_setupSliverController] method.
+  Function()? innerReattachCallBack;
 
   /// Dispatch a observe notification
   innerDispatchOnceObserve({
@@ -53,11 +61,137 @@ class ObserverController {
     }
     return _sliverContext;
   }
+
+  /// Get the latest target sliver [BuildContext] and reset some of the old data.
+  reattach() {
+    if (innerReattachCallBack == null) return;
+    ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
+      innerReattachCallBack!();
+    });
+  }
 }
 
-mixin ObserverControllerForScroll on ObserverController {
+mixin ObserverControllerForInfo on ObserverController {
+  /// Find out the current first child in sliver
+  RenderIndexedSemantics? findCurrentFirstChild(
+    RenderSliverMultiBoxAdaptor obj,
+  ) {
+    RenderIndexedSemantics? child;
+    final firstChild = obj.firstChild;
+    if (firstChild == null) return null;
+    if (firstChild is RenderIndexedSemantics) {
+      child = firstChild;
+    } else {
+      final nextChild = obj.childAfter(firstChild);
+      if (nextChild is RenderIndexedSemantics) {
+        child = nextChild;
+      }
+    }
+    return child;
+  }
+
+  /// Find out the next child in sliver
+  RenderIndexedSemantics? findNextChild({
+    required RenderSliverMultiBoxAdaptor obj,
+    RenderBox? currentChild,
+  }) {
+    RenderIndexedSemantics? child;
+    if (currentChild == null) return null;
+    var nextChild = obj.childAfter(currentChild);
+    if (nextChild == null) return null;
+    if (nextChild is RenderIndexedSemantics) {
+      child = nextChild;
+    } else {
+      nextChild = obj.childAfter(nextChild);
+      if (nextChild is RenderIndexedSemantics) {
+        child = nextChild;
+      }
+    }
+    return child;
+  }
+
+  /// Find out the current last child in sliver
+  RenderIndexedSemantics? findCurrentLastChild(
+      RenderSliverMultiBoxAdaptor obj) {
+    RenderIndexedSemantics? child;
+    final lastChild = obj.lastChild;
+    if (lastChild == null) return null;
+    if (lastChild is RenderIndexedSemantics) {
+      child = lastChild;
+    } else {
+      final previousChild = obj.childBefore(lastChild);
+      if (previousChild is RenderIndexedSemantics) {
+        child = previousChild;
+      }
+    }
+    return child;
+  }
+
+  /// Find out the child widget info for specified index in sliver.
+  ObserveFindChildModel? findChildInfo({
+    required int index,
+    BuildContext? sliverContext,
+  }) {
+    final ctx = fetchSliverContext(sliverContext: sliverContext);
+    var obj = ctx?.findRenderObject();
+    if (obj is! RenderSliverMultiBoxAdaptor) return null;
+    var targetChild = findCurrentFirstChild(obj);
+    if (targetChild == null) return null;
+    while (targetChild != null && (targetChild.index != index)) {
+      targetChild = findNextChild(obj: obj, currentChild: targetChild);
+    }
+    if (targetChild == null) return null;
+    return ObserveFindChildModel(
+      sliver: obj,
+      index: targetChild.index,
+      renderObject: targetChild,
+    );
+  }
+
+  /// Find out the first child widget info in sliver.
+  ObserveFindChildModel? findCurrentFirstChildInfo({
+    BuildContext? sliverContext,
+  }) {
+    final ctx = fetchSliverContext(sliverContext: sliverContext);
+    var obj = ctx?.findRenderObject();
+    if (obj == null || obj is! RenderSliverMultiBoxAdaptor) return null;
+    final targetChild = findCurrentFirstChild(obj);
+    if (targetChild == null) return null;
+    final index = targetChild.index;
+    return findChildInfo(index: index, sliverContext: sliverContext);
+  }
+
+  /// Find out the viewport
+  RenderViewport? _findViewport(RenderSliverMultiBoxAdaptor obj) {
+    int maxCycleCount = 10;
+    int currentCycleCount = 1;
+    AbstractNode? parent = obj.parent;
+    while (parent != null && currentCycleCount <= maxCycleCount) {
+      if (parent is RenderViewport) {
+        return parent;
+      }
+      parent = parent.parent;
+      currentCycleCount++;
+    }
+    return null;
+  }
+
+  /// Getting [maxScrollExtent] of viewport
+  double viewportMaxScrollExtent(RenderViewport viewport) {
+    return (viewport.offset as ScrollPositionWithSingleContext).maxScrollExtent;
+  }
+}
+
+mixin ObserverControllerForScroll on ObserverControllerForInfo {
   static const Duration _findingDuration = Duration(milliseconds: 1);
   static const Curve _findingCurve = Curves.ease;
+
+  /// Clear the offset cache that jumping to a specified index location.
+  clearIndexOffsetCache(BuildContext? sliverContext) {
+    final ctx = fetchSliverContext(sliverContext: sliverContext);
+    if (ctx == null) return;
+    indexOffsetMap[ctx]?.clear();
+  }
 
   /// Jump to the specified index position without animation.
   ///
@@ -213,8 +347,8 @@ mixin ObserverControllerForScroll on ObserverController {
     // Find the index of the first [RenderIndexedSemantics] child in viewport
     var firstChildIndex = 0;
     var lastChildIndex = 0;
-    final firstChild = _findCurrentFirstChild(obj);
-    final lastChild = _findCurrentLastChild(obj);
+    final firstChild = findCurrentFirstChild(obj);
+    final lastChild = findCurrentLastChild(obj);
     if (firstChild == null || lastChild == null) return;
     firstChildIndex = firstChild.index;
     lastChildIndex = lastChild.index;
@@ -249,7 +383,7 @@ mixin ObserverControllerForScroll on ObserverController {
     innerIsHandlingScroll = true;
     bool isAnimateTo = (duration != null) && (curve != null);
 
-    final targetChild = _findCurrentFirstChild(obj);
+    final targetChild = findCurrentFirstChild(obj);
     if (targetChild == null) return;
     final isHorizontal = obj.constraints.axis == Axis.horizontal;
     var nextChild = obj.childAfter(targetChild);
@@ -334,7 +468,7 @@ mixin ObserverControllerForScroll on ObserverController {
       final sliverSize =
           isHorizontal ? obj.paintBounds.width : obj.paintBounds.height;
       double childLayoutOffset = 0;
-      final firstChild = _findCurrentFirstChild(obj);
+      final firstChild = findCurrentFirstChild(obj);
       final parentData = firstChild?.parentData;
       if (parentData is SliverMultiBoxAdaptorParentData) {
         childLayoutOffset = parentData.layoutOffset ?? 0;
@@ -356,8 +490,8 @@ mixin ObserverControllerForScroll on ObserverController {
       }
 
       ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
-        final firstChild = _findCurrentFirstChild(obj);
-        final lastChild = _findCurrentLastChild(obj);
+        final firstChild = findCurrentFirstChild(obj);
+        final lastChild = findCurrentLastChild(obj);
         if (firstChild == null || lastChild == null) {
           innerIsHandlingScroll = false;
           return;
@@ -378,7 +512,7 @@ mixin ObserverControllerForScroll on ObserverController {
       });
     } else if (index > lastChildIndex) {
       innerIsHandlingScroll = true;
-      final lastChild = _findCurrentLastChild(obj);
+      final lastChild = findCurrentLastChild(obj);
       final childSize = (isHorizontal
               ? lastChild?.paintBounds.width
               : lastChild?.paintBounds.height) ??
@@ -403,8 +537,8 @@ mixin ObserverControllerForScroll on ObserverController {
       }
 
       ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
-        final firstChild = _findCurrentFirstChild(obj);
-        final lastChild = _findCurrentLastChild(obj);
+        final firstChild = findCurrentFirstChild(obj);
+        final lastChild = findCurrentLastChild(obj);
         if (firstChild == null || lastChild == null) {
           innerIsHandlingScroll = false;
           return;
@@ -547,58 +681,6 @@ mixin ObserverControllerForScroll on ObserverController {
     return targetOffset;
   }
 
-  /// Getting [maxScrollExtent] of viewport
-  double viewportMaxScrollExtent(RenderViewport viewport) {
-    return (viewport.offset as ScrollPositionWithSingleContext).maxScrollExtent;
-  }
-
-  /// Find out the current first child in sliver
-  RenderIndexedSemantics? _findCurrentFirstChild(
-      RenderSliverMultiBoxAdaptor obj) {
-    RenderIndexedSemantics? child;
-    final firstChild = obj.firstChild;
-    if (firstChild is RenderIndexedSemantics) {
-      child = firstChild;
-    } else {
-      final nextChild = obj.childAfter(firstChild!);
-      if (nextChild is RenderIndexedSemantics) {
-        child = nextChild;
-      }
-    }
-    return child;
-  }
-
-  /// Find out the current last child in sliver
-  RenderIndexedSemantics? _findCurrentLastChild(
-      RenderSliverMultiBoxAdaptor obj) {
-    RenderIndexedSemantics? child;
-    final lastChild = obj.lastChild;
-    if (lastChild is RenderIndexedSemantics) {
-      child = lastChild;
-    } else {
-      final previousChild = obj.childBefore(lastChild!);
-      if (previousChild is RenderIndexedSemantics) {
-        child = previousChild;
-      }
-    }
-    return child;
-  }
-
-  /// Find out the viewport
-  RenderViewport? _findViewport(RenderSliverMultiBoxAdaptor obj) {
-    int maxCycleCount = 10;
-    int currentCycleCount = 1;
-    AbstractNode? parent = obj.parent;
-    while (parent != null && currentCycleCount <= maxCycleCount) {
-      if (parent is RenderViewport) {
-        return parent;
-      }
-      parent = parent.parent;
-      currentCycleCount++;
-    }
-    return null;
-  }
-
   /// Update the [indexOffsetMap] property.
   _updateIndexOffsetMap({
     required BuildContext ctx,
@@ -606,6 +688,9 @@ mixin ObserverControllerForScroll on ObserverController {
     required double childLayoutOffset,
     required double childSize,
   }) {
+    // No need to cache
+    if (!cacheJumpIndexOffset) return;
+    // To cache offset
     final map = indexOffsetMap[ctx] ?? {};
     map[index] = ObserveScrollChildModel(
       layoutOffset: childLayoutOffset,

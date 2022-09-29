@@ -5,8 +5,26 @@
  */
 import 'package:flutter/material.dart';
 
+class ScrollViewOnceObserveNotification extends Notification {
+  ScrollViewOnceObserveNotification({
+    this.isForce = false,
+  });
+
+  final bool isForce;
+}
+
 /// The Notification for Triggering an ListView observation
-class ListViewOnceObserveNotification extends Notification {}
+class ListViewOnceObserveNotification
+    extends ScrollViewOnceObserveNotification {
+  ListViewOnceObserveNotification({
+    bool isForce = false,
+  }) : super(isForce: isForce);
+}
 
 /// The Notification for Triggering an GridView observation
-class GridViewOnceObserveNotification extends Notification {}
+class GridViewOnceObserveNotification
+    extends ScrollViewOnceObserveNotification {
+  GridViewOnceObserveNotification({
+    bool isForce = false,
+  }) : super(isForce: isForce);
+}

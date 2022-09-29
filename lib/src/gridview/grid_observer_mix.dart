@@ -14,7 +14,7 @@ import '../../scrollview_observer.dart';
 mixin GridObserverMix<
         C extends ObserverController,
         M extends ObserveModel,
-        N extends Notification,
+        N extends ScrollViewOnceObserveNotification,
         S extends RenderSliver,
         T extends ObserverWidget<C, M, N, S>>
     on ObserverWidgetState<C, M, N, S, T> {
