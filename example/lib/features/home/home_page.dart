@@ -17,6 +17,7 @@ import 'package:scrollview_observer_example/features/listview/listview_dynamic_o
 import 'package:scrollview_observer_example/features/listview/listview_fixed_height_demo/listview_fixed_height_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/sliver_list_demo/sliver_list_demo_page.dart';
 import 'package:scrollview_observer_example/features/scene/anchor_demo/anchor_page.dart';
+import 'package:scrollview_observer_example/features/scene/chat_demo/page/chat_page.dart';
 import 'package:scrollview_observer_example/features/scene/image_tab_demo/image_tab_page.dart';
 import 'package:scrollview_observer_example/features/scene/video_auto_play_list/video_list_auto_play_page.dart';
 import 'package:tuple/tuple.dart';
@@ -147,6 +148,12 @@ class HomePage extends StatelessWidget {
         "ImageTab",
         () {
           return const ImageTabPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "Chat",
+        () {
+          return const ChatPage();
         },
       ),
     ];
