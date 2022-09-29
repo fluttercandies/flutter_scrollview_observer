@@ -300,7 +300,7 @@ However, in scence where the height of child widget is always changing dynamical
 
 ### 3、Chat Observer
 
-We only need three steps to implete the chat session page list effect.
+We only need three steps to implement the chat session page list effect.
 
 - 1、All chat data are displayed at the top of the listView when there is less than one screen of chat data.
 - 2、When inserting a chat data
