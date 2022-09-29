@@ -284,7 +284,76 @@ observerController.animateTo(
 - `alignment: 0.5` : 滚动到子部件的中间位置
 - `alignment: 1` : 滚动到子部件的尾部位置
 
-### 3、模型属性
+#### 2.5、`cacheJumpIndexOffset` 属性
+
+为了性能考虑，在默认情况下，列表在滚动到指定位置时，`ScrollController` 会对子部件的信息进行缓存，便于下次直接使用。
+
+但是对于子部件高度一直都是动态改变的场景下，这反而会造成不必要的麻烦，所以这时可以通过对 `cacheJumpIndexOffset` 属性设置为 `false` 来关闭这一缓存功能。
+
+### 3、聊天会话
+
+只需要三个步骤即可实现聊天会话页的列表效果
+
+- 1、聊天数据不满一屏时，顶部显示所有聊天数据
+- 2、插入消息时
+  - 如果最新消息紧靠列表底部时，则插入消息会使列表向上推
+  - 如果不是紧靠列表底部，则固定到当前聊天位置
+
+步骤一：初始化必要的 `ListObserverController` 和 `ChatScrollObserver`
+```dart
+/// 初始化 ListObserverController
+observerController = ListObserverController(controller: scrollController)
+  ..cacheJumpIndexOffset = false;
+
+/// 初始化 ChatScrollObserver
+chatObserver = ChatScrollObserver(observerController)
+  ..toRebuildScrollViewCallback = () {
+    // 这里可以重建指定的滚动视图即可
+    setState(() {});
+  };
+```
+
+步骤二：按如下配置 `ListView` 并使用 `ListViewObserver` 将其包裹
+
+```dart
+Widget _buildListView() {
+  Widget resultWidget = ListView.builder(
+    physics: ChatObserverClampinScrollPhysics(observer: chatObserver),
+    shrinkWrap: chatObserver.isShrinkWrap,
+    reverse: true,
+    controller: scrollController,
+    ...
+  );
+
+  resultWidget = ListViewObserver(
+    controller: observerController,
+    child: resultWidget,
+  );
+  return resultWidget;
+}
+```
+
+步骤三：插入或消息消息前，调用 `ChatScrollObserver` 的 `standby` 方法
+
+```dart
+onPressed: () {
+  chatObserver.standby();
+  setState(() {
+    chatModels.insert(0, ChatDataHelper.createChatModel());
+  });
+},
+...
+onRemove: () {
+  chatObserver.standby(isRemove: true);
+  setState(() {
+    chatModels.removeAt(index);
+  });
+},
+```
+
+![](https://cdn.jsdelivr.net/gh/FullStackAction/PicBed@resource20220417121922/image/202209292333410.gif)
+
+### 4、模型属性
 
 #### `ObserveModel`
 

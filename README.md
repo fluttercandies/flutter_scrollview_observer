@@ -292,8 +292,77 @@ The `alignment` specifies the desired position for the leading edge of the child
 - `alignment: 0.5` : Scrolling to the `middle` position of the child widget.
 - `alignment: 1` : Scrolling to the `tail` position of the child widget.
 
+#### 2.5、Property `cacheJumpIndexOffset`
 
-### 3、Model Property
+For performance reasons, `ScrollController` will caches the child's information by default when the listView `jump` or `animate` to the specified location, so that it can be used next time directly.
+
+However, in scence where the height of child widget is always changing dynamically, this will cause unnecessary trouble, so you can turn this off by setting the `cacheJumpIndexOffset` property to `false`.
+
+### 3、Chat Observer
+
+We only need three steps to implete the chat session page list effect.
+
+- 1、All chat data are displayed at the top of the listView when there is less than one screen of chat data.
+- 2、When inserting a chat data
+  - If the latest message is close to the bottom of the list, the listView will be pushed up.
+  - Otherwise, the listview will be fixed to the current chat location.
+
+Step 1: Initialize the necessary `ListObserverController` and `ChatScrollObserver`.
+
+```dart
+/// Initialize ListObserverController
+observerController = ListObserverController(controller: scrollController)
+  ..cacheJumpIndexOffset = false;
+
+/// Initialize ChatScrollObserver
+chatObserver = ChatScrollObserver(observerController)
+  ..toRebuildScrollViewCallback = () {
+    // Here you can use other way to rebuild the specified listView instead of [setState]
+    setState(() {});
+  };
+```
+
+Step 2: Configure `ListView` as follows and wrap it with `ListViewObserver`.
+
+```dart
+Widget _buildListView() {
+  Widget resultWidget = ListView.builder(
+    physics: ChatObserverClampinScrollPhysics(observer: chatObserver),
+    shrinkWrap: chatObserver.isShrinkWrap,
+    reverse: true,
+    controller: scrollController,
+    ...
+  );
+
+  resultWidget = ListViewObserver(
+    controller: observerController,
+    child: resultWidget,
+  );
+  return resultWidget;
+}
+```
+
+Step 3: Call the [standby] method of `ChatScrollObserver` before inserting or removing chat data.
+
+```dart
+onPressed: () {
+  chatObserver.standby();
+  setState(() {
+    chatModels.insert(0, ChatDataHelper.createChatModel());
+  });
+},
+...
+onRemove: () {
+  chatObserver.standby(isRemove: true);
+  setState(() {
+    chatModels.removeAt(index);
+  });
+},
+```
+
+![](https://cdn.jsdelivr.net/gh/FullStackAction/PicBed@resource20220417121922/image/202209292333410.gif)
+
+### 4、Model Property
 
 #### `ObserveModel`
 
