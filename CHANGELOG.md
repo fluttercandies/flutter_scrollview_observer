@@ -1,3 +1,9 @@
+## 1.5.0
+- Chat Observer
+  - Quickly implement the chat session page effect.
+- Scrolling to the specified index location
+  - Add the properties `[cacheJumpIndexOffset]`.
+
 ## 1.4.0
 - Scrolling to the specified index location
   - New `alignment` paramter in the `jumpTo` and `animateTo` methods.
