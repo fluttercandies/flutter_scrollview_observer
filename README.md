@@ -10,6 +10,7 @@ This is a library of widget that can be used to listen for child widgets those a
 
 ## Article
 
+- [Flutter - 快速实现聊天会话列表的效果，完美💯](https://juejin.cn/post/7152307272436154405)
 - [Flutter - 列表滚动定位超强辅助库，墙裂推荐！🔥](https://juejin.cn/post/7129888644290068487)
 - [Flutter - 获取ListView当前正在显示的Widget信息](https://juejin.cn/post/7103058155692621837)
 
@@ -19,6 +20,7 @@ This is a library of widget that can be used to listen for child widgets those a
 
 - [x] Observing child widgets those are being displayed in the scroll view
 - [x] Supports scrolling to the specified index location
+- [x] Quickly implement the chat session page effect
 
 ## Support
 

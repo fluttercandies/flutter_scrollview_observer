@@ -8,6 +8,7 @@ Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_ob
 
 ## 文章
 
+- [Flutter - 快速实现聊天会话列表的效果，完美💯](https://juejin.cn/post/7152307272436154405)
 - [Flutter - 列表滚动定位超强辅助库，墙裂推荐！🔥](https://juejin.cn/post/7129888644290068487)
 - [Flutter - 获取ListView当前正在显示的Widget信息](https://juejin.cn/post/7103058155692621837)
 
@@ -17,6 +18,7 @@ Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_ob
 
 - [x] 监听滚动视图中正在显示的子部件
 - [x] 支持滚动到指定下标位置
+- [x] 快速实现聊天会话列表的效果
 
 ## 支持
 - [x] `ListView`
@@ -333,7 +335,7 @@ Widget _buildListView() {
 }
 ```
 
-步骤三：插入或消息消息前，调用 `ChatScrollObserver` 的 `standby` 方法
+步骤三：插入或删除消息前，调用 `ChatScrollObserver` 的 `standby` 方法
 
 ```dart
 onPressed: () {
