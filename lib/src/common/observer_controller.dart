@@ -6,6 +6,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/models/observe_find_child_model.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
 
@@ -163,17 +164,7 @@ mixin ObserverControllerForInfo on ObserverController {
 
   /// Find out the viewport
   RenderViewport? _findViewport(RenderSliverMultiBoxAdaptor obj) {
-    int maxCycleCount = 10;
-    int currentCycleCount = 1;
-    AbstractNode? parent = obj.parent;
-    while (parent != null && currentCycleCount <= maxCycleCount) {
-      if (parent is RenderViewport) {
-        return parent;
-      }
-      parent = parent.parent;
-      currentCycleCount++;
-    }
-    return null;
+    return ObserverUtils.findViewport(obj);
   }
 
   /// Getting [maxScrollExtent] of viewport

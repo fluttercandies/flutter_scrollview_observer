@@ -4,6 +4,7 @@
  * @Date: 2022-08-21 00:53:44
  */
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/listview/models/listview_observe_model.dart';
@@ -57,5 +58,20 @@ class ObserverUtils {
       }
     }
     return currentTabIndex;
+  }
+
+  /// Find out the viewport
+  static RenderViewport? findViewport(RenderSliverMultiBoxAdaptor obj) {
+    int maxCycleCount = 10;
+    int currentCycleCount = 1;
+    AbstractNode? parent = obj.parent;
+    while (parent != null && currentCycleCount <= maxCycleCount) {
+      if (parent is RenderViewport) {
+        return parent;
+      }
+      parent = parent.parent;
+      currentCycleCount++;
+    }
+    return null;
   }
 }

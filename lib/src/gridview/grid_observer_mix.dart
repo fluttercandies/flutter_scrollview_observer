@@ -21,6 +21,9 @@ mixin GridObserverMix<
   GridViewObserveModel? handleGridObserve(BuildContext ctx) {
     final _obj = ctx.findRenderObject();
     if (_obj is! RenderSliverGrid) return null;
+    final viewport = ObserverUtils.findViewport(_obj);
+    if (viewport == null) return null;
+    if (viewport.debugNeedsPaint) return null;
     if (!(_obj.geometry?.visible ?? true)) {
       return GridViewObserveModel(
         sliverGrid: _obj,

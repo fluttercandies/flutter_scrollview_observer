@@ -21,6 +21,9 @@ mixin ListObserverMix<
   ListViewObserveModel? handleListObserve(BuildContext ctx) {
     final _obj = ctx.findRenderObject();
     if (_obj is! RenderSliverList) return null;
+    final viewport = ObserverUtils.findViewport(_obj);
+    if (viewport == null) return null;
+    if (viewport.debugNeedsPaint) return null;
     if (!(_obj.geometry?.visible ?? true)) {
       return ListViewObserveModel(
         sliverList: _obj,
