@@ -1,5 +1,5 @@
 ## 1.5.1
-- Fix app being stuck when child widget get `[size]`.
+- Fix scrollView being stuck when child widget get `[size]`.
 
 ## 1.5.0
 - Chat Observer
