@@ -1,8 +1,11 @@
+## 1.5.1
+- Fix app being stuck when child widget get `[size]`.
+
 ## 1.5.0
 - Chat Observer
   - Quickly implement the chat session page effect.
 - Scrolling to the specified index location
-  - Add the properties `[cacheJumpIndexOffset]`.
+  - Add the property `[cacheJumpIndexOffset]`.
 
 ## 1.4.0
 - Scrolling to the specified index location
