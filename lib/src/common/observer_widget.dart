@@ -204,6 +204,7 @@ class ObserverWidgetState<
     required RenderBox targetFirstChild,
   }) {
     if (targetFirstChild is! RenderIndexedSemantics) return false;
+    if (!targetFirstChild.hasSize) return false;
     final parentData = targetFirstChild.parentData;
     if (parentData is! SliverMultiBoxAdaptorParentData) {
       return false;

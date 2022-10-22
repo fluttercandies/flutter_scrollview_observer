@@ -3,6 +3,7 @@
  * @Reop: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
@@ -21,9 +22,11 @@ mixin ListObserverMix<
   ListViewObserveModel? handleListObserve(BuildContext ctx) {
     final _obj = ctx.findRenderObject();
     if (_obj is! RenderSliverList) return null;
-    final viewport = ObserverUtils.findViewport(_obj);
-    if (viewport == null) return null;
-    if (viewport.debugNeedsPaint) return null;
+    if (kDebugMode) {
+      final viewport = ObserverUtils.findViewport(_obj);
+      if (viewport == null) return null;
+      if (viewport.debugNeedsPaint) return null;
+    }
     if (!(_obj.geometry?.visible ?? true)) {
       return ListViewObserveModel(
         sliverList: _obj,
