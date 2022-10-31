@@ -5,6 +5,7 @@
  */
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer/src/common/typedefs.dart';
 
 mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
   late final ChatScrollObserver observer;
@@ -29,15 +30,27 @@ mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
     if (newPosition.extentBefore == 0 ||
         !isNeedFixedPosition ||
         observer.isRemove) {
+      _handlePositionCallback(ChatScrollObserverHandlePositionType.none);
       return adjustPosition;
     }
     final model = observer.observeRefItem();
-    if (model == null) return adjustPosition;
+    if (model == null) {
+      _handlePositionCallback(ChatScrollObserverHandlePositionType.none);
+      return adjustPosition;
+    }
 
+    _handlePositionCallback(ChatScrollObserverHandlePositionType.keepPosition);
     final delta = model.layoutOffset - observer.refItemLayoutOffset;
     return adjustPosition + delta;
   }
 
   @override
   bool shouldAcceptUserOffset(ScrollMetrics position) => true;
+
+  /// Calling observer's [onHandlePositionCallback].
+  _handlePositionCallback(ChatScrollObserverHandlePositionType type) {
+    ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
+      observer.onHandlePositionCallback?.call(type);
+    });
+  }
 }

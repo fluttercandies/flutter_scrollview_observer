@@ -35,6 +35,10 @@ class ChatScrollObserver {
   /// Such as call [setState] method.
   Function? toRebuildScrollViewCallback;
 
+  /// This callback will be called when handling in [ClampingScrollPhysics]'s
+  /// [adjustPositionForNewDimensions].
+  void Function(ChatScrollObserverHandlePositionType)? onHandlePositionCallback;
+
   /// Observe the child widget of the reference.
   ListViewObserveDisplayingChildModel? observeRefItem() {
     return observerController.observeItem(index: refItemIndex + 1);
