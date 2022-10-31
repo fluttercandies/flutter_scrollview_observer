@@ -9,6 +9,7 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/helper/chat_data_helper.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/model/chat_model.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/widget/chat_item_widget.dart';
+import 'package:scrollview_observer_example/features/scene/chat_demo/widget/chat_unread_tip_view.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
@@ -26,11 +27,17 @@ class _ChatPageState extends State<ChatPage> {
 
   List<ChatModel> chatModels = [];
 
+  ValueNotifier<int> unreadMsgCount = ValueNotifier<int>(0);
+
+  bool needIncrementUnreadMsgCount = false;
+
   @override
   void initState() {
     super.initState();
 
     chatModels = createChatModels();
+
+    scrollController.addListener(scrollControllerListener);
 
     observerController = ListObserverController(controller: scrollController)
       ..cacheJumpIndexOffset = false;
@@ -38,7 +45,24 @@ class _ChatPageState extends State<ChatPage> {
     chatObserver = ChatScrollObserver(observerController)
       ..toRebuildScrollViewCallback = () {
         setState(() {});
+      }
+      ..onHandlePositionCallback = (type) {
+        if (!needIncrementUnreadMsgCount) return;
+        switch (type) {
+          case ChatScrollObserverHandlePositionType.keepPosition:
+            updateUnreadMsgCount();
+            break;
+          case ChatScrollObserverHandlePositionType.none:
+            updateUnreadMsgCount(isReset: true);
+            break;
+        }
       };
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -54,13 +78,46 @@ class _ChatPageState extends State<ChatPage> {
               chatObserver.standby();
               setState(() {
                 chatModels.insert(0, ChatDataHelper.createChatModel());
+                needIncrementUnreadMsgCount = true;
               });
             },
             icon: const Icon(Icons.add_comment),
           )
         ],
       ),
-      body: SafeArea(child: _buildListView()),
+      body: SafeArea(child: _buildBody()),
+    );
+  }
+
+  Widget _buildBody() {
+    return Stack(
+      children: [
+        _buildListView(),
+        Positioned(
+          bottom: 0,
+          right: 30,
+          child: _buildUnreadTipView(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUnreadTipView() {
+    return ValueListenableBuilder<int>(
+      builder: (context, value, child) {
+        return ChatUnreadTipView(
+          unreadMsgCount: unreadMsgCount.value,
+          onTap: () {
+            scrollController.animateTo(
+              0,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+            updateUnreadMsgCount(isReset: true);
+          },
+        );
+      },
+      valueListenable: unreadMsgCount,
     );
   }
 
@@ -98,5 +155,20 @@ class _ChatPageState extends State<ChatPage> {
     return Iterable<int>.generate(num)
         .map((e) => ChatDataHelper.createChatModel())
         .toList();
+  }
+
+  updateUnreadMsgCount({bool isReset = false}) {
+    needIncrementUnreadMsgCount = false;
+    if (isReset) {
+      unreadMsgCount.value = 0;
+    } else {
+      unreadMsgCount.value += 1;
+    }
+  }
+
+  scrollControllerListener() {
+    if (scrollController.offset < 50) {
+      updateUnreadMsgCount(isReset: true);
+    }
   }
 }
