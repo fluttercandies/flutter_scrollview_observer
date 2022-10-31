@@ -1,3 +1,7 @@
+## 1.6.0
+- Chat Observer
+  - Add `onHandlePositionCallback`.
+
 ## 1.5.1
 - Fix scrollView being stuck when child widget get `[size]`.
 
