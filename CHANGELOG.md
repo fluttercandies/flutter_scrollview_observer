@@ -1,3 +1,6 @@
+## 1.6.1
+- Fix lib not working when `shrinkWrap` is `true` in scrollView.
+
 ## 1.6.0
 - Chat Observer
   - Add `onHandlePositionCallback`.
