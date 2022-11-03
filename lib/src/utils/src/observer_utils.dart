@@ -61,12 +61,12 @@ class ObserverUtils {
   }
 
   /// Find out the viewport
-  static RenderViewport? findViewport(RenderSliverMultiBoxAdaptor obj) {
+  static RenderViewportBase? findViewport(RenderSliverMultiBoxAdaptor obj) {
     int maxCycleCount = 10;
     int currentCycleCount = 1;
     AbstractNode? parent = obj.parent;
     while (parent != null && currentCycleCount <= maxCycleCount) {
-      if (parent is RenderViewport) {
+      if (parent is RenderViewportBase) {
         return parent;
       }
       parent = parent.parent;

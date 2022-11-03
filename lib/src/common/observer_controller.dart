@@ -162,12 +162,12 @@ mixin ObserverControllerForInfo on ObserverController {
   }
 
   /// Find out the viewport
-  RenderViewport? _findViewport(RenderSliverMultiBoxAdaptor obj) {
+  RenderViewportBase? _findViewport(RenderSliverMultiBoxAdaptor obj) {
     return ObserverUtils.findViewport(obj);
   }
 
   /// Getting [maxScrollExtent] of viewport
-  double viewportMaxScrollExtent(RenderViewport viewport) {
+  double viewportMaxScrollExtent(RenderViewportBase viewport) {
     return (viewport.offset as ScrollPositionWithSingleContext).maxScrollExtent;
   }
 }
