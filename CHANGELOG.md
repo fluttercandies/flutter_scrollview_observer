@@ -1,3 +1,6 @@
+## 1.6.2
+- Fix lib not working when `itemExtent` is set in `ListView`.
+
 ## 1.6.1
 - Fix lib not working when `shrinkWrap` is `true` in scrollView.
 
