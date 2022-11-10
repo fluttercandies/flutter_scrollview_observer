@@ -292,8 +292,22 @@ observerController.animateTo(
 
 但是对于子部件高度一直都是动态改变的场景下，这反而会造成不必要的麻烦，所以这时可以通过对 `cacheJumpIndexOffset` 属性设置为 `false` 来关闭这一缓存功能。
 
+#### 2.6、`clearIndexOffsetCache` 方法
+
+如果你想保留滚动的缓存功能，并且只想在特定情况下去清除缓存，则可以使用 `clearIndexOffsetCache` 方法。
+
+```dart
+/// Clear the offset cache that jumping to a specified index location.
+clearIndexOffsetCache(BuildContext? sliverContext) {
+  ...
+}
+```
+
+其形参 `sliverContext` 只有在你自行管理 `ScrollView` 的 `BuildContext` 时才需要传递。
+
 ### 3、聊天会话
 
+#### 3.1、基本使用
 只需要三个步骤即可实现聊天会话页的列表效果
 
 - 1、聊天数据不满一屏时，顶部显示所有聊天数据
@@ -354,6 +368,30 @@ onRemove: () {
 ```
 
 ![](https://cdn.jsdelivr.net/gh/FullStackAction/PicBed@resource20220417121922/image/202209292333410.gif)
+
+#### 3.2、聊天消息位置的处理回调
+
+// Nothing will be done
+  none,
+  // Keep the current chat location.
+
+```dart
+chatObserver = ChatScrollObserver(observerController)
+  ..onHandlePositionCallback = (type) {
+    switch (type) {
+      case ChatScrollObserverHandlePositionType.keepPosition:
+        // 保持当前聊天消息位置
+        // updateUnreadMsgCount();
+        break;
+      case ChatScrollObserverHandlePositionType.none:
+        // 对聊天消息位置不做处理
+        // updateUnreadMsgCount(isReset: true);
+        break;
+    }
+  };
+```
+
+该回调的主要作用：在新增聊天消息时，处理新消息未读数气泡的展示
 
 ### 4、模型属性
 

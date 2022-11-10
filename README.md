@@ -300,7 +300,21 @@ For performance reasons, `ScrollController` will caches the child's information 
 
 However, in scence where the height of child widget is always changing dynamically, this will cause unnecessary trouble, so you can turn this off by setting the `cacheJumpIndexOffset` property to `false`.
 
+#### 2.6、Method `clearIndexOffsetCache`
+
+You can use the `clearIndexOffsetCache` method if you want to preserve the cache function of scrolling and only want to clear the cache in certain cases.
+
+```dart
+/// Clear the offset cache that jumping to a specified index location.
+clearIndexOffsetCache(BuildContext? sliverContext) {
+  ...
+}
+```
+
+The parameter `sliverContext` needs to be passed only if you manage `ScrollView`'s `BuildContext` by yourself.
+
 ### 3、Chat Observer
+#### 3.1、Basic usage
 
 We only need three steps to implement the chat session page effect.
 
@@ -363,6 +377,26 @@ onRemove: () {
 ```
 
 ![](https://cdn.jsdelivr.net/gh/FullStackAction/PicBed@resource20220417121922/image/202209292333410.gif)
+
+#### 3.2、The result callback for processing chat location.
+
+```dart
+chatObserver = ChatScrollObserver(observerController)
+  ..onHandlePositionCallback = (type) {
+    switch (type) {
+      case ChatScrollObserverHandlePositionType.keepPosition:
+        // Keep the current chat location.
+        // updateUnreadMsgCount();
+        break;
+      case ChatScrollObserverHandlePositionType.none:
+        // Do nothing about the chat location.
+        // updateUnreadMsgCount(isReset: true);
+        break;
+    }
+  };
+```
+
+This callback is mainly used to display the unread bubbles of new messages when adding chat messages.
 
 ### 4、Model Property
 
