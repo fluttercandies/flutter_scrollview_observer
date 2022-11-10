@@ -20,8 +20,11 @@ mixin ListObserverMix<
         T extends ObserverWidget<C, M, N, S>>
     on ObserverWidgetState<C, M, N, S, T> {
   ListViewObserveModel? handleListObserve(BuildContext ctx) {
-    final _obj = ctx.findRenderObject();
-    if (_obj is! RenderSliverList) return null;
+    var _obj = ctx.findRenderObject();
+    if (_obj is! RenderSliverList && _obj is! RenderSliverFixedExtentList) {
+      return null;
+    }
+    _obj = _obj as RenderSliverMultiBoxAdaptor;
     if (kDebugMode) {
       final viewport = ObserverUtils.findViewport(_obj);
       if (viewport == null) return null;

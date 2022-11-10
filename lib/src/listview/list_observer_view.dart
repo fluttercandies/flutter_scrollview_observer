@@ -62,4 +62,10 @@ class ListViewObserverState extends ObserverWidgetState<
   ListViewObserveModel? handleObserve(BuildContext ctx) {
     return handleListObserve(ctx);
   }
+
+  /// Determine whether it is the type of the target sliver.
+  @override
+  bool isTargetSliverContextType(RenderObject? obj) {
+    return obj is RenderSliverList || obj is RenderSliverFixedExtentList;
+  }
 }

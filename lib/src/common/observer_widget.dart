@@ -126,7 +126,7 @@ class ObserverWidgetState<
       } else {
         List<BuildContext> _ctxs = [];
         void visitor(Element element) {
-          if (element.renderObject is S) {
+          if (isTargetSliverContextType(element.renderObject)) {
             /// Find the target sliver context
             _ctxs.add(element);
             return;
@@ -139,6 +139,11 @@ class ObserverWidgetState<
       }
     }
     return ctxs;
+  }
+
+  /// Determine whether it is the type of the target sliver.
+  bool isTargetSliverContextType(RenderObject? obj) {
+    return obj is S;
   }
 
   /// Handle all buildContext

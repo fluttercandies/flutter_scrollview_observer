@@ -21,7 +21,8 @@ class ListViewObserveModel extends ObserveModel {
         );
 
   /// The target sliverList.
-  RenderSliverList sliverList;
+  /// It would be [RenderSliverList] or [RenderSliverFixedExtentList].
+  RenderSliverMultiBoxAdaptor sliverList;
 
   /// The observing data of the first child widget that is displaying.
   final ListViewObserveDisplayingChildModel? firstChild;

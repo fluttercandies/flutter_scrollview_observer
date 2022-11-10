@@ -15,8 +15,9 @@ class ListViewObserveDisplayingChildModel extends ObserveDisplayingChildModel
     required RenderBox renderObject,
   }) : super(sliver: sliverList, index: index, renderObject: renderObject);
 
-  // The target sliverList
-  RenderSliverList sliverList;
+  /// The target sliverList.
+  /// It would be [RenderSliverList] or [RenderSliverFixedExtentList].
+  RenderSliverMultiBoxAdaptor sliverList;
 
   @override
   bool operator ==(Object other) {
