@@ -76,6 +76,14 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
   }
 
   ListView _buildListView() {
+    // return ListView.builder(
+    //   itemExtent: 50,
+    //   controller: scrollController,
+    //   itemCount: 500,
+    //   itemBuilder: (context, index) {
+    //     return _buildListItemView(index);
+    //   },
+    // );
     return ListView.separated(
       padding: const EdgeInsets.only(top: 1000, bottom: 1000),
       controller: scrollController,
