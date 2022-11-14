@@ -371,10 +371,6 @@ onRemove: () {
 
 #### 3.2、聊天消息位置的处理回调
 
-// Nothing will be done
-  none,
-  // Keep the current chat location.
-
 ```dart
 chatObserver = ChatScrollObserver(observerController)
   ..onHandlePositionCallback = (type) {
@@ -413,7 +409,7 @@ chatObserver = ChatScrollObserver(observerController)
 
 |属性|类型|描述|
 |-|-|-|
-|`sliver`|`RenderSliver`|当前 `sliver`|
+|`sliver`|`RenderSliverMultiBoxAdaptor`|当前 `sliver`|
 |`firstChild`|`ListViewObserveDisplayingChildModel`|当前第一个正在显示的子部件数据模型|
 |`displayingChildModelList`|`List<ListViewObserveDisplayingChildModel>`|当前正在显示的所有子部件数据模型|
 

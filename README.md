@@ -418,7 +418,7 @@ This callback is mainly used to display the unread bubbles of new messages when 
 
 |Property|Type|Desc|
 |-|-|-|
-|`sliver`|`RenderSliver`|The target sliverList.|
+|`sliver`|`RenderSliverMultiBoxAdaptor`|The target sliverList.|
 |`firstChild`|`ListViewObserveDisplayingChildModel`|The observing data of the first child widget that is displaying.|
 |`displayingChildModelList`|`List<ListViewObserveDisplayingChildModel>`|Stores observing model list of displaying children widgets.|
 
