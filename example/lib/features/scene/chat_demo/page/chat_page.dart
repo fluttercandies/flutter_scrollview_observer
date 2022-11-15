@@ -31,6 +31,14 @@ class _ChatPageState extends State<ChatPage> {
 
   bool needIncrementUnreadMsgCount = false;
 
+  bool editViewReadOnly = false;
+
+  TextEditingController editViewController = TextEditingController();
+
+  BuildContext? pageOverlayContext;
+
+  final LayerLink layerLink = LayerLink();
+
   @override
   void initState() {
     super.initState();
@@ -57,6 +65,8 @@ class _ChatPageState extends State<ChatPage> {
             break;
         }
       };
+
+    Future.delayed(const Duration(seconds: 1), addUnreadTipView);
   }
 
   @override
@@ -75,6 +85,7 @@ class _ChatPageState extends State<ChatPage> {
         actions: [
           IconButton(
             onPressed: () {
+              editViewController.text = '';
               chatObserver.standby();
               setState(() {
                 chatModels.insert(0, ChatDataHelper.createChatModel());
@@ -85,20 +96,79 @@ class _ChatPageState extends State<ChatPage> {
           )
         ],
       ),
-      body: SafeArea(child: _buildBody()),
+      body: _buildBody(),
     );
   }
 
+  Widget _buildPageOverlay() {
+    return Overlay(initialEntries: [
+      OverlayEntry(
+        builder: (context) {
+          pageOverlayContext = context;
+          return Container();
+        },
+      )
+    ]);
+  }
+
   Widget _buildBody() {
-    return Stack(
+    Widget resultWidget = Column(
       children: [
-        _buildListView(),
-        Positioned(
-          bottom: 0,
-          right: 30,
-          child: _buildUnreadTipView(),
+        Expanded(child: _buildListView()),
+        CompositedTransformTarget(
+          link: layerLink,
+          child: Container(),
         ),
+        _buildEditView(),
+        const SafeArea(top: false, child: SizedBox.shrink()),
       ],
+    );
+    resultWidget = Stack(children: [
+      resultWidget,
+      _buildPageOverlay(),
+    ]);
+    return resultWidget;
+  }
+
+  Widget _buildEditView() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.white, width: 0.5),
+        borderRadius: BorderRadius.circular(4),
+        // color: Colors.white,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                isCollapsed: true,
+              ),
+              style: const TextStyle(color: Colors.white),
+              maxLines: 4,
+              minLines: 1,
+              showCursor: true,
+              readOnly: editViewReadOnly,
+              controller: editViewController,
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.emoji_emotions_outlined),
+            iconSize: 24,
+            color: Colors.white,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints.tightForFinite(),
+            onPressed: () {
+              setState(() {
+                editViewReadOnly = !editViewReadOnly;
+              });
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -141,14 +211,35 @@ class _ChatPageState extends State<ChatPage> {
         );
       }),
       itemCount: chatModels.length,
-      clipBehavior: Clip.none,
     );
 
     resultWidget = ListViewObserver(
       controller: observerController,
       child: resultWidget,
     );
+    resultWidget = Align(
+      child: resultWidget,
+      alignment: Alignment.topCenter,
+    );
     return resultWidget;
+  }
+
+  addUnreadTipView() {
+    Overlay.of(pageOverlayContext!)?.insert(OverlayEntry(
+      builder: (BuildContext context) => UnconstrainedBox(
+        child: CompositedTransformFollower(
+          link: layerLink,
+          followerAnchor: Alignment.bottomRight,
+          targetAnchor: Alignment.topRight,
+          offset: const Offset(-20, 0),
+          child: Material(
+            type: MaterialType.transparency,
+            // color: Colors.green,
+            child: _buildUnreadTipView(),
+          ),
+        ),
+      ),
+    ));
   }
 
   List<ChatModel> createChatModels({int num = 3}) {
