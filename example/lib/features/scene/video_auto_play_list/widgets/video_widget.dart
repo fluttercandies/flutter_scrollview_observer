@@ -1,6 +1,6 @@
 /*
  * @Author: LinXunFeng linxunfeng@yeah.net
- * @Reop: https://github.com/LinXunFeng/flutter_scrollview_observer
+ * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-05-28 14:08:53
  */
 import 'package:flutter/material.dart';

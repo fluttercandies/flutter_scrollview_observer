@@ -1,6 +1,6 @@
 /*
  * @Author: LinXunFeng linxunfeng@yeah.net
- * @Reop: https://github.com/LinXunFeng/flutter_scrollview_observer
+ * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-22 22:17:55
  */
 
