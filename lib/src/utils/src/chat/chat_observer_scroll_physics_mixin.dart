@@ -17,8 +17,8 @@ mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
     required bool isScrolling,
     required double velocity,
   }) {
-    final isNeedFixedPosition = observer.isNeedFixedPosition;
-    observer.isNeedFixedPosition = false;
+    final isNeedFixedPosition = observer.innerIsNeedFixedPosition;
+    observer.innerIsNeedFixedPosition = false;
 
     var adjustPosition = super.adjustPositionForNewDimensions(
       oldPosition: oldPosition,
@@ -27,7 +27,7 @@ mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
       velocity: velocity,
     );
 
-    if (newPosition.extentBefore == 0 ||
+    if (newPosition.extentBefore <= observer.fixedPositionOffset ||
         !isNeedFixedPosition ||
         observer.isRemove) {
       _handlePositionCallback(ChatScrollObserverHandlePositionType.none);
@@ -40,7 +40,7 @@ mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
     }
 
     _handlePositionCallback(ChatScrollObserverHandlePositionType.keepPosition);
-    final delta = model.layoutOffset - observer.refItemLayoutOffset;
+    final delta = model.layoutOffset - observer.innerRefItemLayoutOffset;
     return adjustPosition + delta;
   }
 

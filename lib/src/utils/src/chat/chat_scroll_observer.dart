@@ -16,19 +16,27 @@ class ChatScrollObserver {
   final ListObserverController observerController;
 
   /// Whether a fixed position is required.
-  bool isNeedFixedPosition = false;
+  bool get isNeedFixedPosition => innerIsNeedFixedPosition;
+  bool innerIsNeedFixedPosition = false;
 
   /// The index of the reference.
-  int refItemIndex = 0;
+  int get refItemIndex => innerRefItemIndex;
+  int innerRefItemIndex = 0;
 
   /// The [layoutOffset] of the reference.
-  double refItemLayoutOffset = 0;
+  double get refItemLayoutOffset => innerRefItemLayoutOffset;
+  double innerRefItemLayoutOffset = 0;
 
-  /// Control the [shrinkWrap] propertie of the external scroll view.
-  bool isShrinkWrap = true;
+  /// Control the [shrinkWrap] properties of the external scroll view.
+  bool get isShrinkWrap => innerIsShrinkWrap;
+  bool innerIsShrinkWrap = true;
 
   /// Whether is remove chat data.
   bool isRemove = false;
+
+  /// The current chat location is retained when the scrollView offset is
+  /// greater than [fixedPositionOffset].
+  double fixedPositionOffset = 0;
 
   /// The callback that tells the outside to rebuild the scroll view.
   ///
@@ -41,7 +49,7 @@ class ChatScrollObserver {
 
   /// Observe the child widget of the reference.
   ListViewObserveDisplayingChildModel? observeRefItem() {
-    return observerController.observeItem(index: refItemIndex + 1);
+    return observerController.observeItem(index: innerRefItemIndex + 1);
   }
 
   /// Prepare to adjust position for sliver.
@@ -55,9 +63,9 @@ class ChatScrollObserver {
       sliverContext: sliverContext,
     );
     if (model == null) return;
-    isNeedFixedPosition = true;
-    refItemIndex = model.index;
-    refItemLayoutOffset = model.layoutOffset;
+    innerIsNeedFixedPosition = true;
+    innerRefItemIndex = model.index;
+    innerRefItemLayoutOffset = model.layoutOffset;
   }
 
   observeSwitchShrinkWrap() {
@@ -68,13 +76,13 @@ class ChatScrollObserver {
       final viewportMainAxisExtent = obj.constraints.viewportMainAxisExtent;
       final scrollExtent = obj.geometry?.scrollExtent ?? 0;
       if (viewportMainAxisExtent >= scrollExtent) {
-        if (isShrinkWrap) return;
-        isShrinkWrap = true;
+        if (innerIsShrinkWrap) return;
+        innerIsShrinkWrap = true;
         observerController.reattach();
         toRebuildScrollViewCallback?.call();
       } else {
-        if (!isShrinkWrap) return;
-        isShrinkWrap = false;
+        if (!innerIsShrinkWrap) return;
+        innerIsShrinkWrap = false;
         observerController.reattach();
         toRebuildScrollViewCallback?.call();
       }
