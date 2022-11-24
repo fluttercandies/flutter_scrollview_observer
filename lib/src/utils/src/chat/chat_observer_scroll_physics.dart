@@ -8,9 +8,18 @@ import 'package:flutter/material.dart';
 import 'chat_observer_scroll_physics_mixin.dart';
 import 'chat_scroll_observer.dart';
 
-class ChatObserverClampinScrollPhysics extends ClampingScrollPhysics
-    with ChatObserverScrollPhysicsMixin {
+@Deprecated(
+    'It will be removed in version 2, please use [ChatObserverClampingScrollPhysics] instead')
+class ChatObserverClampinScrollPhysics
+    extends ChatObserverClampingScrollPhysics {
   ChatObserverClampinScrollPhysics({
+    required ChatScrollObserver observer,
+  }) : super(observer: observer);
+}
+
+class ChatObserverClampingScrollPhysics extends ClampingScrollPhysics
+    with ChatObserverScrollPhysicsMixin {
+  ChatObserverClampingScrollPhysics({
     ScrollPhysics? parent,
     required ChatScrollObserver observer,
   }) : super(parent: parent) {
@@ -18,8 +27,8 @@ class ChatObserverClampinScrollPhysics extends ClampingScrollPhysics
   }
 
   @override
-  ChatObserverClampinScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return ChatObserverClampinScrollPhysics(
+  ChatObserverClampingScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return ChatObserverClampingScrollPhysics(
       parent: buildParent(ancestor),
       observer: observer,
     );
