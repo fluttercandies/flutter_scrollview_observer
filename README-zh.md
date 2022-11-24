@@ -323,6 +323,8 @@ observerController = ListObserverController(controller: scrollController)
 
 /// 初始化 ChatScrollObserver
 chatObserver = ChatScrollObserver(observerController)
+  // 超过该偏移量才会触发保持当前聊天位置的功能
+  ..fixedPositionOffset = 5
   ..toRebuildScrollViewCallback = () {
     // 这里可以重建指定的滚动视图即可
     setState(() {});

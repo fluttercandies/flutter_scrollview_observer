@@ -321,7 +321,7 @@ We only need three steps to implement the chat session page effect.
 - 1、All chat data are displayed at the top of the listView when there is less than one screen of chat data.
 - 2、When inserting a chat data
   - If the latest message is close to the bottom of the list, the listView will be pushed up.
-  - Otherwise, the listview will be fixed to the current chat location.
+  - Otherwise, the listView will be fixed to the current chat location.
 
 Step 1: Initialize the necessary `ListObserverController` and `ChatScrollObserver`.
 
@@ -332,6 +332,8 @@ observerController = ListObserverController(controller: scrollController)
 
 /// Initialize ChatScrollObserver
 chatObserver = ChatScrollObserver(observerController)
+  // Greater than this offset will be fixed to the current chat location.
+  ..fixedPositionOffset = 5
   ..toRebuildScrollViewCallback = () {
     // Here you can use other way to rebuild the specified listView instead of [setState]
     setState(() {});
