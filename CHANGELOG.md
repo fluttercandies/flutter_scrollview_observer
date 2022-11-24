@@ -1,7 +1,7 @@
 ## 1.7.0
 - Chat Observer
   - Add the property `[fixedPositionOffset]`.
-  - Deprecated [ChatObserverClampinScrollPhysics], please use [ChatObserverClampingScrollPhysics] instead.
+  - Deprecated `[ChatObserverClampinScrollPhysics]`, please use `[ChatObserverClampingScrollPhysics]` instead.
 
 ## 1.6.2
 - Fix lib not working when `itemExtent` is set in `ListView`.
