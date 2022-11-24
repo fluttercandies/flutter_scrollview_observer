@@ -51,6 +51,7 @@ class _ChatPageState extends State<ChatPage> {
       ..cacheJumpIndexOffset = false;
 
     chatObserver = ChatScrollObserver(observerController)
+      ..fixedPositionOffset = 5
       ..toRebuildScrollViewCallback = () {
         setState(() {});
       }
@@ -193,7 +194,7 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _buildListView() {
     Widget resultWidget = ListView.builder(
-      physics: ChatObserverClampinScrollPhysics(observer: chatObserver),
+      physics: ChatObserverClampingScrollPhysics(observer: chatObserver),
       padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
       shrinkWrap: chatObserver.isShrinkWrap,
       reverse: true,
