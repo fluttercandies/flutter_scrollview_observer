@@ -30,7 +30,8 @@ class _HorizontalGridViewDemoPageState
   @override
   void initState() {
     super.initState();
-    observerController = GridObserverController(controller: scrollController);
+    observerController = GridObserverController(controller: scrollController)
+      ..initialIndex = 32;
 
     // Trigger an observation manually
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
@@ -105,6 +106,7 @@ class _HorizontalGridViewDemoPageState
         );
       },
       itemCount: 100,
+      cacheExtent: double.maxFinite,
     );
   }
 }

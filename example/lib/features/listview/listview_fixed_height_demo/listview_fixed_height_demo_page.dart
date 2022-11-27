@@ -28,7 +28,11 @@ class _ListViewFixedHeightDemoPageState
   void initState() {
     super.initState();
 
-    observerController = ListObserverController(controller: scrollController);
+    observerController = ListObserverController(controller: scrollController)
+      ..initialIndexModel = ObserverIndexPositionModel(
+        index: 3,
+        isFixedHeight: true,
+      );
 
     // Trigger an observation manually
     ambiguate(WidgetsBinding.instance)?.endOfFrame.then(

@@ -26,7 +26,8 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
   void initState() {
     super.initState();
 
-    observerController = ListObserverController(controller: scrollController);
+    observerController = ListObserverController(controller: scrollController)
+      ..initialIndex = 10;
 
     // Trigger an observation manually
     ambiguate(WidgetsBinding.instance)?.endOfFrame.then(
@@ -64,12 +65,12 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.airline_stops_outlined),
         onPressed: () {
-          // observerController.jumpTo(index: 100);
-          observerController.animateTo(
-            index: 100,
-            duration: const Duration(seconds: 1),
-            curve: Curves.ease,
-          );
+          observerController.jumpTo(index: 50);
+          // observerController.animateTo(
+          //   index: 50,
+          //   duration: const Duration(seconds: 1),
+          //   curve: Curves.ease,
+          // );
         },
       ),
     );
@@ -79,7 +80,7 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
     // return ListView.builder(
     //   itemExtent: 50,
     //   controller: scrollController,
-    //   itemCount: 500,
+    //   itemCount: 100,
     //   itemBuilder: (context, index) {
     //     return _buildListItemView(index);
     //   },
@@ -93,7 +94,8 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
       separatorBuilder: (ctx, index) {
         return _buildSeparatorView();
       },
-      itemCount: 500,
+      itemCount: 100,
+      cacheExtent: double.maxFinite,
     );
   }
 

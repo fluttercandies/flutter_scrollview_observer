@@ -32,7 +32,14 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
   void initState() {
     super.initState();
 
-    observerController = SliverObserverController(controller: scrollController);
+    observerController = SliverObserverController(controller: scrollController)
+      ..initialIndexModelBlock = () {
+        return ObserverIndexPositionModel(
+          index: 6,
+          sliverContext: _sliverListCtx,
+          offset: calcPersistentHeaderExtent,
+        );
+      };
 
     // Trigger an observation manually
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
@@ -94,12 +101,7 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
                   index: 8,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
-                  offset: (offset) {
-                    return ObserverUtils.calcPersistentHeaderExtent(
-                      key: appBarKey,
-                      offset: offset,
-                    );
-                  },
+                  offset: calcPersistentHeaderExtent,
                 );
               },
               icon: const Icon(Icons.ac_unit_outlined),
@@ -115,12 +117,7 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
                   index: 5,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
-                  offset: (offset) {
-                    return ObserverUtils.calcPersistentHeaderExtent(
-                      key: appBarKey,
-                      offset: offset,
-                    );
-                  },
+                  offset: calcPersistentHeaderExtent,
                 );
               },
               icon: const Icon(Icons.backup_table),
@@ -153,6 +150,7 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
         _buildSliverListView(),
         _buildSliverGridView(),
       ],
+      cacheExtent: double.maxFinite,
     );
   }
 
@@ -214,6 +212,13 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
         },
         childCount: 20,
       ),
+    );
+  }
+
+  double calcPersistentHeaderExtent(double offset) {
+    return ObserverUtils.calcPersistentHeaderExtent(
+      key: appBarKey,
+      offset: offset,
     );
   }
 }
