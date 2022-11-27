@@ -17,10 +17,6 @@ class ObserverController {
   /// Target scroll controller.
   final ScrollController? controller;
 
-  /// Whether to cache the offset when jump to a specified index position.
-  /// Default is true.
-  bool cacheJumpIndexOffset = true;
-
   /// The map which stores the offset of child in the sliver
   Map<BuildContext, Map<int, ObserveScrollChildModel>> indexOffsetMap = {};
 
@@ -176,8 +172,19 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
   static const Duration _findingDuration = Duration(milliseconds: 1);
   static const Curve _findingCurve = Curves.ease;
 
+  /// Whether to cache the offset when jump to a specified index position.
+  /// Default is true.
+  bool cacheJumpIndexOffset = true;
+
   /// Clear the offset cache that jumping to a specified index location.
+  @Deprecated(
+      'It will be removed in version 2, please use [clearScrollIndexCache] instead')
   clearIndexOffsetCache(BuildContext? sliverContext) {
+    clearScrollIndexCache(sliverContext: sliverContext);
+  }
+
+  /// Clear the offset cache that jumping to a specified index location.
+  clearScrollIndexCache({BuildContext? sliverContext}) {
     final ctx = fetchSliverContext(sliverContext: sliverContext);
     if (ctx == null) return;
     indexOffsetMap[ctx]?.clear();
