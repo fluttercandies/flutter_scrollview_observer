@@ -78,7 +78,7 @@ class ObserverWidgetState<
   @override
   void initState() {
     super.initState();
-    _setupSliverController();
+    _setupSliverController(isInitState: true);
   }
 
   @override
@@ -99,7 +99,7 @@ class ObserverWidgetState<
   }
 
   /// Setup sliver controller
-  _setupSliverController() {
+  _setupSliverController({bool isInitState = false}) {
     final sliverController = widget.sliverController;
     if (sliverController == null) return;
     sliverController.innerReset();
@@ -113,6 +113,9 @@ class ObserverWidgetState<
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
       targetSliverContexts = fetchTargetSliverContexts();
       sliverController.sliverContexts = targetSliverContexts;
+      if (isInitState && sliverController is ObserverControllerForScroll) {
+        sliverController.innerInitialIndexPosition();
+      }
     });
   }
 

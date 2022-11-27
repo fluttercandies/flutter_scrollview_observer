@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/models/observe_find_child_model.dart';
+import 'package:scrollview_observer/src/common/models/observer_index_position_model.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
 
 import 'models/observe_scroll_child_model.dart';
@@ -173,8 +174,27 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
   static const Curve _findingCurve = Curves.ease;
 
   /// Whether to cache the offset when jump to a specified index position.
-  /// Default is true.
+  /// Defaults to true.
   bool cacheJumpIndexOffset = true;
+
+  /// The initial index position of the scrollView.
+  ///
+  /// Defaults to zero.
+  int get initialIndex => initialIndexModel.index;
+  set initialIndex(int index) {
+    initialIndexModel = ObserverIndexPositionModel(index: index);
+  }
+
+  /// The initial index position model of the scrollView.
+  ///
+  /// Defaults to ObserverIndexPositionModel(index: 0, sliverContext: null).
+  ObserverIndexPositionModel initialIndexModel = ObserverIndexPositionModel(
+    index: 0,
+  );
+
+  /// The block to return [ObserverIndexPositionModel] which to init index
+  /// position.
+  ObserverIndexPositionModel Function()? initialIndexModelBlock;
 
   /// Clear the offset cache that jumping to a specified index location.
   @Deprecated(
@@ -188,6 +208,19 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     final ctx = fetchSliverContext(sliverContext: sliverContext);
     if (ctx == null) return;
     indexOffsetMap[ctx]?.clear();
+  }
+
+  /// Init index position for scrollView.
+  innerInitialIndexPosition() {
+    final model = initialIndexModelBlock?.call() ?? initialIndexModel;
+    if (model.sliverContext == null && model.index <= 0) return;
+    jumpTo(
+      index: model.index,
+      sliverContext: model.sliverContext,
+      isFixedHeight: model.isFixedHeight,
+      alignment: model.alignment,
+      offset: model.offset,
+    );
   }
 
   /// Jump to the specified index position without animation.
