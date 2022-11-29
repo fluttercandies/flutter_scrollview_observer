@@ -25,10 +25,10 @@ class ObserverWidget<
   /// The callback of getting all sliver's buildContext.
   final List<BuildContext> Function()? sliverContexts;
 
-  /// The callback of geting observed result map.
+  /// The callback of getting observed result map.
   final Function(Map<BuildContext, M>)? onObserveAll;
 
-  /// The callback of geting observed result for first listView.
+  /// The callback of getting observed result for first listView.
   final Function(M)? onObserve;
 
   /// Calculate offset.
@@ -183,7 +183,7 @@ class ObserverWidgetState<
         }
       }
 
-      // Geting observed result for first listView
+      // Getting observed result for first listView.
       if (i == 0 && changeResultMap[ctx] != null) {
         changeResultModel = changeResultMap[ctx];
       }
