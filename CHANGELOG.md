@@ -1,3 +1,8 @@
+## 1.8.0
+- Scrolling to the specified index location
+  - Supports initializing the index position of the scrollView.
+  - Deprecated `[clearIndexOffsetCache]`, please use `[clearScrollIndexCache]` instead.
+
 ## 1.7.0
 - Chat Observer
   - Add the property `[fixedPositionOffset]`.
