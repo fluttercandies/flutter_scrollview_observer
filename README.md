@@ -162,6 +162,13 @@ ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
 
 ### 2、Scrolling to the specified index location
 
+It should be used with the scrollView's `cacheExtent` property. Assigning an appropriate value to it can avoid unnecessary page turning. 
+The recommendations are as follows:
+
+- If child widgets are fixed height in scrollView, use `isFixedHeight` instead of `cacheExtent`.
+- For scrollView such as detail page, it is recommended to set `cacheExtent` to `double.maxFinite`.
+- If child widgets are dynamic height in scrollView, it is recommended that setting `cacheExtent` to a large and reasonable value depending on your situation.
+
 #### 2.1、Basic usage
 
 Create and use instance of `ScrollController` normally.
@@ -312,6 +319,68 @@ clearIndexOffsetCache(BuildContext? sliverContext) {
 ```
 
 The parameter `sliverContext` needs to be passed only if you manage `ScrollView`'s `BuildContext` by yourself.
+
+#### 2.7、Initial index location
+
+- Method 1: `initialIndex`
+
+The simplest way to use, directly set the location index.
+
+```dart
+observerController = ListObserverController(controller: scrollController)
+  ..initialIndex = 10;
+```
+
+- Method 2: `initialIndexModel`
+
+You can customize the configuration of the initial index position.
+See the end of this section for property descriptions.
+
+```dart
+observerController = ListObserverController(controller: scrollController)
+  ..initialIndexModel = ObserverIndexPositionModel(
+    index: 10,
+    isFixedHeight = true,
+    alignment = 0.5,
+  );
+```
+
+- Method 3: `initialIndexModelBlock`
+
+You need return ` ObserverIndexPositionModel ` object within the callback.
+
+This method applies to some of scenarios those the parameters can't be determined from the start, such as `sliverContext`.
+
+```dart
+observerController = SliverObserverController(controller: scrollController)
+  ..initialIndexModelBlock = () {
+    return ObserverIndexPositionModel(
+      index: 6,
+      sliverContext: _sliverListCtx,
+      offset: calcPersistentHeaderExtent,
+    );
+  };
+```
+
+The structure of `ObserverIndexPositionModel` :
+
+```dart
+ObserverIndexPositionModel({
+  required this.index,
+  this.sliverContext,
+  this.isFixedHeight = false,
+  this.alignment = 0,
+  this.offset,
+});
+```
+
+|Property|Type|Desc|
+|-|-|-|
+|`index`|`int`|The index of child widget.|
+|`sliverContext`|`BuildContext`|The target sliver `[BuildContext]`.|
+|`isFixedHeight`|`bool`| If the height of the child widget and the height of the separator are fixed, please pass `true` to this property. Defaults to `false`|
+|`alignment`|`double`|The alignment specifies the desired position for the leading edge of the child widget. It must be a value in the range `[0.0, 1.0]`. Defaults to `1.0`|
+|`offset`|`double Function(double targetOffset)`|Use this property when locating position needs an offset.|
 
 ### 3、Chat Observer
 #### 3.1、Basic usage

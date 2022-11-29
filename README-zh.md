@@ -157,6 +157,12 @@ ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
 
 ### 2、滚动到指定下标位置
 
+建议搭配滚动视图的 `cacheExtent` 属性使用，将其赋予适当的值可避免不必要的翻页，分为以下几种情况:
+
+- 如果子部件是固定高度则使用 `isFixedHeight` 参数即可，不用设置 `cacheExtent`
+- 如果是详细页这类滚动视图，建议将 `cacheExtent` 设置为 `double.maxFinite`
+- 如果为子部件不等高的滚动视图，建议根据自身情况将 `cacheExtent` 设置为比较大且合理的值
+
 #### 2.1、基本使用
 正常创建和使用 `ScrollController` 实例
 
@@ -304,6 +310,64 @@ clearIndexOffsetCache(BuildContext? sliverContext) {
 ```
 
 其形参 `sliverContext` 只有在你自行管理 `ScrollView` 的 `BuildContext` 时才需要传递。
+
+#### 2.7、初始下标位置
+
+- 方式一: `initialIndex`
+
+最简单的使用方式，直接指定下标即可
+
+```dart
+observerController = ListObserverController(controller: scrollController)
+  ..initialIndex = 10;
+```
+
+- 方式二: `initialIndexModel`
+
+定制初始下标位置的配置，各参数说明请看该节的最后部分
+
+```dart
+observerController = ListObserverController(controller: scrollController)
+  ..initialIndexModel = ObserverIndexPositionModel(
+    index: 10,
+    isFixedHeight = true,
+    alignment = 0.5,
+  );
+```
+
+- 方式三: `initialIndexModelBlock`
+
+回调内返回 `ObserverIndexPositionModel` 对象, 适用于在一些参数无法一开始就可以确定的场景下使用，如 `sliverContext`
+
+```dart
+observerController = SliverObserverController(controller: scrollController)
+  ..initialIndexModelBlock = () {
+    return ObserverIndexPositionModel(
+      index: 6,
+      sliverContext: _sliverListCtx,
+      offset: calcPersistentHeaderExtent,
+    );
+  };
+```
+
+`ObserverIndexPositionModel` 的定义:
+
+```dart
+ObserverIndexPositionModel({
+  required this.index,
+  this.sliverContext,
+  this.isFixedHeight = false,
+  this.alignment = 0,
+  this.offset,
+});
+```
+|属性|类型|描述|
+|-|-|-|
+|`index`|`int`|初始下标|
+|`sliverContext`|`BuildContext`|滚动视图的 `BuildContext`|
+|`isFixedHeight`|`bool`|如果列表子部件的高度是固定的，则建议使用 `isFixedHeight` 参数提升性能，默认为 `false`|
+|`alignment`|`double`|指定你期望定位到子部件的对齐位置，该值需要在 `[0.0, 1.0]` 这个范围之间。默认为 `0`|
+|`offset`|`double Function(double targetOffset)`|用于在滚动到指定下标位置时，设置整体的偏移量|
 
 ### 3、聊天会话
 
