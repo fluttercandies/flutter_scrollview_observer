@@ -14,7 +14,7 @@ import '../notification.dart';
 import 'sliver_observer_controller.dart';
 
 class SliverViewObserver extends ObserverWidget<SliverObserverController,
-    ObserveModel, ListViewOnceObserveNotification, RenderSliverList> {
+    ObserveModel, ScrollViewOnceObserveNotification, RenderSliverList> {
   /// The callback of getting all sliverList's buildContext.
   final List<BuildContext> Function()? sliverListContexts;
 
@@ -49,7 +49,7 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
 class MixViewObserverState extends ObserverWidgetState<
     SliverObserverController,
     ObserveModel,
-    ListViewOnceObserveNotification,
+    ScrollViewOnceObserveNotification,
     RenderSliverList,
     SliverViewObserver> with ListObserverMix, GridObserverMix {
   @override

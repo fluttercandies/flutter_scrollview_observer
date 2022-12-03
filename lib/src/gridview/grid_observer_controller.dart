@@ -15,10 +15,13 @@ class GridObserverController extends ObserverController
   }) : super(controller: controller);
 
   /// Dispatch a [GridViewOnceObserveNotification]
-  dispatchOnceObserve({BuildContext? sliverContext}) {
+  dispatchOnceObserve({
+    BuildContext? sliverContext,
+    bool isForce = false,
+  }) {
     innerDispatchOnceObserve(
       sliverContext: sliverContext,
-      notification: GridViewOnceObserveNotification(),
+      notification: GridViewOnceObserveNotification(isForce: isForce),
     );
   }
 

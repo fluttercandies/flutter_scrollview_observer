@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/models/observe_find_child_model.dart';
-import 'package:scrollview_observer/src/common/models/observer_index_position_model.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
 
 import 'models/observe_scroll_child_model.dart';

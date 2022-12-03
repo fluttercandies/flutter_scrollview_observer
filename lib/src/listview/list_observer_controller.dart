@@ -15,10 +15,13 @@ class ListObserverController extends ObserverController
   }) : super(controller: controller);
 
   /// Dispatch a [ListViewOnceObserveNotification]
-  dispatchOnceObserve({BuildContext? sliverContext}) {
+  dispatchOnceObserve({
+    BuildContext? sliverContext,
+    bool isForce = false,
+  }) {
     innerDispatchOnceObserve(
       sliverContext: sliverContext,
-      notification: ListViewOnceObserveNotification(),
+      notification: ListViewOnceObserveNotification(isForce: isForce),
     );
   }
 

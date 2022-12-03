@@ -14,23 +14,16 @@ class SliverObserverController extends ObserverController
     ScrollController? controller,
   }) : super(controller: controller);
 
-  /// Dispatch a [ListViewOnceObserveNotification] or
-  /// [GridViewOnceObserveNotification]
+  /// Dispatch a [ScrollViewOnceObserveNotification]
   dispatchOnceObserve({
     required BuildContext sliverContext,
+    bool isForce = false,
   }) {
-    final renderObj = sliverContext.findRenderObject();
-    if (renderObj == null) return;
-    Notification? notification;
-    if (renderObj is RenderSliverList) {
-      notification = ListViewOnceObserveNotification();
-    } else if (renderObj is RenderSliverGrid) {
-      notification = GridViewOnceObserveNotification();
-    }
-    if (notification == null) return;
     innerDispatchOnceObserve(
       sliverContext: sliverContext,
-      notification: notification,
+      notification: ScrollViewOnceObserveNotification(
+        isForce: isForce,
+      ),
     );
   }
 }
