@@ -43,7 +43,9 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
 
     // Trigger an observation manually
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
-      ListViewOnceObserveNotification().dispatch(_sliverListCtx);
+      observerController.dispatchOnceObserve(
+        sliverContext: _sliverListCtx!,
+      );
     });
   }
 

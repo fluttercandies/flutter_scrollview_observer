@@ -34,7 +34,9 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
 
     // Trigger an observation manually
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
-      ListViewOnceObserveNotification().dispatch(_sliverListCtx);
+      observerController.dispatchOnceObserve(
+        sliverContext: _sliverListCtx!,
+      );
     });
   }
 
