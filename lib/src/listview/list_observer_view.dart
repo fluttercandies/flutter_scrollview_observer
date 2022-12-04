@@ -5,12 +5,14 @@
  */
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
 import 'package:scrollview_observer/src/common/observer_widget.dart';
+import 'package:scrollview_observer/src/common/observer_typedef.dart';
+import 'package:scrollview_observer/src/notification.dart';
 
 import 'list_observer_controller.dart';
 import 'list_observer_mix.dart';
 import 'models/listview_observe_model.dart';
-import '../notification.dart';
 
 class ListViewObserver extends ObserverWidget<ListObserverController,
     ListViewObserveModel, ListViewOnceObserveNotification, RenderSliverList> {
@@ -29,6 +31,9 @@ class ListViewObserver extends ObserverWidget<ListObserverController,
     double leadingOffset = 0,
     double Function()? dynamicLeadingOffset,
     double toNextOverPercent = 1,
+    List<ObserverAutoTriggerObserveType>? autoTriggerObserveTypes,
+    ObserverTriggerOnObserveType triggerOnObserveType =
+        ObserverTriggerOnObserveType.displayingItemsChange,
   }) : super(
           key: key,
           child: child,
@@ -39,6 +44,8 @@ class ListViewObserver extends ObserverWidget<ListObserverController,
           leadingOffset: leadingOffset,
           dynamicLeadingOffset: dynamicLeadingOffset,
           toNextOverPercent: toNextOverPercent,
+          autoTriggerObserveTypes: autoTriggerObserveTypes,
+          triggerOnObserveType: triggerOnObserveType,
         );
 
   @override

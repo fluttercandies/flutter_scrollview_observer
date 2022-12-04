@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/common/observer_controller.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
+import 'package:scrollview_observer/src/common/observer_typedef.dart';
 import 'package:scrollview_observer/src/notification.dart';
 
 import 'models/observe_model.dart';
@@ -45,6 +46,16 @@ class ObserverWidget<
   /// child widget.
   final double toNextOverPercent;
 
+  /// Used to set types those can trigger observe automatically.
+  ///
+  /// Defaults to [.scrollStart, .scrollUpdate, .scrollEnd]
+  final List<ObserverAutoTriggerObserveType>? autoTriggerObserveTypes;
+
+  /// Used to set the prerequisite for triggering the [onObserve] callback.
+  /// 
+  /// Defaults to [ObserverTriggerOnObserveType.displayingItemsChange].
+  final ObserverTriggerOnObserveType triggerOnObserveType;
+
   const ObserverWidget({
     Key? key,
     required this.child,
@@ -55,6 +66,9 @@ class ObserverWidget<
     this.leadingOffset = 0,
     this.dynamicLeadingOffset,
     this.toNextOverPercent = 1,
+    this.autoTriggerObserveTypes,
+    this.triggerOnObserveType =
+        ObserverTriggerOnObserveType.displayingItemsChange,
   })  : assert(toNextOverPercent > 0 && toNextOverPercent <= 1),
         super(key: key);
 
@@ -75,6 +89,28 @@ class ObserverWidgetState<
   /// The last observation result
   Map<BuildContext, M> lastResultMap = {};
 
+  /// Default values for the widget's autoTriggerObserveTypes property.
+  List<ObserverAutoTriggerObserveType> get innerAutoTriggerObserveTypes =>
+      widget.autoTriggerObserveTypes ??
+      [
+        ObserverAutoTriggerObserveType.scrollStart,
+        ObserverAutoTriggerObserveType.scrollUpdate,
+        ObserverAutoTriggerObserveType.scrollEnd
+      ];
+
+  /// Mapping [ObserverAutoTriggerObserveType] to [ScrollNotification].
+  List<Type> get innerAutoTriggerObserveScrollNotifications =>
+      innerAutoTriggerObserveTypes.map((type) {
+        switch (type) {
+          case ObserverAutoTriggerObserveType.scrollStart:
+            return ScrollStartNotification;
+          case ObserverAutoTriggerObserveType.scrollUpdate:
+            return ScrollUpdateNotification;
+          case ObserverAutoTriggerObserveType.scrollEnd:
+            return ScrollEndNotification;
+        }
+      }).toList();
+
   @override
   void initState() {
     super.initState();
@@ -90,7 +126,10 @@ class ObserverWidgetState<
       },
       child: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
-          _handleContexts();
+          if (innerAutoTriggerObserveScrollNotifications
+              .contains(notification.runtimeType)) {
+            _handleContexts();
+          }
           return false;
         },
         child: widget.child,
@@ -119,7 +158,7 @@ class ObserverWidgetState<
     });
   }
 
-  /// Featch target sliver [BuildContext]s
+  /// Fetch target sliver [BuildContext]s
   List<BuildContext> fetchTargetSliverContexts() {
     List<BuildContext> ctxs = targetSliverContexts;
     if (ctxs.isEmpty) {
@@ -172,7 +211,9 @@ class ObserverWidgetState<
       if (targetObserveModel == null) continue;
       resultMap[ctx] = targetObserveModel;
 
-      if (isForceObserve) {
+      if (isForceObserve ||
+          widget.triggerOnObserveType ==
+              ObserverTriggerOnObserveType.directly) {
         changeResultMap[ctx] = targetObserveModel;
       } else {
         final lastResultModel = lastResultMap[ctx];

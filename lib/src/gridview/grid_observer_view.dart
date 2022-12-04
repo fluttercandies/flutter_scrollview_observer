@@ -5,7 +5,9 @@
  */
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
 import 'package:scrollview_observer/src/common/observer_widget.dart';
+import 'package:scrollview_observer/src/common/observer_typedef.dart';
 import 'package:scrollview_observer/src/notification.dart';
 
 import 'grid_observer_controller.dart';
@@ -29,6 +31,9 @@ class GridViewObserver extends ObserverWidget<GridObserverController,
     double leadingOffset = 0,
     double Function()? dynamicLeadingOffset,
     double toNextOverPercent = 1,
+    List<ObserverAutoTriggerObserveType>? autoTriggerObserveTypes,
+    ObserverTriggerOnObserveType triggerOnObserveType =
+        ObserverTriggerOnObserveType.displayingItemsChange,
   }) : super(
           key: key,
           child: child,
@@ -39,6 +44,8 @@ class GridViewObserver extends ObserverWidget<GridObserverController,
           leadingOffset: leadingOffset,
           dynamicLeadingOffset: dynamicLeadingOffset,
           toNextOverPercent: toNextOverPercent,
+          autoTriggerObserveTypes: autoTriggerObserveTypes,
+          triggerOnObserveType: triggerOnObserveType,
         );
 
   @override

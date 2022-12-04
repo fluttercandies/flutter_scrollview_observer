@@ -5,12 +5,14 @@
  */
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
+import 'package:scrollview_observer/src/common/observer_typedef.dart';
+import 'package:scrollview_observer/src/common/models/observe_model.dart';
+import 'package:scrollview_observer/src/common/observer_widget.dart';
 import 'package:scrollview_observer/src/gridview/grid_observer_mix.dart';
 import 'package:scrollview_observer/src/listview/list_observer_mix.dart';
+import 'package:scrollview_observer/src/notification.dart';
 
-import '../common/models/observe_model.dart';
-import '../common/observer_widget.dart';
-import '../notification.dart';
 import 'sliver_observer_controller.dart';
 
 class SliverViewObserver extends ObserverWidget<SliverObserverController,
@@ -30,6 +32,9 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
     double leadingOffset = 0,
     double Function()? dynamicLeadingOffset,
     double toNextOverPercent = 1,
+    List<ObserverAutoTriggerObserveType>? autoTriggerObserveTypes,
+    ObserverTriggerOnObserveType triggerOnObserveType =
+        ObserverTriggerOnObserveType.displayingItemsChange,
   }) : super(
           key: key,
           child: child,
@@ -40,6 +45,8 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
           leadingOffset: leadingOffset,
           dynamicLeadingOffset: dynamicLeadingOffset,
           toNextOverPercent: toNextOverPercent,
+          autoTriggerObserveTypes: autoTriggerObserveTypes,
+          triggerOnObserveType: triggerOnObserveType,
         );
 
   @override
