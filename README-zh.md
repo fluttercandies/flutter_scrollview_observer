@@ -155,6 +155,56 @@ ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
   
 </details>
 
+#### 1.1、`autoTriggerObserveTypes` 参数
+
+用于设置自动触发观察的时机，定义如下：
+
+```dart
+final List<ObserverAutoTriggerObserveType>? autoTriggerObserveTypes;
+```
+
+```dart
+enum ObserverAutoTriggerObserveType {
+  scrollStart,
+  scrollUpdate,
+  scrollEnd,
+}
+```
+
+其默认值为 `[.scrollStart, .scrollUpdate, .scrollEnd]`
+
+枚举值说明：
+
+|枚举值|描述|
+|-|-|
+|`scrollStart`|开始滚动|
+|`scrollUpdate`|滚动中|
+|`scrollEnd`|结束滚动|
+
+#### 1.2、`triggerOnObserveType` 参数
+
+用于配置触发 `[onObserve]` 回调的前提，定义如下：
+
+```dart
+final ObserverTriggerOnObserveType triggerOnObserveType;
+```
+
+```dart
+enum ObserverTriggerOnObserveType {
+  directly,
+  displayingItemsChange,
+}
+```
+
+其默认值为 `.displayingItemsChange`
+
+枚举值说明：
+
+|枚举值|描述|
+|-|-|
+|`directly`|观察到数据后直接将数据返出|
+|`displayingItemsChange`|当列表子部件进出或数量发生变化时将观察到的数据返出|
+
 ### 2、滚动到指定下标位置
 
 建议搭配滚动视图的 `cacheExtent` 属性使用，将其赋予适当的值可避免不必要的翻页，分为以下几种情况:

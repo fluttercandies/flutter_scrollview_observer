@@ -159,6 +159,55 @@ ListViewOnceObserveNotification().dispatch(_sliverListViewContext);
   
 </details>
 
+#### 1.1、Parameter `autoTriggerObserveTypes`
+
+Used to set types those can trigger observe automatically, defined as follows:
+
+```dart
+final List<ObserverAutoTriggerObserveType>? autoTriggerObserveTypes;
+```
+
+```dart
+enum ObserverAutoTriggerObserveType {
+  scrollStart,
+  scrollUpdate,
+  scrollEnd,
+}
+```
+
+Defaults to `[.scrollStart, .scrollUpdate, .scrollEnd]`.
+
+Description of enum values as follow：
+
+|value|Desc|
+|-|-|
+|`scrollStart`|when a `[Scrollable]` widget has started scrolling.|
+|`scrollUpdate`|when a `[Scrollable]` widget has changed its scroll position.|
+|`scrollEnd`|when a `[Scrollable]` widget has stopped scrolling.|
+
+#### 1.2、Parameter `triggerOnObserveType`
+
+Used to set the prerequisite for triggering the [onObserve] callback, defined as follows:
+
+```dart
+final ObserverTriggerOnObserveType triggerOnObserveType;
+```
+
+```dart
+enum ObserverTriggerOnObserveType {
+  directly,
+  displayingItemsChange,
+}
+```
+
+Defaults to `.displayingItemsChange`.
+
+Description of enum values as follow：
+
+|value|Desc|
+|-|-|
+|`directly`|The callback `onObserve` will be called directly when getting observed result for scrollView.|
+|`displayingItemsChange`|The callback `onObserve` will be called when child widget comes in and out or when the number of child widget changes.|
 
 ### 2、Scrolling to the specified index location
 
