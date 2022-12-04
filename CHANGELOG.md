@@ -1,3 +1,9 @@
+## 1.9.0
+- `ObserverWidget` 
+  - Add property `[autoTriggerObserveTypes]` and property `[triggerOnObserveType]`.
+- `ObserverController`
+  - method `[dispatchOnceObserve]` adds parameter `[isForce]`.
+
 ## 1.8.0
 - Scrolling to the specified index location
   - Supports initializing the index position of the scrollView.
