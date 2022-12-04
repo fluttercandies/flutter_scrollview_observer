@@ -52,7 +52,7 @@ class ObserverWidget<
   final List<ObserverAutoTriggerObserveType>? autoTriggerObserveTypes;
 
   /// Used to set the prerequisite for triggering the [onObserve] callback.
-  /// 
+  ///
   /// Defaults to [ObserverTriggerOnObserveType.displayingItemsChange].
   final ObserverTriggerOnObserveType triggerOnObserveType;
 
