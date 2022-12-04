@@ -48,6 +48,11 @@ class _HorizontalGridViewDemoPageState
         sliverGridContexts: () {
           return [if (_sliverGridViewContext != null) _sliverGridViewContext!];
         },
+        autoTriggerObserveTypes: const [
+          ObserverAutoTriggerObserveType.scrollEnd,
+        ],
+        triggerOnObserveType:
+            ObserverTriggerOnObserveType.displayingItemsChange,
         onObserveAll: (resultMap) {
           final model = resultMap[_sliverGridViewContext];
           if (model == null) return;

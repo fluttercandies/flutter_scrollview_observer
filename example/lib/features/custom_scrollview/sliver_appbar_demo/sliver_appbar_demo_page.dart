@@ -61,6 +61,10 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
             if (_sliverGridCtx != null) _sliverGridCtx!,
           ];
         },
+        autoTriggerObserveTypes: const [
+          ObserverAutoTriggerObserveType.scrollEnd,
+        ],
+        triggerOnObserveType: ObserverTriggerOnObserveType.directly,
         onObserveAll: (resultMap) {
           final model1 = resultMap[_sliverListCtx];
           if (model1 != null &&
@@ -68,6 +72,7 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
               model1 is ListViewObserveModel) {
             debugPrint('1 visible -- ${model1.visible}');
             debugPrint('1 firstChild.index -- ${model1.firstChild?.index}');
+            debugPrint('1 firstChild.size -- ${model1.firstChild?.size}');
             debugPrint('1 displaying -- ${model1.displayingChildIndexList}');
             setState(() {
               _hitIndexForCtx1 = model1.firstChild?.index ?? 0;

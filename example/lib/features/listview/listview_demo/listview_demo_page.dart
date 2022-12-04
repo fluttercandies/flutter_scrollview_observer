@@ -46,6 +46,10 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
       appBar: AppBar(title: const Text("ListView")),
       body: ListViewObserver(
         child: _buildListView(),
+        autoTriggerObserveTypes: const [
+          ObserverAutoTriggerObserveType.scrollEnd,
+        ],
+        triggerOnObserveType: ObserverTriggerOnObserveType.directly,
         controller: observerController,
         onObserve: (resultModel) {
           debugPrint('visible -- ${resultModel.visible}');
