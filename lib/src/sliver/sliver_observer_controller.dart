@@ -4,7 +4,6 @@
  * @Date: 2022-08-08 00:20:03
  */
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/observer_controller.dart';
 
