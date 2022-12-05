@@ -41,6 +41,12 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
   }
 
   @override
+  void dispose() {
+    observerController.controller?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("ListView")),

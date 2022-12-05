@@ -30,6 +30,13 @@ class _AnchorListPageState extends State<AnchorListPage>
   }
 
   @override
+  void dispose() {
+    observerController.controller?.dispose();
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

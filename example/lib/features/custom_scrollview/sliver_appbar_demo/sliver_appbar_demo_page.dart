@@ -50,6 +50,12 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
   }
 
   @override
+  void dispose() {
+    observerController.controller?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SliverViewObserver(

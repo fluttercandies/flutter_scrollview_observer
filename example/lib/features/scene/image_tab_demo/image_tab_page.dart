@@ -40,6 +40,12 @@ class _ImageTabPageState extends State<ImageTabPage> {
   }
 
   @override
+  void dispose() {
+    observerController.controller?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
 

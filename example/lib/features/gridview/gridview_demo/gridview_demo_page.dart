@@ -42,6 +42,12 @@ class _GridViewDemoPageState extends State<GridViewDemoPage> {
   }
 
   @override
+  void dispose() {
+    observerController.controller?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("GridView")),

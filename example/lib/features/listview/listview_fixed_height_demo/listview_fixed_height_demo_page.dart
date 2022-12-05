@@ -46,6 +46,12 @@ class _ListViewFixedHeightDemoPageState
   }
 
   @override
+  void dispose() {
+    observerController.controller?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("ListView")),

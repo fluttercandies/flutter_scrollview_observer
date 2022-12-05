@@ -41,6 +41,12 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
   }
 
   @override
+  void dispose() {
+    observerController.controller?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("CustomScrollView")),

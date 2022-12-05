@@ -45,8 +45,9 @@ class _ListViewDynamicOffsetPageState extends State<ListViewDynamicOffsetPage> {
 
   @override
   void dispose() {
-    super.dispose();
     _pageController.removeListener(_pageDidScroll);
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
