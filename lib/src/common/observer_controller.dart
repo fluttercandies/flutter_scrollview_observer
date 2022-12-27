@@ -669,14 +669,16 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     double remainingBottomExtent = scrollExtent - scrollOffset - layoutExtent;
     double needScrollExtent = childLayoutOffset - scrollOffset;
 
-    final viewport = _findViewport(obj);
-    double viewportPixels = 0;
-    if (viewport != null && viewport.offset.hasPixels) {
-      viewportPixels = viewport.offset.pixels;
-      final maxScrollExtent = viewportMaxScrollExtent(viewport);
-      remainingBottomExtent = maxScrollExtent - viewportPixels;
-      needScrollExtent = targetOffset;
-      scrollExtent = maxScrollExtent;
+    if (this is SliverObserverController) {
+      final viewport = _findViewport(obj);
+      double viewportPixels = 0;
+      if (viewport != null && viewport.offset.hasPixels) {
+        viewportPixels = viewport.offset.pixels;
+        final maxScrollExtent = viewportMaxScrollExtent(viewport);
+        remainingBottomExtent = maxScrollExtent - viewportPixels;
+        needScrollExtent = targetOffset;
+        scrollExtent = maxScrollExtent;
+      }
     }
 
     // The bottom remaining distance is satisfied to go completely scrolling.
