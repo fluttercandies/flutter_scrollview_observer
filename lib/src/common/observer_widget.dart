@@ -259,9 +259,15 @@ class ObserverWidgetState<
       return false;
     }
     final targetFirstChildOffset = parentData.layoutOffset ?? 0;
-    final targetFirstChildSize = scrollDirection == Axis.vertical
-        ? targetFirstChild.size.height
-        : targetFirstChild.size.width;
+    final double targetFirstChildSize;
+    try {
+      // In some cases, getting size may throw an exception.
+      targetFirstChildSize = scrollDirection == Axis.vertical
+          ? targetFirstChild.size.height
+          : targetFirstChild.size.width;
+    } catch (_) {
+      return false;
+    }
     return listViewOffset <
         targetFirstChildSize * widget.toNextOverPercent +
             targetFirstChildOffset;
