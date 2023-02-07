@@ -1,3 +1,7 @@
+## 1.9.2
+- `ObserverWidget` 
+  - Catch the exception thrown by getting size.
+
 ## 1.9.1
 - `ObserverController`
   - Modify offset calculation logic in method `[_calculateTargetLayoutOffset]`.
