@@ -1,3 +1,10 @@
+## 1.10.0
+- `ObserverController` 
+  - Improve `[_calculateTargetLayoutOffset]` logic.
+  - The `jumpTo` method and `animateTo` method both add a parameter `[padding]`.
+- `ObserverIndexPositionModel`.
+  - Add property `[padding]`.
+
 ## 1.9.2
 - `ObserverWidget` 
   - Catch the exception thrown by getting size.
@@ -43,8 +50,8 @@
 
 ## 1.4.0
 - Scrolling to the specified index location
-  - New `alignment` paramter in the `jumpTo` and `animateTo` methods.
-  - Fixed a bug that caused scrolling to the first child to jitter when using `offset` paramter.
+  - New `alignment` parameter in the `jumpTo` and `animateTo` methods.
+  - Fixed a bug that caused scrolling to the first child to jitter when using `offset` parameter.
 
 ## 1.3.0
 - Scrolling to the specified index location supports the `SliverPersistentHeader`.
