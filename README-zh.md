@@ -252,7 +252,34 @@ observerController.animateTo(
   curve: Curves.ease,
 );
 ```
-#### 2.2、`isFixedHeight` 参数
+
+#### 2.2、`padding` 参数
+
+如果你的 `ListView` 或 `GridView` 有用到其 `padding` 参数时，也需要同步给该值！如:
+
+```dart
+ListView.separated(padding: _padding, ...);
+GridView.builder(padding: _padding, ...);
+```
+
+```dart
+observerController.jumpTo(index: 1, padding: _padding);
+```
+
+以下这种则不需要
+```dart
+CustomScrollView(
+  controller: scrollController,
+  slivers: [
+    const SliverPadding(padding: _padding),
+    _buildSliverListView(),
+    _buildSliverGridView(),
+    const SliverPadding(padding: _padding),
+  ],
+);
+```
+
+#### 2.3、`isFixedHeight` 参数
 
 如果列表子部件的高度是固定的，则建议使用 `isFixedHeight` 参数提升性能
 
@@ -302,7 +329,7 @@ observerController.animateTo(
 );
 ```
 
-#### 2.3、`offset` 参数
+#### 2.4、`offset` 参数
 
 > 用于在滚动到指定下标位置时，设置整体的偏移量。
 
@@ -334,7 +361,7 @@ observerController.animateTo(
 );
 ```
 
-#### 2.4、`alignment` 参数
+#### 2.5、`alignment` 参数
 
 `alignment` 参数用于指定你期望定位到子部件的对齐位置，该值需要在 `[0.0, 1.0]` 这个范围之间。默认为 `0`，比如：
 
@@ -342,13 +369,13 @@ observerController.animateTo(
 - `alignment: 0.5` : 滚动到子部件的中间位置
 - `alignment: 1` : 滚动到子部件的尾部位置
 
-#### 2.5、`cacheJumpIndexOffset` 属性
+#### 2.6、`cacheJumpIndexOffset` 属性
 
 为了性能考虑，在默认情况下，列表在滚动到指定位置时，`ScrollController` 会对子部件的信息进行缓存，便于下次直接使用。
 
 但是对于子部件高度一直都是动态改变的场景下，这反而会造成不必要的麻烦，所以这时可以通过对 `cacheJumpIndexOffset` 属性设置为 `false` 来关闭这一缓存功能。
 
-#### 2.6、`clearIndexOffsetCache` 方法
+#### 2.7、`clearIndexOffsetCache` 方法
 
 如果你想保留滚动的缓存功能，并且只想在特定情况下去清除缓存，则可以使用 `clearIndexOffsetCache` 方法。
 
@@ -361,7 +388,7 @@ clearIndexOffsetCache(BuildContext? sliverContext) {
 
 其形参 `sliverContext` 只有在你自行管理 `ScrollView` 的 `BuildContext` 时才需要传递。
 
-#### 2.7、初始下标位置
+#### 2.8、初始下标位置
 
 - 方式一: `initialIndex`
 
@@ -409,6 +436,7 @@ ObserverIndexPositionModel({
   this.isFixedHeight = false,
   this.alignment = 0,
   this.offset,
+  this.padding = EdgeInsets.zero,
 });
 ```
 |属性|类型|描述|
@@ -418,6 +446,7 @@ ObserverIndexPositionModel({
 |`isFixedHeight`|`bool`|如果列表子部件的高度是固定的，则建议使用 `isFixedHeight` 参数提升性能，默认为 `false`|
 |`alignment`|`double`|指定你期望定位到子部件的对齐位置，该值需要在 `[0.0, 1.0]` 这个范围之间。默认为 `0`|
 |`offset`|`double Function(double targetOffset)`|用于在滚动到指定下标位置时，设置整体的偏移量|
+|`padding`|`EdgeInsets`|当你的 `ListView` 或 `GridView` 有用到 `padding` 参数时，也需要同步给该值，其实情况则不需要|
 
 ### 3、聊天会话
 

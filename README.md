@@ -259,7 +259,33 @@ observerController.animateTo(
 );
 ```
 
-#### 2.2、Parameter `isFixedHeight` 
+#### 2.2、Parameter `padding`
+
+If your ListView or GridView uses its padding parameter, you need to sync that value as well! Such as:
+
+```dart
+ListView.separated(padding: _padding, ...);
+GridView.builder(padding: _padding, ...);
+```
+
+```dart
+observerController.jumpTo(index: 1, padding: _padding);
+```
+
+It is not necessary in the following cases
+```dart
+CustomScrollView(
+  controller: scrollController,
+  slivers: [
+    const SliverPadding(padding: _padding),
+    _buildSliverListView(),
+    _buildSliverGridView(),
+    const SliverPadding(padding: _padding),
+  ],
+);
+```
+
+#### 2.3、Parameter `isFixedHeight` 
 
 If the height of a list child widget is fixed, it is recommended to use the 'isFixedHeight' parameter to improve performance.
 
@@ -310,7 +336,7 @@ observerController.animateTo(
 ```
 
 
-#### 2.3、Parameter `offset`
+#### 2.4、Parameter `offset`
 
 > Used to set the whole scrollView offset when scrolling to a specified index.
 
@@ -342,7 +368,7 @@ observerController.animateTo(
 );
 ```
 
-#### 2.4、Parameter `alignment`
+#### 2.5、Parameter `alignment`
 
 The `alignment` specifies the desired position for the leading edge of the child widget. It must be a value in the range `[0.0, 1.0]`. Such as:
 
@@ -350,13 +376,13 @@ The `alignment` specifies the desired position for the leading edge of the child
 - `alignment: 0.5` : Scrolling to the `middle` position of the child widget.
 - `alignment: 1` : Scrolling to the `tail` position of the child widget.
 
-#### 2.5、Property `cacheJumpIndexOffset`
+#### 2.6、Property `cacheJumpIndexOffset`
 
 For performance reasons, `ScrollController` will caches the child's information by default when the listView `jump` or `animate` to the specified location, so that it can be used next time directly.
 
 However, in scence where the height of child widget is always changing dynamically, this will cause unnecessary trouble, so you can turn this off by setting the `cacheJumpIndexOffset` property to `false`.
 
-#### 2.6、Method `clearIndexOffsetCache`
+#### 2.7、Method `clearIndexOffsetCache`
 
 You can use the `clearIndexOffsetCache` method if you want to preserve the cache function of scrolling and only want to clear the cache in certain cases.
 
@@ -369,7 +395,7 @@ clearIndexOffsetCache(BuildContext? sliverContext) {
 
 The parameter `sliverContext` needs to be passed only if you manage `ScrollView`'s `BuildContext` by yourself.
 
-#### 2.7、Initial index location
+#### 2.8、Initial index location
 
 - Method 1: `initialIndex`
 
@@ -420,6 +446,7 @@ ObserverIndexPositionModel({
   this.isFixedHeight = false,
   this.alignment = 0,
   this.offset,
+  this.padding = EdgeInsets.zero,
 });
 ```
 
@@ -430,6 +457,7 @@ ObserverIndexPositionModel({
 |`isFixedHeight`|`bool`| If the height of the child widget and the height of the separator are fixed, please pass `true` to this property. Defaults to `false`|
 |`alignment`|`double`|The alignment specifies the desired position for the leading edge of the child widget. It must be a value in the range `[0.0, 1.0]`. Defaults to `1.0`|
 |`offset`|`double Function(double targetOffset)`|Use this property when locating position needs an offset.|
+|`padding`|`EdgeInsets`|If your ListView or GridView uses its padding parameter, you need to sync that value as well! Otherwise it is not required.|
 
 ### 3、Chat Observer
 #### 3.1、Basic usage
