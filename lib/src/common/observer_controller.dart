@@ -218,6 +218,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       sliverContext: model.sliverContext,
       isFixedHeight: model.isFixedHeight,
       alignment: model.alignment,
+      padding: model.padding,
       offset: model.offset,
     );
   }
@@ -238,13 +239,15 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     BuildContext? sliverContext,
     bool isFixedHeight = false,
     double alignment = 0,
+    EdgeInsets padding = EdgeInsets.zero,
     ObserverLocateIndexOffsetCallback? offset,
   }) async {
     await _scrollToIndex(
       index: index,
       isFixedHeight: isFixedHeight,
-      sliverContext: sliverContext,
       alignment: alignment,
+      padding: padding,
+      sliverContext: sliverContext,
       offset: offset,
     );
   }
@@ -260,6 +263,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     required int index,
     required Duration duration,
     required Curve curve,
+    EdgeInsets padding = EdgeInsets.zero,
     BuildContext? sliverContext,
     bool isFixedHeight = false,
     double alignment = 0,
@@ -268,10 +272,11 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     await _scrollToIndex(
       index: index,
       isFixedHeight: isFixedHeight,
+      alignment: alignment,
+      padding: padding,
       sliverContext: sliverContext,
       duration: duration,
       curve: curve,
-      alignment: alignment,
       offset: offset,
     );
   }
@@ -280,6 +285,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     required int index,
     required bool isFixedHeight,
     required double alignment,
+    required EdgeInsets padding,
     BuildContext? sliverContext,
     Duration? duration,
     Curve? curve,
@@ -336,6 +342,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         childLayoutOffset: targetScrollChildModel.layoutOffset,
         childSize: targetScrollChildModel.size,
         alignment: alignment,
+        padding: padding,
         offset: offset,
       );
       if (isAnimateTo) {
@@ -366,6 +373,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         obj: obj,
         index: index,
         alignment: alignment,
+        padding: padding,
         duration: duration,
         curve: curve,
         offset: offset,
@@ -389,6 +397,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       alignment: alignment,
       firstChildIndex: firstChildIndex,
       lastChildIndex: lastChildIndex,
+      padding: padding,
       duration: duration,
       curve: curve,
       offset: offset,
@@ -402,6 +411,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     required RenderSliverMultiBoxAdaptor obj,
     required int index,
     required double alignment,
+    required EdgeInsets padding,
     Duration? duration,
     Curve? curve,
     ObserverLocateIndexOffsetCallback? offset,
@@ -444,6 +454,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       childLayoutOffset: childLayoutOffset,
       childSize: childSize,
       alignment: alignment,
+      padding: padding,
       offset: offset,
     );
     if (isAnimateTo) {
@@ -477,6 +488,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     required double alignment,
     required int firstChildIndex,
     required int lastChildIndex,
+    required EdgeInsets padding,
     Duration? duration,
     Curve? curve,
     ObserverLocateIndexOffsetCallback? offset,
@@ -534,6 +546,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           alignment: alignment,
           firstChildIndex: firstChildIndex,
           lastChildIndex: lastChildIndex,
+          padding: padding,
           duration: duration,
           curve: curve,
           offset: offset,
@@ -581,6 +594,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           alignment: alignment,
           firstChildIndex: firstChildIndex,
           lastChildIndex: lastChildIndex,
+          padding: padding,
           duration: duration,
           curve: curve,
           offset: offset,
@@ -619,6 +633,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
             childLayoutOffset: childLayoutOffset,
             childSize: childSize,
             alignment: alignment,
+            padding: padding,
             offset: offset,
           );
           if (isAnimateTo) {
@@ -655,58 +670,57 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     required double childLayoutOffset,
     required double childSize,
     required double alignment,
+    required EdgeInsets padding,
     ObserverLocateIndexOffsetCallback? offset,
   }) {
-    double precedingScrollExtent = obj.constraints.precedingScrollExtent;
-    double leadingPadding = childSize * alignment;
+    final precedingScrollExtent = obj.constraints.precedingScrollExtent;
+    double targetItemLeadingPadding = childSize * alignment;
+    childLayoutOffset + precedingScrollExtent + targetItemLeadingPadding;
     var targetOffset =
-        childLayoutOffset + precedingScrollExtent + leadingPadding;
-    final geometry = obj.geometry;
-    final layoutExtent = geometry?.layoutExtent ?? 0;
-    // The (estimated) total scrollable extent of this sliver.
-    double scrollExtent = geometry?.scrollExtent ?? 0;
-    double scrollOffset = obj.constraints.scrollOffset;
-    double remainingBottomExtent = scrollExtent - scrollOffset - layoutExtent;
-    double needScrollExtent = childLayoutOffset - scrollOffset;
+        childLayoutOffset + precedingScrollExtent + targetItemLeadingPadding;
+    double scrollOffset = 0;
+    double remainingBottomExtent = 0;
+    double needScrollExtent = 0;
 
     if (this is SliverObserverController) {
       final viewport = _findViewport(obj);
-      double viewportPixels = 0;
       if (viewport != null && viewport.offset.hasPixels) {
-        viewportPixels = viewport.offset.pixels;
+        scrollOffset = viewport.offset.pixels;
         final maxScrollExtent = viewportMaxScrollExtent(viewport);
-        remainingBottomExtent = maxScrollExtent - viewportPixels;
-        needScrollExtent = targetOffset;
-        scrollExtent = maxScrollExtent;
+        remainingBottomExtent = maxScrollExtent - scrollOffset;
+        needScrollExtent = childLayoutOffset +
+            precedingScrollExtent +
+            targetItemLeadingPadding -
+            scrollOffset;
       }
+    } else {
+      final constraints = obj.constraints;
+      final isVertical = constraints.axis == Axis.vertical;
+      final trailingPadding = isVertical ? padding.bottom : padding.right;
+      final viewportExtent = constraints.viewportMainAxisExtent;
+      final geometry = obj.geometry;
+      // The (estimated) total scrollable extent of this sliver.
+      double scrollExtent = geometry?.scrollExtent ?? 0;
+      scrollOffset = obj.constraints.scrollOffset;
+      remainingBottomExtent = scrollExtent +
+          precedingScrollExtent +
+          trailingPadding -
+          scrollOffset -
+          viewportExtent;
+      needScrollExtent = childLayoutOffset +
+          precedingScrollExtent +
+          targetItemLeadingPadding -
+          scrollOffset;
     }
 
+    final outerOffset = offset?.call(targetOffset) ?? 0;
+    needScrollExtent = needScrollExtent - outerOffset;
     // The bottom remaining distance is satisfied to go completely scrolling.
     bool isEnoughScroll = remainingBottomExtent >= needScrollExtent;
     if (!isEnoughScroll) {
-      targetOffset = scrollExtent;
-    }
-    final outerOffset = offset?.call(targetOffset) ?? 0;
-
-    if (!isEnoughScroll) {
-      // The distance between the target child widget and the leading of the
-      // viewport.
-      final childLeadingMarginToViewport = childLayoutOffset +
-          precedingScrollExtent +
-          leadingPadding -
-          targetOffset;
-      if (childLeadingMarginToViewport < outerOffset) {
-        // The distance between the target child and the leading of the viewport
-        // overlaps with the specified offset.
-        // Such as: target child widget is obscured by the sticky header.
-        targetOffset -= outerOffset - childLeadingMarginToViewport;
-      }
+      targetOffset = remainingBottomExtent + scrollOffset;
     } else {
-      if (targetOffset >= outerOffset) {
-        targetOffset -= outerOffset;
-      } else {
-        targetOffset = 0;
-      }
+      targetOffset = needScrollExtent + scrollOffset;
     }
 
     return targetOffset;
