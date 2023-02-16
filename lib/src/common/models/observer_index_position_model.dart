@@ -8,6 +8,7 @@ class ObserverIndexPositionModel {
     this.isFixedHeight = false,
     this.alignment = 0,
     this.offset,
+    this.padding = EdgeInsets.zero,
   });
 
   /// The index position of the scrollView.
@@ -28,4 +29,23 @@ class ObserverIndexPositionModel {
 
   /// Use this property when locating position needs an offset.
   ObserverLocateIndexOffsetCallback? offset;
+
+  /// This value is required when the scrollView is wrapped in the 
+  /// [SliverPadding].
+  /// 
+  /// For example:
+  /// 1. ListView.separated(padding: _padding, ...)
+  /// 2. GridView.builder(padding: _padding, ...)
+  /// 
+  /// There is no need to pass the value in this case:
+  /// CustomScrollView(
+  ///    controller: scrollController,
+  ///    slivers: [
+  ///      const SliverPadding(padding: _padding),
+  ///      _buildSliverListView(),
+  ///      _buildSliverGridView(),
+  ///      const SliverPadding(padding: _padding),
+  ///    ],
+  ///  );
+  EdgeInsets padding;
 }
