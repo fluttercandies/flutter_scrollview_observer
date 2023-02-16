@@ -109,11 +109,11 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
               onPressed: () {
                 _showSnackBar(
                   context: context,
-                  text: 'SliverGrid - Jumping to item 10',
+                  text: 'SliverGrid - Jumping to item 20',
                 );
                 observerController.animateTo(
                   sliverContext: _sliverGridCtx,
-                  index: 149,
+                  index: 20,
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                 );
@@ -144,10 +144,8 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
       controller: scrollController,
       // scrollDirection: Axis.horizontal,
       slivers: [
-        const SliverPadding(padding: EdgeInsets.only(top: 1000, bottom: 2000)),
         _buildSliverListView(),
         _buildSliverGridView(),
-        const SliverPadding(padding: EdgeInsets.only(top: 1000, bottom: 2000)),
       ],
     );
   }
