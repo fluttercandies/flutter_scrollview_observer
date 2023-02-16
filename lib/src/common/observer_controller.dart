@@ -675,7 +675,6 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
   }) {
     final precedingScrollExtent = obj.constraints.precedingScrollExtent;
     double targetItemLeadingPadding = childSize * alignment;
-    childLayoutOffset + precedingScrollExtent + targetItemLeadingPadding;
     var targetOffset =
         childLayoutOffset + precedingScrollExtent + targetItemLeadingPadding;
     double scrollOffset = 0;
