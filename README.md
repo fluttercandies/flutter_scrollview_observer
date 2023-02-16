@@ -272,18 +272,7 @@ GridView.builder(padding: _padding, ...);
 observerController.jumpTo(index: 1, padding: _padding);
 ```
 
-It is not necessary in the following cases
-```dart
-CustomScrollView(
-  controller: scrollController,
-  slivers: [
-    const SliverPadding(padding: _padding),
-    _buildSliverListView(),
-    _buildSliverGridView(),
-    const SliverPadding(padding: _padding),
-  ],
-);
-```
+⚠ Do not use `SliverPadding` in `CustomScrollView`.
 
 #### 2.3、Parameter `isFixedHeight` 
 
