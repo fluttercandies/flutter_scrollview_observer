@@ -16,6 +16,11 @@ class GridViewDemoPage extends StatefulWidget {
 
 class _GridViewDemoPageState extends State<GridViewDemoPage> {
   static const double _leadingPadding = 1000;
+  static const double _trailingPadding = 100;
+  static const EdgeInsets _padding = EdgeInsets.only(
+    top: _leadingPadding,
+    bottom: _trailingPadding,
+  );
 
   List<int> _hitIndexs = [0, 1];
 
@@ -70,6 +75,7 @@ class _GridViewDemoPageState extends State<GridViewDemoPage> {
         onPressed: () {
           observerController.jumpTo(
             index: 49,
+            padding: _padding,
           );
           // observerController.animateTo(
           //   index: 49,
@@ -83,7 +89,7 @@ class _GridViewDemoPageState extends State<GridViewDemoPage> {
 
   Widget _buildGridView() {
     return GridView.builder(
-      padding: const EdgeInsets.only(top: _leadingPadding, bottom: 0),
+      padding: _padding,
       controller: scrollController,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,

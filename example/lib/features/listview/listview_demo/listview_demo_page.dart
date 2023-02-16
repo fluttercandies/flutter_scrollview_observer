@@ -15,10 +15,16 @@ class ListViewDemoPage extends StatefulWidget {
 }
 
 class _ListViewDemoPageState extends State<ListViewDemoPage> {
+  static const double _leadingPadding = 1000;
+  static const double _trailingPadding = 2000;
+  static const EdgeInsets _padding = EdgeInsets.only(
+    top: _leadingPadding,
+    bottom: _trailingPadding,
+  );
   int _hitIndex = 0;
 
   ScrollController scrollController =
-      ScrollController(initialScrollOffset: 1000);
+      ScrollController(initialScrollOffset: _leadingPadding);
 
   late ListObserverController observerController;
 
@@ -27,7 +33,10 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
     super.initState();
 
     observerController = ListObserverController(controller: scrollController)
-      ..initialIndex = 10;
+      ..initialIndexModel = ObserverIndexPositionModel(
+        index: 10,
+        padding: _padding,
+      );
 
     // Trigger an observation manually
     ambiguate(WidgetsBinding.instance)?.endOfFrame.then(
@@ -96,7 +105,7 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
     //   },
     // );
     return ListView.separated(
-      padding: const EdgeInsets.only(top: 1000, bottom: 1000),
+      padding: _padding,
       controller: scrollController,
       itemBuilder: (ctx, index) {
         return _buildListItemView(index);

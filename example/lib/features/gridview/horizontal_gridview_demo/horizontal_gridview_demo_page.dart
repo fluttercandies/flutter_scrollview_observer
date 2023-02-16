@@ -18,6 +18,11 @@ class HorizontalGridViewDemoPage extends StatefulWidget {
 class _HorizontalGridViewDemoPageState
     extends State<HorizontalGridViewDemoPage> {
   static const double _leadingPadding = 1000;
+  static const double _trailingPadding = 2000;
+  static const EdgeInsets _padding = EdgeInsets.only(
+    left: _leadingPadding,
+    right: _trailingPadding,
+  );
   BuildContext? _sliverGridViewContext;
 
   List<int> _hitIndexs = [];
@@ -31,7 +36,10 @@ class _HorizontalGridViewDemoPageState
   void initState() {
     super.initState();
     observerController = GridObserverController(controller: scrollController)
-      ..initialIndex = 32;
+      ..initialIndexModel = ObserverIndexPositionModel(
+        index: 98,
+        padding: _padding,
+      );
 
     // Trigger an observation manually
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
@@ -80,6 +88,7 @@ class _HorizontalGridViewDemoPageState
             observerController.jumpTo(
               index: 87,
               sliverContext: _sliverGridViewContext,
+              padding: _padding,
             );
           }
           // observerController.jumpTo(
@@ -98,7 +107,10 @@ class _HorizontalGridViewDemoPageState
   Widget _buildGridView() {
     return GridView.builder(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.only(left: _leadingPadding, right: 1000),
+      padding: const EdgeInsets.only(
+        left: _leadingPadding,
+        right: _trailingPadding,
+      ),
       controller: scrollController,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
