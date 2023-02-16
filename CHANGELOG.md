@@ -2,7 +2,7 @@
 - `ObserverController` 
   - Improve `[_calculateTargetLayoutOffset]` logic.
   - The `jumpTo` method and `animateTo` method both add a parameter `[padding]`.
-- `ObserverIndexPositionModel`.
+- `ObserverIndexPositionModel`
   - Add property `[padding]`.
 
 ## 1.9.2
