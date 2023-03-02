@@ -84,11 +84,15 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.airline_stops_outlined),
         onPressed: () {
-          observerController.jumpTo(index: 50);
+          observerController.jumpTo(
+            index: 50,
+            padding: _padding,
+          );
           // observerController.animateTo(
           //   index: 50,
           //   duration: const Duration(seconds: 1),
           //   curve: Curves.ease,
+          //   padding: _padding,
           // );
         },
       ),
