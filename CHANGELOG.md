@@ -1,3 +1,7 @@
+## 1.10.1
+- `ObserverController` 
+  - fix: targetOffset calculate may be negative by @zeqinjie in [#21](https://github.com/LinXunFeng/flutter_scrollview_observer/pull/21).
+
 ## 1.10.0
 - `ObserverController` 
   - Improve `[_calculateTargetLayoutOffset]` logic.
