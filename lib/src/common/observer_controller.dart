@@ -721,7 +721,9 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     } else {
       targetOffset = needScrollExtent + scrollOffset;
     }
-
+    // The remainingBottomExtent may be negative when the scrollView has too
+    // few items.
+    targetOffset = targetOffset.clamp(0, double.maxFinite);
     return targetOffset;
   }
 
