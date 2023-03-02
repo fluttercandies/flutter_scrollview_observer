@@ -3,12 +3,12 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/models/observe_find_child_model.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
+
 import 'models/observe_scroll_child_model.dart';
 
 class ObserverController {
@@ -721,7 +721,8 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     } else {
       targetOffset = needScrollExtent + scrollOffset;
     }
-    // The remainingBottomExtent may be negative when the scrollView has too few items.
+    // The remainingBottomExtent may be negative when the scrollView has too
+    // few items.
     targetOffset = targetOffset.clamp(0, double.maxFinite);
     return targetOffset;
   }
