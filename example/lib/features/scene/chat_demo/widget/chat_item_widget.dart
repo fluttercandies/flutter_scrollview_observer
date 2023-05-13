@@ -12,11 +12,13 @@ class ChatItemWidget extends StatelessWidget {
     Key? key,
     required this.chatModel,
     required this.index,
+    required this.itemCount,
     this.onRemove,
   }) : super(key: key);
 
   final ChatModel chatModel;
   final int index;
+  final int itemCount;
   final Function? onRemove;
 
   @override
@@ -54,7 +56,7 @@ class ChatItemWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
-              '------------ $index ------------ \n ${chatModel.content}',
+              '------------ ${itemCount - index} ------------ \n ${chatModel.content}',
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w500,

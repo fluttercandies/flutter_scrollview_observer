@@ -10,6 +10,7 @@ import 'package:scrollview_observer_example/features/scene/chat_demo/helper/chat
 import 'package:scrollview_observer_example/features/scene/chat_demo/model/chat_model.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/widget/chat_item_widget.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/widget/chat_unread_tip_view.dart';
+import 'package:scrollview_observer_example/utils/random.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
@@ -55,11 +56,11 @@ class _ChatPageState extends State<ChatPage> {
       ..toRebuildScrollViewCallback = () {
         setState(() {});
       }
-      ..onHandlePositionCallback = (type) {
+      ..onHandlePositionResultCallback = (result) {
         if (!needIncrementUnreadMsgCount) return;
-        switch (type) {
+        switch (result.type) {
           case ChatScrollObserverHandlePositionType.keepPosition:
-            updateUnreadMsgCount();
+            updateUnreadMsgCount(changeCount: result.changeCount);
             break;
           case ChatScrollObserverHandlePositionType.none:
             updateUnreadMsgCount(isReset: true);
@@ -88,11 +89,7 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(
             onPressed: () {
               editViewController.text = '';
-              chatObserver.standby();
-              setState(() {
-                chatModels.insert(0, ChatDataHelper.createChatModel());
-                needIncrementUnreadMsgCount = true;
-              });
+              _addMessage(RandomTool.genInt(min: 1, max: 3));
             },
             icon: const Icon(Icons.add_comment),
           )
@@ -204,6 +201,7 @@ class _ChatPageState extends State<ChatPage> {
         return ChatItemWidget(
           chatModel: chatModels[index],
           index: index,
+          itemCount: chatModels.length,
           onRemove: () {
             chatObserver.standby(isRemove: true);
             setState(() {
@@ -250,12 +248,25 @@ class _ChatPageState extends State<ChatPage> {
         .toList();
   }
 
-  updateUnreadMsgCount({bool isReset = false}) {
+  _addMessage(int count) {
+    chatObserver.standby(changeCount: count);
+    setState(() {
+      needIncrementUnreadMsgCount = true;
+      for (var i = 0; i < count; i++) {
+        chatModels.insert(0, ChatDataHelper.createChatModel());
+      }
+    });
+  }
+
+  updateUnreadMsgCount({
+    bool isReset = false,
+    int changeCount = 1,
+  }) {
     needIncrementUnreadMsgCount = false;
     if (isReset) {
       unreadMsgCount.value = 0;
     } else {
-      unreadMsgCount.value += 1;
+      unreadMsgCount.value += changeCount;
     }
   }
 
