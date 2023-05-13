@@ -518,15 +518,31 @@ onRemove: () {
 
 ![](https://cdn.jsdelivr.net/gh/FullStackAction/PicBed@resource20220417121922/image/202209292333410.gif)
 
+This feature only handles inserting one message by default. If you need to insert multiple messages at once, you can pass the `changeCount` parameter to the `standby` method.
+
+```dart
+_addMessage(int count) {
+  chatObserver.standby(changeCount: count);
+  setState(() {
+    needIncrementUnreadMsgCount = true;
+    for (var i = 0; i < count; i++) {
+      chatModels.insert(0, ChatDataHelper.createChatModel());
+    }
+  });
+}
+```
+
+Note: This feature relies on the latest message view before the message is inserted as a reference to calculate the offset, so if too many messages are inserted at once and the reference message view cannot be rendered, this feature will fail, and you need to try to avoid this problem by setting a reasonable value for `cacheExtent` of `ScrollView` by yourself!
+
 #### 3.2、The result callback for processing chat location.
 
 ```dart
 chatObserver = ChatScrollObserver(observerController)
-  ..onHandlePositionCallback = (type) {
-    switch (type) {
+  ..onHandlePositionResultCallback = (result) {
+    switch (result.type) {
       case ChatScrollObserverHandlePositionType.keepPosition:
         // Keep the current chat location.
-        // updateUnreadMsgCount();
+        // updateUnreadMsgCount(changeCount: result.changeCount);
         break;
       case ChatScrollObserverHandlePositionType.none:
         // Do nothing about the chat location.

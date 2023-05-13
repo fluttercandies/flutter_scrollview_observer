@@ -507,15 +507,31 @@ onRemove: () {
 
 ![](https://cdn.jsdelivr.net/gh/FullStackAction/PicBed@resource20220417121922/image/202209292333410.gif)
 
+默认只处理插入一条消息的情况，如果你需要一次性插入多条，那 `standby` 需要传入 `changeCount` 参数
+
+```dart
+_addMessage(int count) {
+  chatObserver.standby(changeCount: count);
+  setState(() {
+    needIncrementUnreadMsgCount = true;
+    for (var i = 0; i < count; i++) {
+      chatModels.insert(0, ChatDataHelper.createChatModel());
+    }
+  });
+}
+```
+
+注：该功能依赖被插入消息前的最新消息视图做为参照去计算偏移量，所以如果一次性插入的消息数太多，导致该参照消息视图无法得到渲染，则该功能会失效，需要你自己去对 `ScrollView` 的 `cacheExtent` 设置合理的值来尽量避免这个问题！
+
 #### 3.2、聊天消息位置的处理回调
 
 ```dart
 chatObserver = ChatScrollObserver(observerController)
-  ..onHandlePositionCallback = (type) {
-    switch (type) {
+  ..onHandlePositionResultCallback = (result) {
+    switch (result.type) {
       case ChatScrollObserverHandlePositionType.keepPosition:
         // 保持当前聊天消息位置
-        // updateUnreadMsgCount();
+        // updateUnreadMsgCount(changeCount: result.changeCount);
         break;
       case ChatScrollObserverHandlePositionType.none:
         // 对聊天消息位置不做处理
