@@ -30,16 +30,25 @@ mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
     if (newPosition.extentBefore <= observer.fixedPositionOffset ||
         !isNeedFixedPosition ||
         observer.isRemove) {
-      _handlePositionCallback(ChatScrollObserverHandlePositionType.none);
+      _handlePositionCallback(ChatScrollObserverHandlePositionResultModel(
+        ChatScrollObserverHandlePositionType.none,
+        observer.changeCount,
+      ));
       return adjustPosition;
     }
     final model = observer.observeRefItem();
     if (model == null) {
-      _handlePositionCallback(ChatScrollObserverHandlePositionType.none);
+      _handlePositionCallback(ChatScrollObserverHandlePositionResultModel(
+        ChatScrollObserverHandlePositionType.none,
+        observer.changeCount,
+      ));
       return adjustPosition;
     }
 
-    _handlePositionCallback(ChatScrollObserverHandlePositionType.keepPosition);
+    _handlePositionCallback(ChatScrollObserverHandlePositionResultModel(
+      ChatScrollObserverHandlePositionType.keepPosition,
+      observer.changeCount,
+    ));
     final delta = model.layoutOffset - observer.innerRefItemLayoutOffset;
     return adjustPosition + delta;
   }
@@ -48,9 +57,10 @@ mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
   bool shouldAcceptUserOffset(ScrollMetrics position) => true;
 
   /// Calling observer's [onHandlePositionCallback].
-  _handlePositionCallback(ChatScrollObserverHandlePositionType type) {
+  _handlePositionCallback(ChatScrollObserverHandlePositionResultModel result) {
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
-      observer.onHandlePositionCallback?.call(type);
+      observer.onHandlePositionResultCallback?.call(result);
+      observer.onHandlePositionCallback?.call(result.type);
     });
   }
 }

@@ -34,6 +34,9 @@ class ChatScrollObserver {
   /// Whether is remove chat data.
   bool isRemove = false;
 
+  /// The number of messages added.
+  int changeCount = 1;
+
   /// The current chat location is retained when the scrollView offset is
   /// greater than [fixedPositionOffset].
   double fixedPositionOffset = 0;
@@ -43,21 +46,41 @@ class ChatScrollObserver {
   /// Such as call [setState] method.
   Function? toRebuildScrollViewCallback;
 
+  /// The result callback for processing chat location.
+  ///
   /// This callback will be called when handling in [ClampingScrollPhysics]'s
   /// [adjustPositionForNewDimensions].
+  @Deprecated(
+      'It will be removed in version 2, please use [onHandlePositionCallback] instead')
   void Function(ChatScrollObserverHandlePositionType)? onHandlePositionCallback;
 
+  /// The result callback for processing chat location.
+  ///
+  /// This callback will be called when handling in [ClampingScrollPhysics]'s
+  /// [adjustPositionForNewDimensions].
+  void Function(ChatScrollObserverHandlePositionResultModel)?
+      onHandlePositionResultCallback;
+
   /// Observe the child widget of the reference.
+  ///
+  /// It is only called in the scene when a message is added.
   ListViewObserveDisplayingChildModel? observeRefItem() {
-    return observerController.observeItem(index: innerRefItemIndex + 1);
+    return observerController.observeItem(
+      index: innerRefItemIndex + changeCount,
+    );
   }
 
   /// Prepare to adjust position for sliver.
+  ///
+  /// The [changeCount] parameter is used only when [isRemove] parameter is
+  /// false.
   standby({
     BuildContext? sliverContext,
     bool isRemove = false,
+    int changeCount = 1,
   }) {
     this.isRemove = isRemove;
+    this.changeCount = changeCount;
     observeSwitchShrinkWrap();
     final model = observerController.observeFirstItem(
       sliverContext: sliverContext,
