@@ -53,7 +53,7 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
       body: SliverViewObserver(
         controller: observerController,
         child: _buildScrollView(),
-        sliverListContexts: () {
+        sliverContexts: () {
           return [
             if (_sliverListCtx != null) _sliverListCtx!,
             if (_sliverGridCtx != null) _sliverGridCtx!,
