@@ -1,3 +1,10 @@
+## 1.11.0
+- Chat Observer
+  - Support inserting multiple messages at once.
+- `ObserverWidget` 
+  - `GridViewObserver` is compatible with waterfall flow.
+  - `SliverViewObserver` supports observation of viewport.
+
 ## 1.10.1
 - `ObserverController` 
   - fix: targetOffset calculate may be negative by @zeqinjie in [#21](https://github.com/LinXunFeng/flutter_scrollview_observer/pull/21).
