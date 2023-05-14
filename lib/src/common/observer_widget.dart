@@ -121,14 +121,14 @@ class ObserverWidgetState<
   Widget build(BuildContext context) {
     return NotificationListener<N>(
       onNotification: (notification) {
-        _handleContexts(isForceObserve: notification.isForce);
+        handleContexts(isForceObserve: notification.isForce);
         return true;
       },
       child: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
           if (innerAutoTriggerObserveScrollNotifications
               .contains(notification.runtimeType)) {
-            _handleContexts();
+            handleContexts();
           }
           return false;
         },
@@ -143,7 +143,7 @@ class ObserverWidgetState<
     if (sliverController == null) return;
     sliverController.innerReset();
     sliverController.innerNeedOnceObserveCallBack = () {
-      _handleContexts();
+      handleContexts();
     };
     sliverController.innerReattachCallBack = () {
       targetSliverContexts.clear();
@@ -189,7 +189,7 @@ class ObserverWidgetState<
   }
 
   /// Handle all buildContext
-  _handleContexts({
+  handleContexts({
     bool isForceObserve = false,
   }) {
     final onObserve = widget.onObserve;
@@ -245,16 +245,16 @@ class ObserverWidgetState<
     return null;
   }
 
-  /// Determines whether the target child widget is the first widget being
-  /// displayed
-  bool isTargetFirstWidget({
+  /// Determines whether the offset at the bottom of the target child widget
+  /// is below the specified offset.
+  bool isBelowOffsetWidget({
     required double listViewOffset,
     required Axis scrollDirection,
-    required RenderBox targetFirstChild,
+    required RenderBox targetChild,
   }) {
-    if (targetFirstChild is! RenderIndexedSemantics) return false;
-    if (!targetFirstChild.hasSize) return false;
-    final parentData = targetFirstChild.parentData;
+    if (targetChild is! RenderIndexedSemantics) return false;
+    if (!targetChild.hasSize) return false;
+    final parentData = targetChild.parentData;
     if (parentData is! SliverMultiBoxAdaptorParentData) {
       return false;
     }
@@ -263,14 +263,34 @@ class ObserverWidgetState<
     try {
       // In some cases, getting size may throw an exception.
       targetFirstChildSize = scrollDirection == Axis.vertical
-          ? targetFirstChild.size.height
-          : targetFirstChild.size.width;
+          ? targetChild.size.height
+          : targetChild.size.width;
     } catch (_) {
       return false;
     }
     return listViewOffset <
         targetFirstChildSize * widget.toNextOverPercent +
             targetFirstChildOffset;
+  }
+
+  /// Determines whether the target child widget has reached the specified
+  /// offset
+  bool isReachOffsetWidget({
+    required double listViewOffset,
+    required Axis scrollDirection,
+    required RenderBox targetChild,
+  }) {
+    if (!isBelowOffsetWidget(
+      listViewOffset: listViewOffset,
+      scrollDirection: scrollDirection,
+      targetChild: targetChild,
+    )) return false;
+    final parentData = targetChild.parentData;
+    if (parentData is! SliverMultiBoxAdaptorParentData) {
+      return false;
+    }
+    final targetFirstChildOffset = parentData.layoutOffset ?? 0;
+    return listViewOffset >= targetFirstChildOffset;
   }
 
   /// Determines whether the target child widget is being displayed

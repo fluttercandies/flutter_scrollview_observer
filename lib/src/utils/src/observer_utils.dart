@@ -61,7 +61,7 @@ class ObserverUtils {
   }
 
   /// Find out the viewport
-  static RenderViewportBase? findViewport(RenderSliverMultiBoxAdaptor obj) {
+  static RenderViewportBase? findViewport(RenderObject obj) {
     int maxCycleCount = 10;
     int currentCycleCount = 1;
     AbstractNode? parent = obj.parent;
@@ -73,5 +73,44 @@ class ObserverUtils {
       currentCycleCount++;
     }
     return null;
+  }
+
+  /// For viewport
+  ///
+  /// Determines whether the offset at the bottom of the target child widget
+  /// is below the specified offset.
+  static bool isBelowOffsetSliverInViewport({
+    required double viewportPixels,
+    RenderSliver? sliver,
+  }) {
+    if (sliver == null) return false;
+    final layoutOffset = sliver.constraints.precedingScrollExtent;
+    final size = sliver.geometry?.maxPaintExtent ?? 0;
+    return viewportPixels <= layoutOffset + size;
+  }
+
+  /// For viewport
+  ///
+  /// Determines whether the target sliver is being displayed
+  static bool isDisplayingSliverInViewport({
+    required RenderSliver? sliver,
+    required double viewportPixels,
+    required double viewportBottomOffset,
+  }) {
+    if (sliver == null) {
+      return false;
+    }
+    if (!isBelowOffsetSliverInViewport(
+      viewportPixels: viewportPixels,
+      sliver: sliver,
+    )) {
+      return false;
+    }
+    return sliver.constraints.precedingScrollExtent < viewportBottomOffset;
+  }
+
+  /// Determines whether it is a valid list index.
+  static bool isValidListIndex(int index) {
+    return index != -1;
   }
 }

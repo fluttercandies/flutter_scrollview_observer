@@ -56,10 +56,10 @@ mixin ListObserverMix<
     // Find out the first child which is displaying
     var targetFirstChild = firstChild;
 
-    while (!isTargetFirstWidget(
+    while (!isBelowOffsetWidget(
       listViewOffset: listViewOffset,
       scrollDirection: scrollDirection,
-      targetFirstChild: targetFirstChild,
+      targetChild: targetFirstChild,
     )) {
       index = index + 1;
       var nextChild = _obj.childAfter(targetFirstChild);

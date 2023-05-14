@@ -3,6 +3,7 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -47,94 +48,63 @@ mixin GridObserverMix<
     final rawListViewOffset =
         _obj.constraints.scrollOffset + _obj.constraints.overlap;
     var listViewOffset = rawListViewOffset + offset;
-    var parentData = firstChild.parentData as SliverMultiBoxAdaptorParentData;
-    var index = parentData.index ?? 0;
 
     // Find out the first child which is displaying
     var targetFirstChild = firstChild;
     var lastFirstGroupChildWidget = targetFirstChild;
 
-    while (!isTargetFirstWidget(
+    while (!isBelowOffsetWidget(
       listViewOffset: listViewOffset,
       scrollDirection: scrollDirection,
-      targetFirstChild: targetFirstChild,
+      targetChild: targetFirstChild,
     )) {
       /// Entering here means it is not the target object
-      /// Exclude child widgets with the same offset
-      var isFindingSameOffset = true;
-      index = index + 1;
       RenderBox? nextChild = _obj.childAfter(targetFirstChild);
-      while (isFindingSameOffset) {
-        if (nextChild == null) break;
-
-        final targetFirstChildParentData =
-            targetFirstChild.parentData as SliverMultiBoxAdaptorParentData;
-        final targetFirstChildOffset =
-            targetFirstChildParentData.layoutOffset ?? 0;
-
-        final nextChildParentData =
-            nextChild.parentData as SliverMultiBoxAdaptorParentData;
-        final nextChildOffset = nextChildParentData.layoutOffset ?? 0;
-
-        if (targetFirstChildOffset == nextChildOffset) {
-          index++;
-          nextChild = _obj.childAfter(nextChild);
-          continue;
-        }
-
-        targetFirstChild = nextChild;
-        isFindingSameOffset = false;
-      }
-
       if (nextChild == null) break;
+      targetFirstChild = nextChild;
     }
     if (targetFirstChild is! RenderIndexedSemantics) return null;
 
-    List<GridViewObserveDisplayingChildModel> firstGroupChildModelList = [
-      GridViewObserveDisplayingChildModel(
-        sliverGrid: _obj,
-        index: targetFirstChild.index,
-        renderObject: targetFirstChild,
-      ),
-    ];
+    final firstModel = GridViewObserveDisplayingChildModel(
+      sliverGrid: _obj,
+      index: targetFirstChild.index,
+      renderObject: targetFirstChild,
+    );
+    List<GridViewObserveDisplayingChildModel> firstGroupChildModelList = [];
+    firstGroupChildModelList.add(firstModel);
 
-    var isFindingSameOffset = true;
-    index = index + 1;
-    RenderBox? nextChild = _obj.childAfter(targetFirstChild);
-    while (isFindingSameOffset) {
-      if (nextChild == null || nextChild is! RenderIndexedSemantics) break;
-
-      final targetFirstChildParentData =
-          targetFirstChild.parentData as SliverMultiBoxAdaptorParentData;
-      final targetFirstChildOffset =
-          targetFirstChildParentData.layoutOffset ?? 0;
-
-      final nextChildParentData =
-          nextChild.parentData as SliverMultiBoxAdaptorParentData;
-      final nextChildOffset = nextChildParentData.layoutOffset ?? 0;
-
-      if (targetFirstChildOffset != nextChildOffset) {
-        break;
+    final listViewBottomOffset =
+        rawListViewOffset + _obj.constraints.remainingPaintExtent;
+    // Find out other child those have reached the specified offset.
+    RenderBox? targetChild = _obj.childAfter(targetFirstChild);
+    while (targetChild != null) {
+      if (!isDisplayingChild(
+        targetChild: targetChild,
+        listViewBottomOffset: listViewBottomOffset,
+      )) break;
+      if (isReachOffsetWidget(
+        listViewOffset: max(listViewOffset, firstModel.layoutOffset),
+        scrollDirection: scrollDirection,
+        targetChild: targetChild,
+      )) {
+        if (targetChild is! RenderIndexedSemantics) break;
+        firstGroupChildModelList.add(GridViewObserveDisplayingChildModel(
+          sliverGrid: _obj,
+          index: targetChild.index,
+          renderObject: targetChild,
+        ));
+        lastFirstGroupChildWidget = targetChild;
       }
 
-      firstGroupChildModelList.add(GridViewObserveDisplayingChildModel(
-        sliverGrid: _obj,
-        index: nextChild.index,
-        renderObject: nextChild,
-      ));
-      lastFirstGroupChildWidget = nextChild;
-
-      // Find next widget
-      index = index + 1;
-      nextChild = _obj.childAfter(nextChild);
+      RenderBox? nextChild = _obj.childAfter(targetChild);
+      if (nextChild == null) break;
+      targetChild = nextChild;
     }
 
     List<GridViewObserveDisplayingChildModel> showingChildModelList =
         List.from(firstGroupChildModelList);
 
     // Find the remaining children that are being displayed
-    final listViewBottomOffset =
-        rawListViewOffset + _obj.constraints.remainingPaintExtent;
     var displayingChild = _obj.childAfter(lastFirstGroupChildWidget);
     while (isDisplayingChild(
       targetChild: displayingChild,
