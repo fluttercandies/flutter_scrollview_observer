@@ -20,6 +20,7 @@ import 'package:scrollview_observer_example/features/scene/anchor_demo/anchor_pa
 import 'package:scrollview_observer_example/features/scene/chat_demo/page/chat_page.dart';
 import 'package:scrollview_observer_example/features/scene/image_tab_demo/image_tab_page.dart';
 import 'package:scrollview_observer_example/features/scene/video_auto_play_list/video_list_auto_play_page.dart';
+import 'package:scrollview_observer_example/features/scene/waterfall_flow_demo/waterfall_flow_page.dart';
 import 'package:tuple/tuple.dart';
 
 typedef PageBuilder = Widget Function();
@@ -154,6 +155,12 @@ class HomePage extends StatelessWidget {
         "Chat",
         () {
           return const ChatPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "Waterfall Flow",
+        () {
+          return const WaterfallFlowPage();
         },
       ),
     ];
