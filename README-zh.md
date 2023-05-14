@@ -209,6 +209,35 @@ enum ObserverTriggerOnObserveType {
 |`directly`|观察到数据后直接将数据返出|
 |`displayingItemsChange`|当列表子部件进出或数量发生变化时将观察到的数据返出|
 
+#### 1.3、`onObserveViewport` 回调
+
+> 仅支持 `CustomScrollView`
+
+用于观察当前 `CustomScrollView` 的 `Viewport` 中有哪些指定的 `Sliver` 正在展示
+
+```dart
+SliverViewObserver(
+  child: _buildScrollView(),
+  sliverContexts: () {
+    return [
+      if (grid1Context != null) grid1Context!,
+      if (swipeContext != null) swipeContext!,
+      if (grid2Context != null) grid2Context!,
+    ];
+  },
+  onObserveViewport: (result) {
+    firstChildCtxInViewport = result.firstChild.sliverContext;
+    if (firstChildCtxInViewport == grid1Context) {
+      debugPrint('current first sliver in viewport - gridView1');
+    } else if (firstChildCtxInViewport == swipeContext) {
+      debugPrint('current first sliver in viewport - swipeView');
+    } else if (firstChildCtxInViewport == grid2Context) {
+      debugPrint('current first sliver in viewport - gridView2');
+    }
+  },
+)
+```
+
 ### 2、滚动到指定下标位置
 
 建议搭配滚动视图的 `cacheExtent` 属性使用，将其赋予适当的值可避免不必要的翻页，分为以下几种情况:

@@ -212,6 +212,35 @@ Description of enum values as follow：
 |`directly`|The callback `onObserve` will be called directly when getting observed result for scrollView.|
 |`displayingItemsChange`|The callback `onObserve` will be called when child widget comes in and out or when the number of child widget changes.|
 
+#### 1.3、Callback `onObserveViewport`
+
+> Only `CustomScrollView` is supported.
+
+Used to observe which specified `slivers` are being displayed in the `Viewport` of `CustomScrollView`.
+
+```dart
+SliverViewObserver(
+  child: _buildScrollView(),
+  sliverContexts: () {
+    return [
+      if (grid1Context != null) grid1Context!,
+      if (swipeContext != null) swipeContext!,
+      if (grid2Context != null) grid2Context!,
+    ];
+  },
+  onObserveViewport: (result) {
+    firstChildCtxInViewport = result.firstChild.sliverContext;
+    if (firstChildCtxInViewport == grid1Context) {
+      debugPrint('current first sliver in viewport - gridView1');
+    } else if (firstChildCtxInViewport == swipeContext) {
+      debugPrint('current first sliver in viewport - swipeView');
+    } else if (firstChildCtxInViewport == grid2Context) {
+      debugPrint('current first sliver in viewport - gridView2');
+    }
+  },
+)
+```
+
 ### 2、Scrolling to the specified index location
 
 It should be used with the scrollView's `cacheExtent` property. Assigning an appropriate value to it can avoid unnecessary page turning. 
