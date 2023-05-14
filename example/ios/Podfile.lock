@@ -14,8 +14,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/video_player_avfoundation/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 405776dd0763d7e32a8f989d4e271ca1317d080c
-  video_player_avfoundation: e489aac24ef5cf7af82702979ed16f2a5ef84cff
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  video_player_avfoundation: 81e49bb3d9fb63dccf9fa0f6d877dc3ddbeac126
 
 PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3
 

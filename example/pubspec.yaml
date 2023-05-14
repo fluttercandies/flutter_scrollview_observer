@@ -30,13 +30,16 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   tuple: ^2.0.0
   video_player: ^2.4.2
-  
+  dynamic_layouts:
+    git:
+      url: https://github.com/flutter/packages.git
+      path: packages/dynamic_layouts
+
   scrollview_observer:
     path: ../
 
@@ -56,7 +59,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
