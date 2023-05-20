@@ -116,11 +116,16 @@ class MixViewObserverState extends ObserverWidgetState<
 
     int indexOfTargetChild = objList.indexOf(targetChild);
 
-    // Find out the first sliver in viewport.
+    // Find out the first sliver which is displayed in viewport.
+    final dimension =
+        (viewport.offset as ScrollPositionWithSingleContext).viewportDimension;
+    final viewportBottomOffset = pixels + dimension;
+
     while (!ObserverUtils.isValidListIndex(indexOfTargetChild) ||
-        !ObserverUtils.isBelowOffsetSliverInViewport(
-          viewportPixels: startCalcPixels,
+        !ObserverUtils.isDisplayingSliverInViewport(
           sliver: targetChild,
+          viewportPixels: startCalcPixels,
+          viewportBottomOffset: viewportBottomOffset,
         )) {
       if (targetChild == null) break;
       final nextChild = viewport.childAfter(targetChild);
@@ -142,9 +147,6 @@ class MixViewObserverState extends ObserverWidgetState<
     ];
 
     // Find the remaining children that are being displayed.
-    final dimension =
-        (viewport.offset as ScrollPositionWithSingleContext).viewportDimension;
-    final viewportBottomOffset = pixels + dimension;
     targetChild = viewport.childAfter(targetChild);
     while (targetChild != null) {
       // The current targetChild is not displayed, so the later children don't
