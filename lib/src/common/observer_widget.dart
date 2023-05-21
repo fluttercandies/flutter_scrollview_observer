@@ -12,11 +12,8 @@ import 'package:scrollview_observer/src/notification.dart';
 
 import 'models/observe_model.dart';
 
-class ObserverWidget<
-    C extends ObserverController,
-    M extends ObserveModel,
-    N extends ScrollViewOnceObserveNotification,
-    S extends RenderSliver> extends StatefulWidget {
+class ObserverWidget<C extends ObserverController, M extends ObserveModel,
+    N extends ScrollViewOnceObserveNotification> extends StatefulWidget {
   final Widget child;
 
   /// An object that can be used to dispatch a [ListViewOnceObserveNotification]
@@ -56,6 +53,16 @@ class ObserverWidget<
   /// Defaults to [ObserverTriggerOnObserveType.displayingItemsChange].
   final ObserverTriggerOnObserveType triggerOnObserveType;
 
+  /// Used to find the target RenderSliver.
+  ///
+  /// The default is to find [RenderSliverList], [RenderSliverFixedExtentList]
+  /// and [RenderSliverGrid].
+  final bool Function(RenderObject?)? customTargetRenderSliverType;
+
+  /// It allows you to customize observation logic when original logic doesn't
+  /// fit your needs.
+  final M? Function(BuildContext)? customHandleObserve;
+
   const ObserverWidget({
     Key? key,
     required this.child,
@@ -69,20 +76,21 @@ class ObserverWidget<
     this.autoTriggerObserveTypes,
     this.triggerOnObserveType =
         ObserverTriggerOnObserveType.displayingItemsChange,
+    this.customHandleObserve,
+    this.customTargetRenderSliverType,
   })  : assert(toNextOverPercent > 0 && toNextOverPercent <= 1),
         super(key: key);
 
   @override
   State<ObserverWidget> createState() =>
-      ObserverWidgetState<C, M, N, S, ObserverWidget<C, M, N, S>>();
+      ObserverWidgetState<C, M, N, ObserverWidget<C, M, N>>();
 }
 
 class ObserverWidgetState<
     C extends ObserverController,
     M extends ObserveModel,
     N extends ScrollViewOnceObserveNotification,
-    S extends RenderSliver,
-    T extends ObserverWidget<C, M, N, S>> extends State<T> {
+    T extends ObserverWidget<C, M, N>> extends State<T> {
   /// Target sliver [BuildContext]
   List<BuildContext> targetSliverContexts = [];
 
@@ -183,9 +191,21 @@ class ObserverWidgetState<
     return ctxs;
   }
 
+  /// Fetch offset from [leadingOffset] or [dynamicLeadingOffset].
+  double fetchLeadingOffset() {
+    var offset = widget.leadingOffset;
+    if (widget.dynamicLeadingOffset != null) {
+      offset = widget.dynamicLeadingOffset!();
+    }
+    return offset;
+  }
+
   /// Determine whether it is the type of the target sliver.
   bool isTargetSliverContextType(RenderObject? obj) {
-    return obj is S;
+    if (widget.customTargetRenderSliverType != null) {
+      return widget.customTargetRenderSliverType!.call(obj);
+    }
+    return obj is RenderSliverList;
   }
 
   /// Handle all buildContext
@@ -242,70 +262,9 @@ class ObserverWidgetState<
   }
 
   M? handleObserve(BuildContext ctx) {
+    if (widget.customHandleObserve != null) {
+      return widget.customHandleObserve?.call(ctx);
+    }
     return null;
-  }
-
-  /// Determines whether the offset at the bottom of the target child widget
-  /// is below the specified offset.
-  bool isBelowOffsetWidget({
-    required double listViewOffset,
-    required Axis scrollDirection,
-    required RenderBox targetChild,
-  }) {
-    if (targetChild is! RenderIndexedSemantics) return false;
-    if (!targetChild.hasSize) return false;
-    final parentData = targetChild.parentData;
-    if (parentData is! SliverMultiBoxAdaptorParentData) {
-      return false;
-    }
-    final targetFirstChildOffset = parentData.layoutOffset ?? 0;
-    final double targetFirstChildSize;
-    try {
-      // In some cases, getting size may throw an exception.
-      targetFirstChildSize = scrollDirection == Axis.vertical
-          ? targetChild.size.height
-          : targetChild.size.width;
-    } catch (_) {
-      return false;
-    }
-    return listViewOffset <
-        targetFirstChildSize * widget.toNextOverPercent +
-            targetFirstChildOffset;
-  }
-
-  /// Determines whether the target child widget has reached the specified
-  /// offset
-  bool isReachOffsetWidget({
-    required double listViewOffset,
-    required Axis scrollDirection,
-    required RenderBox targetChild,
-  }) {
-    if (!isBelowOffsetWidget(
-      listViewOffset: listViewOffset,
-      scrollDirection: scrollDirection,
-      targetChild: targetChild,
-    )) return false;
-    final parentData = targetChild.parentData;
-    if (parentData is! SliverMultiBoxAdaptorParentData) {
-      return false;
-    }
-    final targetFirstChildOffset = parentData.layoutOffset ?? 0;
-    return listViewOffset >= targetFirstChildOffset;
-  }
-
-  /// Determines whether the target child widget is being displayed
-  bool isDisplayingChild({
-    required RenderBox? targetChild,
-    required double listViewBottomOffset,
-  }) {
-    if (targetChild == null) {
-      return false;
-    }
-    final parentData = targetChild.parentData;
-    if (parentData is! SliverMultiBoxAdaptorParentData) {
-      return false;
-    }
-    final targetChildLayoutOffset = parentData.layoutOffset ?? 0;
-    return targetChildLayoutOffset < listViewBottomOffset;
   }
 }

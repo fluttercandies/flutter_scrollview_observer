@@ -60,6 +60,72 @@ class ObserverUtils {
     return currentTabIndex;
   }
 
+  /// Determines whether the offset at the bottom of the target child widget
+  /// is below the specified offset.
+  static bool isBelowOffsetWidgetInSliver({
+    required double listViewOffset,
+    required Axis scrollDirection,
+    required RenderBox targetChild,
+    required double toNextOverPercent,
+  }) {
+    if (targetChild is! RenderIndexedSemantics) return false;
+    if (!targetChild.hasSize) return false;
+    final parentData = targetChild.parentData;
+    if (parentData is! SliverMultiBoxAdaptorParentData) {
+      return false;
+    }
+    final targetFirstChildOffset = parentData.layoutOffset ?? 0;
+    final double targetFirstChildSize;
+    try {
+      // In some cases, getting size may throw an exception.
+      targetFirstChildSize = scrollDirection == Axis.vertical
+          ? targetChild.size.height
+          : targetChild.size.width;
+    } catch (_) {
+      return false;
+    }
+    return listViewOffset <
+        targetFirstChildSize * toNextOverPercent + targetFirstChildOffset;
+  }
+
+  /// Determines whether the target child widget has reached the specified
+  /// offset
+  static bool isReachOffsetWidgetInSliver({
+    required double listViewOffset,
+    required Axis scrollDirection,
+    required RenderBox targetChild,
+    required double toNextOverPercent,
+  }) {
+    if (!isBelowOffsetWidgetInSliver(
+      listViewOffset: listViewOffset,
+      scrollDirection: scrollDirection,
+      targetChild: targetChild,
+      toNextOverPercent: toNextOverPercent,
+    )) return false;
+    final parentData = targetChild.parentData;
+    if (parentData is! SliverMultiBoxAdaptorParentData) {
+      return false;
+    }
+    final targetFirstChildOffset = parentData.layoutOffset ?? 0;
+    return listViewOffset >= targetFirstChildOffset;
+  }
+
+  /// Determines whether the target child widget is being displayed
+  static bool isDisplayingChildInSliver({
+    required RenderBox? targetChild,
+    required double listViewBottomOffset,
+  }) {
+    if (targetChild == null) {
+      return false;
+    }
+    final parentData = targetChild.parentData;
+    if (parentData is! SliverMultiBoxAdaptorParentData) {
+      return false;
+    }
+    final targetChildLayoutOffset = parentData.layoutOffset ?? 0;
+    return targetChildLayoutOffset < listViewBottomOffset;
+  }
+
   /// Find out the viewport
   static RenderViewportBase? findViewport(RenderObject obj) {
     int maxCycleCount = 10;

@@ -22,7 +22,7 @@ class GridViewObserveModel extends ObserveModel {
         );
 
   /// The target sliverGrid.
-  RenderSliverGrid sliverGrid;
+  RenderSliverMultiBoxAdaptor sliverGrid;
 
   /// The first group child widgets those are displaying.
   final List<GridViewObserveDisplayingChildModel> firstGroupChildList;

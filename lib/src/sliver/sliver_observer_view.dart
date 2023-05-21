@@ -9,9 +9,8 @@ import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/common/observer_typedef.dart';
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
 import 'package:scrollview_observer/src/common/observer_widget.dart';
-import 'package:scrollview_observer/src/gridview/grid_observer_mix.dart';
-import 'package:scrollview_observer/src/listview/list_observer_mix.dart';
 import 'package:scrollview_observer/src/notification.dart';
+import 'package:scrollview_observer/src/observer_core.dart';
 import 'package:scrollview_observer/src/sliver/models/sliver_viewport_observe_displaying_child_model.dart';
 import 'package:scrollview_observer/src/utils/observer_utils.dart';
 
@@ -19,9 +18,14 @@ import 'models/sliver_viewport_observe_model.dart';
 import 'sliver_observer_controller.dart';
 
 class SliverViewObserver extends ObserverWidget<SliverObserverController,
-    ObserveModel, ScrollViewOnceObserveNotification, RenderSliverList> {
+    ObserveModel, ScrollViewOnceObserveNotification> {
   /// The callback of getting all slivers those are displayed in viewport.
   final Function(SliverViewportObserveModel)? onObserveViewport;
+
+  /// It's used to handle the observation logic for other types of Sliver
+  /// besides [RenderSliverList], [RenderSliverFixedExtentList] and
+  /// [RenderSliverGrid].
+  final ObserveModel? Function(BuildContext context)? extendedHandleObserve;
 
   final SliverObserverController? controller;
 
@@ -41,6 +45,8 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
     List<ObserverAutoTriggerObserveType>? autoTriggerObserveTypes,
     ObserverTriggerOnObserveType triggerOnObserveType =
         ObserverTriggerOnObserveType.displayingItemsChange,
+    ObserveModel? Function(BuildContext context)? customHandleObserve,
+    this.extendedHandleObserve,
   }) : super(
           key: key,
           child: child,
@@ -53,18 +59,15 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
           toNextOverPercent: toNextOverPercent,
           autoTriggerObserveTypes: autoTriggerObserveTypes,
           triggerOnObserveType: triggerOnObserveType,
+          customHandleObserve: customHandleObserve,
         );
 
   @override
   State<SliverViewObserver> createState() => MixViewObserverState();
 }
 
-class MixViewObserverState extends ObserverWidgetState<
-    SliverObserverController,
-    ObserveModel,
-    ScrollViewOnceObserveNotification,
-    RenderSliverList,
-    SliverViewObserver> with ListObserverMix, GridObserverMix {
+class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
+    ObserveModel, ScrollViewOnceObserveNotification, SliverViewObserver> {
   /// The last viewport observation result.
   SliverViewportObserveModel? lastViewportObserveResultModel;
 
@@ -81,13 +84,24 @@ class MixViewObserverState extends ObserverWidgetState<
 
   @override
   ObserveModel? handleObserve(BuildContext ctx) {
-    final _obj = ctx.findRenderObject();
-    if (_obj is RenderSliverList) {
-      return handleListObserve(ctx);
-    } else if (_obj is RenderSliverGrid) {
-      return handleGridObserve(ctx);
+    if (widget.customHandleObserve != null) {
+      return widget.customHandleObserve?.call(ctx);
     }
-    return null;
+    final _obj = ctx.findRenderObject();
+    if (_obj is RenderSliverList || _obj is RenderSliverFixedExtentList) {
+      return ObserverCore.handleListObserve(
+        context: ctx,
+        fetchLeadingOffset: fetchLeadingOffset,
+        toNextOverPercent: widget.toNextOverPercent,
+      );
+    } else if (_obj is RenderSliverGrid) {
+      return ObserverCore.handleGridObserve(
+        context: ctx,
+        fetchLeadingOffset: fetchLeadingOffset,
+        toNextOverPercent: widget.toNextOverPercent,
+      );
+    }
+    return widget.extendedHandleObserve?.call(ctx);
   }
 
   /// To observe the viewport.

@@ -16,7 +16,7 @@ class GridViewObserveDisplayingChildModel extends ObserveDisplayingChildModel
   }) : super(sliver: sliverGrid, index: index, renderObject: renderObject);
 
   /// The target sliverGrid
-  RenderSliverGrid sliverGrid;
+  RenderSliverMultiBoxAdaptor sliverGrid;
 
   @override
   bool operator ==(Object other) {
