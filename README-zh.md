@@ -237,6 +237,53 @@ SliverViewObserver(
   },
 )
 ```
+#### 1.4、`customTargetRenderSliverType` 回调
+
+> 仅支持 `ListViewObserver` 和 `GridViewObserver`
+
+在保持原来的观察逻辑上，告诉该库要处理的 `RenderSliver`，目的是为了支持对第三方库构建的列表进行观察。
+
+```dart
+customTargetRenderSliverType: (renderObj) {
+  // 告诉该库它需要观察什么类型的RenderObject
+  return renderObj is ExtendedRenderSliverList;
+},
+```
+
+#### 1.5、`customHandleObserve` 回调
+
+该回调用于自定义观察逻辑，当自带的处理逻辑不符合你的需求时使用。
+
+```dart
+customHandleObserve: (context) {
+  // 完全自定义你的观察逻辑
+  final _obj = context.findRenderObject();
+  if (_obj is RenderSliverList) {
+    ObserverCore.handleListObserve(context: context);
+  }
+  if (_obj is RenderSliverGrid || _obj is RenderSliverWaterfallFlow) {
+    return ObserverCore.handleGridObserve(context: context);
+  }
+  return null;
+},
+```
+
+#### 1.6、`extendedHandleObserve` 回调
+
+> 仅支持 `SliverViewObserver`
+
+该回调用于对原来的观察逻辑进行补充，原来只处理 `RenderSliverList`、`RenderSliverFixedExtentList` 和 `RenderSliverGrid`。
+
+```dart
+extendedHandleObserve: (context) {
+  // 在对原来的观察逻辑进行拓展
+  final _obj = context.findRenderObject();
+  if (_obj is RenderSliverWaterfallFlow) {
+    return ObserverCore.handleGridObserve(context: context);
+  }
+  return null;
+},
+```
 
 ### 2、滚动到指定下标位置
 

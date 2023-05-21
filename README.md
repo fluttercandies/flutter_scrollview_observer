@@ -240,6 +240,53 @@ SliverViewObserver(
   },
 )
 ```
+#### 1.4、Callback `customTargetRenderSliverType`
+
+> Only `ListViewObserver` and `GridViewObserver` are supported.
+
+While maintaining the original observation logic, tell the package the `RenderSliver` to be observed, in order to support the observation of the list built by the third-party package.
+
+```dart
+customTargetRenderSliverType: (renderObj) {
+  // Here you tell the package what type of RenderObject it needs to observe.
+  return renderObj is ExtendedRenderSliverList;
+},
+```
+
+#### 1.5、Callback `customHandleObserve`
+
+This callback is used to customize the observation logic and is used when the built-in observation logic does not meet your needs.
+
+```dart
+customHandleObserve: (context) {
+  // Here you can customize the observation logic.
+  final _obj = context.findRenderObject();
+  if (_obj is RenderSliverList) {
+    ObserverCore.handleListObserve(context: context);
+  }
+  if (_obj is RenderSliverGrid || _obj is RenderSliverWaterfallFlow) {
+    return ObserverCore.handleGridObserve(context: context);
+  }
+  return null;
+},
+```
+
+#### 1.6、Callback `extendedHandleObserve`
+
+> Only `SliverViewObserver` is supported.
+
+This callback is used to supplement the original observation logic, which originally only dealt with `RenderSliverList`, `RenderSliverFixedExtentList` and `RenderSliverGrid`.
+
+```dart
+extendedHandleObserve: (context) {
+  // An extension of the original observation logic.
+  final _obj = context.findRenderObject();
+  if (_obj is RenderSliverWaterfallFlow) {
+    return ObserverCore.handleGridObserve(context: context);
+  }
+  return null;
+},
+```
 
 ### 2、Scrolling to the specified index location
 
