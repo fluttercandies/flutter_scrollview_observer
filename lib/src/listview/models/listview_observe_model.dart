@@ -5,8 +5,9 @@
  */
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
-import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
+
+import 'listview_observe_displaying_child_model.dart';
 
 class ListViewObserveModel extends ObserveModel {
   ListViewObserveModel({
