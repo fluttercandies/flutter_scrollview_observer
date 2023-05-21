@@ -57,15 +57,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  dynamic_layouts:
-    dependency: "direct main"
+  extended_list:
+    dependency: transitive
     description:
-      path: "packages/dynamic_layouts"
-      ref: HEAD
-      resolved-ref: a2aac1275d5e75267dd6babf33691f2d9c24c0a9
-      url: "https://github.com/flutter/packages.git"
-    source: git
-    version: "0.0.1"
+      name: extended_list
+      sha256: "7eb3c21cd8b7710b0092cb0606807cd24614e5832e65f370e5dee226d317de44"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
+  extended_list_library:
+    dependency: transitive
+    description:
+      name: extended_list_library
+      sha256: cb424a04464e89bd6737f9ae025029bd8e913c7bf37101ad10c2defe0238d842
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -121,6 +128,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
+  loading_more_list:
+    dependency: "direct main"
+    description:
+      name: loading_more_list
+      sha256: aa680edc81cf024c394dccfa7ba1db701a5efb23ec1b8c657308428ce9da11d1
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.3"
+  loading_more_list_library:
+    dependency: transitive
+    description:
+      name: loading_more_list_library
+      sha256: "31348925a98748ffe04f661e4b47df37103fabad39442064fcf59148a5fee2dd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
   matcher:
     dependency: transitive
     description:
@@ -249,10 +272,10 @@ packages:
     dependency: transitive
     description:
       name: video_player_android
-      sha256: b608c320ab1a5fd373987c9c3c9ddbd6bda04d209f2a9f0bf197c5b02082201e
+      sha256: ae1c7d9a71c236a1bf9e567bd7ed4c90887e389a5f233b2192593f7f7395005c
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.7"
+    version: "2.4.8"
   video_player_avfoundation:
     dependency: transitive
     description:
@@ -277,6 +300,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.16"
+  waterfall_flow:
+    dependency: "direct main"
+    description:
+      name: waterfall_flow
+      sha256: "84486ac34f51977176990ada50b44d83be24726814fa03c22c1e10e3791cc3f2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.2"
 sdks:
   dart: ">=2.18.0 <3.0.0"
   flutter: ">=3.3.0"

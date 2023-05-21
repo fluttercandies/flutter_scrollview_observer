@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:scrollview_observer_example/features/custom_scrollview/custom_scrollview_demo/custom_scrollview_demo_page.dart';
 import 'package:scrollview_observer_example/features/custom_scrollview/sliver_appbar_demo/sliver_appbar_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/gridview_ctx_demo/gridview_ctx_demo_page.dart';
+import 'package:scrollview_observer_example/features/gridview/gridview_custom_demo/gridview_custom_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/gridview_demo/gridview_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/horizontal_gridview_demo/horizontal_gridview_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/sliver_grid_demo/sliver_grid_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/horizontal_listview_demo/horizontal_listview_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_ctx_demo/listview_ctx_demo_page.dart';
+import 'package:scrollview_observer_example/features/listview/listview_custom_demo/listview_custom_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_demo/listview_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_dynamic_offset/listview_dynamic_offset_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_fixed_height_demo/listview_fixed_height_demo_page.dart';
@@ -92,6 +94,12 @@ class HomePage extends StatelessWidget {
         },
       ),
       Tuple2<String, PageBuilder>(
+        "ListView - Custom",
+        () {
+          return const ListViewCustomDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
         "SliverListView",
         () {
           return const SliverListViewDemoPage();
@@ -113,6 +121,12 @@ class HomePage extends StatelessWidget {
         "GridView - Horizontal",
         () {
           return const HorizontalGridViewDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "GridView - Custom",
+        () {
+          return const GridViewCustomDemoPage();
         },
       ),
       Tuple2<String, PageBuilder>(

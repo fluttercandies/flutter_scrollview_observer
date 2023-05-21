@@ -1,7 +1,11 @@
+/*
+ * @Author: LinXunFeng linxunfeng@yeah.net
+ * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
+ * @Date: 2023-05-14 16:22:36
+ */
 import 'package:flutter/material.dart';
-import 'package:dynamic_layouts/dynamic_layouts.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
-import 'package:scrollview_observer_example/utils/random.dart';
+import 'package:waterfall_flow/waterfall_flow.dart';
 
 class WaterfallFlowPage extends StatefulWidget {
   const WaterfallFlowPage({Key? key}) : super(key: key);
@@ -15,6 +19,7 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
   BuildContext? grid1Context;
   BuildContext? grid2Context;
   BuildContext? swipeContext;
+  BuildContext? bottomDetector;
 
   BuildContext? firstChildCtxInViewport;
 
@@ -28,10 +33,30 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
           ObserverAutoTriggerObserveType.scrollEnd,
         ],
         triggerOnObserveType: ObserverTriggerOnObserveType.directly,
+        extendedHandleObserve: (context) {
+          // An extension of the original observation logic.
+          final _obj = context.findRenderObject();
+          if (_obj is RenderSliverWaterfallFlow) {
+            return ObserverCore.handleGridObserve(context: context);
+          }
+          return null;
+        },
+        // customHandleObserve: (context) {
+        //   // Here you can customize the observation logic.
+        //   final _obj = context.findRenderObject();
+        //   if (_obj is RenderSliverList) {
+        //     ObserverCore.handleListObserve(context: context);
+        //   }
+        //   if (_obj is RenderSliverGrid || _obj is RenderSliverWaterfallFlow) {
+        //     return ObserverCore.handleGridObserve(context: context);
+        //   }
+        //   return null;
+        // },
         sliverContexts: () {
           return [
             if (grid1Context != null) grid1Context!,
             if (swipeContext != null) swipeContext!,
+            if (bottomDetector != null) bottomDetector!,
             if (grid2Context != null) grid2Context!,
           ];
         },
@@ -44,6 +69,11 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
           } else if (firstChildCtxInViewport == grid2Context) {
             debugPrint('current first sliver in viewport - gridView2');
           }
+          final displayingChildCtxs =
+              result.displayingChildModelList.map((e) => e.sliverContext);
+
+          debugPrint(
+              'displayingChildCtxs contains bottomDetector - ${displayingChildCtxs.contains(bottomDetector)}');
         },
         onObserveAll: (resultMap) {
           final result = resultMap[firstChildCtxInViewport];
@@ -76,8 +106,25 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
         _buildSeparator(8),
         _buildSwipeView(),
         _buildSeparator(15),
+        _buildBottomDetector(),
         _buildGridView(isFirst: false, childCount: 20),
       ],
+    );
+  }
+
+  Widget _buildBottomDetector() {
+    return SliverLayoutBuilder(
+      builder: (ctx, _) {
+        if (bottomDetector != ctx) {
+          bottomDetector = ctx;
+        }
+        return SliverToBoxAdapter(
+          child: Container(
+            height: 10,
+            color: Colors.red,
+          ),
+        );
+      },
     );
   }
 
@@ -85,27 +132,27 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
     bool isFirst = false,
     required int childCount,
   }) {
-    return DynamicSliverGrid(
+    return SliverWaterfallFlow(
+      gridDelegate: const SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 15,
+        crossAxisSpacing: 10,
+      ),
       delegate: SliverChildBuilderDelegate(
-        (context, index) {
+        (BuildContext context, int index) {
           if (isFirst) {
             if (grid1Context != context) grid1Context = context;
           } else {
             if (grid2Context != context) grid2Context = context;
           }
-
           return Container(
-            width: double.infinity,
-            height: RandomTool.genInt(min: 50).toDouble(),
-            color: Colors.red,
+            alignment: Alignment.center,
+            color: Colors.teal[100 * (index % 9)],
+            child: Text('grid item $index'),
+            height: 50.0 + 100.0 * (index % 9),
           );
         },
         childCount: childCount,
-      ),
-      gridDelegate: const DynamicSliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 15,
-        crossAxisSpacing: 10,
       ),
     );
   }

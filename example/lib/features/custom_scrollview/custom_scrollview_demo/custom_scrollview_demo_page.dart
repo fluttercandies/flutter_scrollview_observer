@@ -151,6 +151,28 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
   }
 
   Widget _buildSliverListView() {
+    // return SliverFixedExtentList(
+    //   delegate: SliverChildBuilderDelegate(
+    //     (ctx, index) {
+    //       _sliverListCtx ??= ctx;
+    //       return Container(
+    //         // height: (index % 2 == 0) ? 80 : 50,
+    //         color: _hitIndexForCtx1 == index ? Colors.red : Colors.black12,
+    //         child: Center(
+    //           child: Text(
+    //             "index -- $index",
+    //             style: TextStyle(
+    //               color:
+    //                   _hitIndexForCtx1 == index ? Colors.white : Colors.black,
+    //             ),
+    //           ),
+    //         ),
+    //       );
+    //     },
+    //     childCount: 30,
+    //   ),
+    //   itemExtent: 100,
+    // );
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (ctx, index) {
