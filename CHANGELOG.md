@@ -1,3 +1,8 @@
+## 1.12.0
+- `ObserverWidget` 
+  - Support custom observation object and observation logic.
+  - Refine the logic for finding the first sliver in viewport.
+
 ## 1.11.0
 - Chat Observer
   - Support inserting multiple messages at once.
