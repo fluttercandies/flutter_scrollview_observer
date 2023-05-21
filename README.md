@@ -32,6 +32,7 @@ This is a library of widget that can be used to listen for child widgets those a
 - [x] `GridView`
 - [x] `SliverGrid` 
 - [x] Mixing usage of `SliverPersistentHeader`, `SliverList` and `SliverGrid`
+- [x] `ScrollView` built from third-party package.
 
 ## Installing
 

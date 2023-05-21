@@ -30,6 +30,7 @@ Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_ob
 - [x] `GridView`
 - [x] `SliverGrid` 
 - [x] 支持 `SliverPersistentHeader`，`SliverList` 和 `SliverGrid` 混合使用
+- [x] 由第三方库构建的 `ScrollView`
 
 ## 安装
 
