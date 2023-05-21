@@ -57,15 +57,17 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 
 Parameter description of `ListViewObserver`:
 
-| `Parameter`            | `Required` | `Description`                                                                                                                                                                           |
-| ---------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `child`                | `yes`      | Create `[ListView]` as a child of `[ListViewObserver]`                                                                                                                                  |
-| `sliverListContexts`   | `no`       | In this callback, we need to return all `[BuildContext]` of the `[ListView]` those needs to be observed. This property is only used when `[BuildContext]` needs to be specified exactly |
-| `onObserve`            | `no`       | This callback can listen for information about the child widgets those are currently being displayed in the current first `[Sliver]`                                                    |
-| `onObserveAll`         | `no`       | This callback can listen for information about all the children of slivers that are currently being displayed. This callback is only needed when there are more than one `[Sliver]`     |
-| `leadingOffset`        | `no`       | The offset of the head of scroll view. Find the first child start at this offset.                                                                                                      |
-| `dynamicLeadingOffset` | `no`       | This is a callback that provides `[leadingOffset]`, used when the leading offset in the head of the scroll view is dynamic. It has a higher priority than `[leadingOffset]`                                                                                             |
-| `toNextOverPercent`    | `no`       | When the percentage of the first child widget is blocked reaches this value, the next child widget will be the first child that is displaying. The default value is `1`                                                                                                            |
+| `Parameter`               | `Required` | `Description`                                                                                                                                                                           |
+| ------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `child`                   | `yes`      | Create `[ListView]` as a child of `[ListViewObserver]`                                                                                                                                  |
+| `sliverListContexts`      | `no`       | In this callback, we need to return all `[BuildContext]` of the `[ListView]` those needs to be observed. This property is only used when `[BuildContext]` needs to be specified exactly |
+| `onObserve`               | `no`       | This callback can listen for information about the child widgets those are currently being displayed in the current first `[Sliver]`                                                    |
+| `onObserveAll`            | `no`       | This callback can listen for information about all the children of slivers that are currently being displayed. This callback is only needed when there are more than one `[Sliver]`     |
+| `leadingOffset`           | `no`       | The offset of the head of scroll view. Find the first child start at this offset.                                                                                                       |
+| `dynamicLeadingOffset`    | `no`       | This is a callback that provides `[leadingOffset]`, used when the leading offset in the head of the scroll view is dynamic. It has a higher priority than `[leadingOffset]`             |
+| `toNextOverPercent`       | `no`       | When the percentage of the first child widget is blocked reaches this value, the next child widget will be the first child that is displaying. The default value is `1`                 |
+| `autoTriggerObserveTypes` | `no`       | Used to set types those can trigger observe automatically                                                                                                                               |
+| `triggerOnObserveType`    | `no`       | Used to set the prerequisite for triggering [onObserve] callback and [onObserveAll] callback                                                                                            |
 
 #### Method 1: General (Recommended)
 
@@ -182,15 +184,15 @@ Defaults to `[.scrollStart, .scrollUpdate, .scrollEnd]`.
 
 Description of enum values as follow：
 
-|value|Desc|
-|-|-|
-|`scrollStart`|when a `[Scrollable]` widget has started scrolling.|
-|`scrollUpdate`|when a `[Scrollable]` widget has changed its scroll position.|
-|`scrollEnd`|when a `[Scrollable]` widget has stopped scrolling.|
+| value          | Desc                                                          |
+| -------------- | ------------------------------------------------------------- |
+| `scrollStart`  | when a `[Scrollable]` widget has started scrolling.           |
+| `scrollUpdate` | when a `[Scrollable]` widget has changed its scroll position. |
+| `scrollEnd`    | when a `[Scrollable]` widget has stopped scrolling.           |
 
 #### 1.2、Parameter `triggerOnObserveType`
 
-Used to set the prerequisite for triggering the [onObserve] callback, defined as follows:
+Used to set the prerequisite for triggering [onObserve] callback and [onObserveAll] callback, defined as follows:
 
 ```dart
 final ObserverTriggerOnObserveType triggerOnObserveType;
@@ -207,10 +209,10 @@ Defaults to `.displayingItemsChange`.
 
 Description of enum values as follow：
 
-|value|Desc|
-|-|-|
-|`directly`|The callback `onObserve` will be called directly when getting observed result for scrollView.|
-|`displayingItemsChange`|The callback `onObserve` will be called when child widget comes in and out or when the number of child widget changes.|
+| value                   | Desc                                                                                                                   |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `directly`              | The callback `onObserve` will be called directly when getting observed result for scrollView.                          |
+| `displayingItemsChange` | The callback `onObserve` will be called when child widget comes in and out or when the number of child widget changes. |
 
 #### 1.3、Callback `onObserveViewport`
 
@@ -518,14 +520,14 @@ ObserverIndexPositionModel({
 });
 ```
 
-|Property|Type|Desc|
-|-|-|-|
-|`index`|`int`|The index of child widget.|
-|`sliverContext`|`BuildContext`|The target sliver `[BuildContext]`.|
-|`isFixedHeight`|`bool`| If the height of the child widget and the height of the separator are fixed, please pass `true` to this property. Defaults to `false`|
-|`alignment`|`double`|The alignment specifies the desired position for the leading edge of the child widget. It must be a value in the range `[0.0, 1.0]`. Defaults to `1.0`|
-|`offset`|`double Function(double targetOffset)`|Use this property when locating position needs an offset.|
-|`padding`|`EdgeInsets`|If your ListView or GridView uses its padding parameter, you need to sync that value as well! Otherwise it is not required.|
+| Property        | Type                                   | Desc                                                                                                                                                   |
+| --------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `index`         | `int`                                  | The index of child widget.                                                                                                                             |
+| `sliverContext` | `BuildContext`                         | The target sliver `[BuildContext]`.                                                                                                                    |
+| `isFixedHeight` | `bool`                                 | If the height of the child widget and the height of the separator are fixed, please pass `true` to this property. Defaults to `false`                  |
+| `alignment`     | `double`                               | The alignment specifies the desired position for the leading edge of the child widget. It must be a value in the range `[0.0, 1.0]`. Defaults to `1.0` |
+| `offset`        | `double Function(double targetOffset)` | Use this property when locating position needs an offset.                                                                                              |
+| `padding`       | `EdgeInsets`                           | If your ListView or GridView uses its padding parameter, you need to sync that value as well! Otherwise it is not required.                            |
 
 ### 3、Chat Observer
 #### 3.1、Basic usage
@@ -636,58 +638,58 @@ This callback is mainly used to display the unread bubbles of new messages when 
 
 > The base class of the observing data.
 
-|Property|Type|Desc|
-|-|-|-|
-|`sliver`|`RenderSliver`|The target sliver.|
-|`visible`|`bool`|Whether this sliver should be painted.|
-|`displayingChildIndexList`|`List<int>`|Stores index list for children widgets those are displaying.|
-|`axis`|`Axis`|The axis of sliver.|
-|`scrollOffset`|`double`|The scroll offset of sliver.|
+| Property                   | Type           | Desc                                                         |
+| -------------------------- | -------------- | ------------------------------------------------------------ |
+| `sliver`                   | `RenderSliver` | The target sliver.                                           |
+| `visible`                  | `bool`         | Whether this sliver should be painted.                       |
+| `displayingChildIndexList` | `List<int>`    | Stores index list for children widgets those are displaying. |
+| `axis`                     | `Axis`         | The axis of sliver.                                          |
+| `scrollOffset`             | `double`       | The scroll offset of sliver.                                 |
 
 #### `ListViewObserveModel`
 
 > A special observing models which inherits from the `ObserveModel` for `ListView` and `SliverList`.
 
-|Property|Type|Desc|
-|-|-|-|
-|`sliver`|`RenderSliverMultiBoxAdaptor`|The target sliverList.|
-|`firstChild`|`ListViewObserveDisplayingChildModel`|The observing data of the first child widget that is displaying.|
-|`displayingChildModelList`|`List<ListViewObserveDisplayingChildModel>`|Stores observing model list of displaying children widgets.|
+| Property                   | Type                                        | Desc                                                             |
+| -------------------------- | ------------------------------------------- | ---------------------------------------------------------------- |
+| `sliver`                   | `RenderSliverMultiBoxAdaptor`               | The target sliverList.                                           |
+| `firstChild`               | `ListViewObserveDisplayingChildModel`       | The observing data of the first child widget that is displaying. |
+| `displayingChildModelList` | `List<ListViewObserveDisplayingChildModel>` | Stores observing model list of displaying children widgets.      |
 
 #### `GridViewObserveModel`
 
 > A special observing models which inherits from the `ObserveModel` for `GridView` and `SliverGrid`.
 
-|Property|Type|Desc|
-|-|-|-|
-|`sliverGrid`|`RenderSliverGrid`|The target sliverGrid.|
-|`firstGroupChildList`|`List<GridViewObserveDisplayingChildModel>`|The observing datas of first group displaying child widgets.|
-|`displayingChildModelList`|`List<GridViewObserveDisplayingChildModel>`|Stores observing model list of displaying children widgets.|
+| Property                   | Type                                        | Desc                                                         |
+| -------------------------- | ------------------------------------------- | ------------------------------------------------------------ |
+| `sliverGrid`               | `RenderSliverGrid`                          | The target sliverGrid.                                       |
+| `firstGroupChildList`      | `List<GridViewObserveDisplayingChildModel>` | The observing datas of first group displaying child widgets. |
+| `displayingChildModelList` | `List<GridViewObserveDisplayingChildModel>` | Stores observing model list of displaying children widgets.  |
 
 #### `ObserveDisplayingChildModel`
 
 > Data information about the child widget that is currently being displayed.
 
-|Property|Type|Desc|
-|-|-|-|
-|`sliver`|`RenderSliver`|The target sliverList.|
-|`index`|`int`|The index of child widget.|
-|`renderObject`|`RenderBox`|The renderObject `[RenderBox]` of child widget.|
+| Property       | Type           | Desc                                            |
+| -------------- | -------------- | ----------------------------------------------- |
+| `sliver`       | `RenderSliver` | The target sliverList.                          |
+| `index`        | `int`          | The index of child widget.                      |
+| `renderObject` | `RenderBox`    | The renderObject `[RenderBox]` of child widget. |
 
 #### `ObserveDisplayingChildModelMixin`
 
 > The currently displayed child widgets data information, is for `ObserveDisplayingChildModel` supplement.
 
-|Property|Type|Desc|
-|-|-|-|
-|`axis`|`Axis`|The axis of sliver.|
-|`size`|`Size`|The size of child widget.|
-|`mainAxisSize`|`double`|The size of child widget on the main axis.|
-|`scrollOffset`|`double`|The scroll offset of sliver.|
-|`layoutOffset`|`double`|The layout offset of child widget.|
-|`leadingMarginToViewport`|`double`|The margin from the top of the child widget to the viewport.|
-|`trailingMarginToViewport`|`double`|The margin from the bottom of the child widget to the viewport.|
-|`displayPercentage`|`double`|The display percentage of the current widget.|
+| Property                   | Type     | Desc                                                            |
+| -------------------------- | -------- | --------------------------------------------------------------- |
+| `axis`                     | `Axis`   | The axis of sliver.                                             |
+| `size`                     | `Size`   | The size of child widget.                                       |
+| `mainAxisSize`             | `double` | The size of child widget on the main axis.                      |
+| `scrollOffset`             | `double` | The scroll offset of sliver.                                    |
+| `layoutOffset`             | `double` | The layout offset of child widget.                              |
+| `leadingMarginToViewport`  | `double` | The margin from the top of the child widget to the viewport.    |
+| `trailingMarginToViewport` | `double` | The margin from the bottom of the child widget to the viewport. |
+| `displayPercentage`        | `double` | The display percentage of the current widget.                   |
 
 
 ## Example

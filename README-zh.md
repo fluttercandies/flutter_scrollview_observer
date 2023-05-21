@@ -54,15 +54,17 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 
 `ListViewObserver` 的参数说明：
 
-| 参数                   | 必传 | 说明                                                                                                        |
-| ---------------------- | ---- | ----------------------------------------------------------------------------------------------------------- |
-| `child`                | 是   | 将构建的 `ListView` 做为 `ListViewObserver` 的子部件                                                        |
-| `sliverListContexts`   | 否   | 该回调中返回需要被观察的 `ListView` 的 `BuildContext`，在需要精确指定 `BuildContext` 时才会用到该参数       |
-| `onObserve`            | 否   | 该回调可以监听到当前 `第一个` `Sliver` 中正在显示中的子部件的相关信息                                       |
-| `onObserveAll`         | 否   | 该回调可以监听到当前 `所有` `Sliver` 正在显示中的子部件的相关信息，当有多个 `Sliver` 时才需要使用到这个回调 |
-| `leadingOffset`        | 否   | 列表头部的计算偏移量，从该偏移量开始计算首个子部件                                                          |
-| `dynamicLeadingOffset` | 否   | `leadingOffset` 的动态版本，在列表头部的计算偏移量不确定时使用，优先级高于 `leadingOffset`                  |
-| `toNextOverPercent`    | 否   | 首个子部件被遮挡的百分比达到该值时，则下一个子部件为首个子部件，默认值为 `1`                                |
+| 参数                      | 必传 | 说明                                                                                                        |
+| ------------------------- | ---- | ----------------------------------------------------------------------------------------------------------- |
+| `child`                   | 是   | 将构建的 `ListView` 做为 `ListViewObserver` 的子部件                                                        |
+| `sliverListContexts`      | 否   | 该回调中返回需要被观察的 `ListView` 的 `BuildContext`，在需要精确指定 `BuildContext` 时才会用到该参数       |
+| `onObserve`               | 否   | 该回调可以监听到当前 `第一个` `Sliver` 中正在显示中的子部件的相关信息                                       |
+| `onObserveAll`            | 否   | 该回调可以监听到当前 `所有` `Sliver` 正在显示中的子部件的相关信息，当有多个 `Sliver` 时才需要使用到这个回调 |
+| `leadingOffset`           | 否   | 列表头部的计算偏移量，从该偏移量开始计算首个子部件                                                          |
+| `dynamicLeadingOffset`    | 否   | `leadingOffset` 的动态版本，在列表头部的计算偏移量不确定时使用，优先级高于 `leadingOffset`                  |
+| `toNextOverPercent`       | 否   | 首个子部件被遮挡的百分比达到该值时，则下一个子部件为首个子部件，默认值为 `1`                                |
+| `autoTriggerObserveTypes` | 否   | 用于设置自动触发观察的时机                                                                                  |
+| `triggerOnObserveType`    | 否   | 用于配置触发 [onObserve] 或 [onObserveAll] 回调的前提                                                       |
 
 #### 方式一：常规（推荐）
 
@@ -179,15 +181,15 @@ enum ObserverAutoTriggerObserveType {
 
 枚举值说明：
 
-|枚举值|描述|
-|-|-|
-|`scrollStart`|开始滚动|
-|`scrollUpdate`|滚动中|
-|`scrollEnd`|结束滚动|
+| 枚举值         | 描述     |
+| -------------- | -------- |
+| `scrollStart`  | 开始滚动 |
+| `scrollUpdate` | 滚动中   |
+| `scrollEnd`    | 结束滚动 |
 
 #### 1.2、`triggerOnObserveType` 参数
 
-用于配置触发 `[onObserve]` 回调的前提，定义如下：
+用于配置触发 `[onObserve]` 和 `[onObserveAll]` 回调的前提，定义如下：
 
 ```dart
 final ObserverTriggerOnObserveType triggerOnObserveType;
@@ -204,10 +206,10 @@ enum ObserverTriggerOnObserveType {
 
 枚举值说明：
 
-|枚举值|描述|
-|-|-|
-|`directly`|观察到数据后直接将数据返出|
-|`displayingItemsChange`|当列表子部件进出或数量发生变化时将观察到的数据返出|
+| 枚举值                  | 描述                                               |
+| ----------------------- | -------------------------------------------------- |
+| `directly`              | 观察到数据后直接将数据返出                         |
+| `displayingItemsChange` | 当列表子部件进出或数量发生变化时将观察到的数据返出 |
 
 #### 1.3、`onObserveViewport` 回调
 
@@ -508,14 +510,14 @@ ObserverIndexPositionModel({
   this.padding = EdgeInsets.zero,
 });
 ```
-|属性|类型|描述|
-|-|-|-|
-|`index`|`int`|初始下标|
-|`sliverContext`|`BuildContext`|滚动视图的 `BuildContext`|
-|`isFixedHeight`|`bool`|如果列表子部件的高度是固定的，则建议使用 `isFixedHeight` 参数提升性能，默认为 `false`|
-|`alignment`|`double`|指定你期望定位到子部件的对齐位置，该值需要在 `[0.0, 1.0]` 这个范围之间。默认为 `0`|
-|`offset`|`double Function(double targetOffset)`|用于在滚动到指定下标位置时，设置整体的偏移量|
-|`padding`|`EdgeInsets`|当你的 `ListView` 或 `GridView` 有用到 `padding` 参数时，也需要同步给该值，其实情况则不需要|
+| 属性            | 类型                                   | 描述                                                                                        |
+| --------------- | -------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `index`         | `int`                                  | 初始下标                                                                                    |
+| `sliverContext` | `BuildContext`                         | 滚动视图的 `BuildContext`                                                                   |
+| `isFixedHeight` | `bool`                                 | 如果列表子部件的高度是固定的，则建议使用 `isFixedHeight` 参数提升性能，默认为 `false`       |
+| `alignment`     | `double`                               | 指定你期望定位到子部件的对齐位置，该值需要在 `[0.0, 1.0]` 这个范围之间。默认为 `0`          |
+| `offset`        | `double Function(double targetOffset)` | 用于在滚动到指定下标位置时，设置整体的偏移量                                                |
+| `padding`       | `EdgeInsets`                           | 当你的 `ListView` 或 `GridView` 有用到 `padding` 参数时，也需要同步给该值，其实情况则不需要 |
 
 ### 3、聊天会话
 
@@ -625,58 +627,58 @@ chatObserver = ChatScrollObserver(observerController)
 
 > 监听模型的基类
 
-|属性|类型|描述|
-|-|-|-|
-|`sliver`|`RenderSliver`|当前 `sliver`|
-|`visible`|`bool`|`sliver` 是否可见|
-|`displayingChildIndexList`|`List<int>`|当前现在显示的子部件的下标|
-|`axis`|`Axis`|`sliver` 的方向|
-|`scrollOffset`|`double`|`sliver` 的偏移量|
+| 属性                       | 类型           | 描述                       |
+| -------------------------- | -------------- | -------------------------- |
+| `sliver`                   | `RenderSliver` | 当前 `sliver`              |
+| `visible`                  | `bool`         | `sliver` 是否可见          |
+| `displayingChildIndexList` | `List<int>`    | 当前现在显示的子部件的下标 |
+| `axis`                     | `Axis`         | `sliver` 的方向            |
+| `scrollOffset`             | `double`       | `sliver` 的偏移量          |
 
 #### `ListViewObserveModel`
 
 > 继承自 `ObserveModel`，`ListView` 和 `SliverList` 专用的监听模型
 
-|属性|类型|描述|
-|-|-|-|
-|`sliver`|`RenderSliverMultiBoxAdaptor`|当前 `sliver`|
-|`firstChild`|`ListViewObserveDisplayingChildModel`|当前第一个正在显示的子部件数据模型|
-|`displayingChildModelList`|`List<ListViewObserveDisplayingChildModel>`|当前正在显示的所有子部件数据模型|
+| 属性                       | 类型                                        | 描述                               |
+| -------------------------- | ------------------------------------------- | ---------------------------------- |
+| `sliver`                   | `RenderSliverMultiBoxAdaptor`               | 当前 `sliver`                      |
+| `firstChild`               | `ListViewObserveDisplayingChildModel`       | 当前第一个正在显示的子部件数据模型 |
+| `displayingChildModelList` | `List<ListViewObserveDisplayingChildModel>` | 当前正在显示的所有子部件数据模型   |
 
 #### `GridViewObserveModel`
 
 > 继承自 `ObserveModel`，`GridView` 和 `SliverGrid` 专用的监听模型
 
-|属性|类型|描述|
-|-|-|-|
-|`sliverGrid`|`RenderSliverGrid`|当前 `sliver`|
-|`firstGroupChildList`|`List<GridViewObserveDisplayingChildModel>`|当前第一排正在显示的所有子部件数据模型|
-|`displayingChildModelList`|`List<GridViewObserveDisplayingChildModel>`|当前正在显示的所有子部件数据模型|
+| 属性                       | 类型                                        | 描述                                   |
+| -------------------------- | ------------------------------------------- | -------------------------------------- |
+| `sliverGrid`               | `RenderSliverGrid`                          | 当前 `sliver`                          |
+| `firstGroupChildList`      | `List<GridViewObserveDisplayingChildModel>` | 当前第一排正在显示的所有子部件数据模型 |
+| `displayingChildModelList` | `List<GridViewObserveDisplayingChildModel>` | 当前正在显示的所有子部件数据模型       |
 
 #### `ObserveDisplayingChildModel`
 
 > 当前正在显示的子部件的数据信息
 
-|属性|类型|描述|
-|-|-|-|
-|`sliver`|`RenderSliver`|当前 `sliver`|
-|`index`|`int`|子部件的下标|
-|`renderObject`|`RenderBox`|子部件对应的 `RenderBox` 实例|
+| 属性           | 类型           | 描述                          |
+| -------------- | -------------- | ----------------------------- |
+| `sliver`       | `RenderSliver` | 当前 `sliver`                 |
+| `index`        | `int`          | 子部件的下标                  |
+| `renderObject` | `RenderBox`    | 子部件对应的 `RenderBox` 实例 |
 
 #### `ObserveDisplayingChildModelMixin`
 
 > 当前正在显示的子部件的数据信息，是对 `ObserveDisplayingChildModel` 的补充
 
-|属性|类型|描述|
-|-|-|-|
-|`axis`|`Axis`|`sliver` 的方向|
-|`size`|`Size`|子部件的大小|
-|`mainAxisSize`|`double`|子部件主轴方向上的大小|
-|`scrollOffset`|`double`|`sliver` 的偏移量|
-|`layoutOffset`|`double`|子部件相应于 `sliver` 的偏移量|
-|`leadingMarginToViewport`|`double`|子部件距离视口顶部的距离|
-|`trailingMarginToViewport`|`double`|子部件距离视口尾部部的距离|
-|`displayPercentage`|`double`|子部件自身大小显示的占比|
+| 属性                       | 类型     | 描述                           |
+| -------------------------- | -------- | ------------------------------ |
+| `axis`                     | `Axis`   | `sliver` 的方向                |
+| `size`                     | `Size`   | 子部件的大小                   |
+| `mainAxisSize`             | `double` | 子部件主轴方向上的大小         |
+| `scrollOffset`             | `double` | `sliver` 的偏移量              |
+| `layoutOffset`             | `double` | 子部件相应于 `sliver` 的偏移量 |
+| `leadingMarginToViewport`  | `double` | 子部件距离视口顶部的距离       |
+| `trailingMarginToViewport` | `double` | 子部件距离视口尾部部的距离     |
+| `displayPercentage`        | `double` | 子部件自身大小显示的占比       |
 
 ## 示例
 
