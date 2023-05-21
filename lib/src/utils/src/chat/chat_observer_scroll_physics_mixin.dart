@@ -60,6 +60,7 @@ mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
   _handlePositionCallback(ChatScrollObserverHandlePositionResultModel result) {
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
       observer.onHandlePositionResultCallback?.call(result);
+      // ignore: deprecated_member_use_from_same_package
       observer.onHandlePositionCallback?.call(result.type);
     });
   }
