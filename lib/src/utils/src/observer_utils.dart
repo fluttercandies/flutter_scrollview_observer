@@ -7,6 +7,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:scrollview_observer/src/common/models/observe_model.dart';
+import 'package:scrollview_observer/src/gridview/models/gridview_observe_displaying_child_model.dart';
+import 'package:scrollview_observer/src/gridview/models/gridview_observe_model.dart';
 import 'package:scrollview_observer/src/listview/models/listview_observe_model.dart';
 import 'dart:math' as math;
 
@@ -35,15 +38,19 @@ class ObserverUtils {
 
   /// Calculate the anchor tab index.
   static int calcAnchorTabIndex({
-    required ListViewObserveModel observeModel,
+    required ObserveModel observeModel,
     required List<int> tabIndexs,
     required int currentTabIndex,
   }) {
-    final topIndex = observeModel.firstChild?.index ?? 0;
-    final index = tabIndexs.indexOf(topIndex);
-    if (index != -1) {
-      return index;
-    } else {
+    if (currentTabIndex >= tabIndexs.length) {
+      return currentTabIndex;
+    }
+    if (observeModel is ListViewObserveModel) {
+      final topIndex = observeModel.firstChild?.index ?? 0;
+      final index = tabIndexs.indexOf(topIndex);
+      if (isValidListIndex(index)) {
+        return index;
+      }
       var targetTabIndex = currentTabIndex - 1;
       if (targetTabIndex < 0 || targetTabIndex >= tabIndexs.length) {
         return currentTabIndex;
@@ -52,8 +59,52 @@ class ObserverUtils {
       var lastIndex = tabIndexs[currentTabIndex - 1];
       if (curIndex > topIndex && lastIndex < topIndex) {
         final lastTabIndex = tabIndexs.indexOf(lastIndex);
-        if (lastTabIndex != -1) {
+        if (isValidListIndex(lastTabIndex)) {
           return lastTabIndex;
+        }
+      }
+    } else if (observeModel is GridViewObserveModel) {
+      final firstGroupChildList = observeModel.firstGroupChildList;
+      if (firstGroupChildList.isEmpty) {
+        return currentTabIndex;
+      }
+      // Record the child with the shortest distance from the bottom.
+      GridViewObserveDisplayingChildModel mainChildModel =
+          firstGroupChildList.first;
+      for (var firstGroupChildModel in firstGroupChildList) {
+        final index = tabIndexs.indexOf(firstGroupChildModel.index);
+        if (isValidListIndex(index)) {
+          // Found the target index from tabIndexs, return directly.
+          return index;
+        }
+        if (mainChildModel.trailingMarginToViewport <
+            firstGroupChildModel.trailingMarginToViewport) {
+          mainChildModel = firstGroupChildModel;
+        }
+      }
+      // Target index not found from tabIndexs.
+      var targetTabIndex = currentTabIndex - 1;
+      if (targetTabIndex < 0 || targetTabIndex >= tabIndexs.length) {
+        return currentTabIndex;
+      }
+      var curIndex = tabIndexs[currentTabIndex];
+      final firstGroupIndexList =
+          firstGroupChildList.map((e) => e.index).toList();
+      final minOffset = mainChildModel.layoutOffset;
+      final maxOffset =
+          mainChildModel.layoutOffset + mainChildModel.mainAxisSize;
+      final displayingChildModelList =
+          observeModel.displayingChildModelList.where((e) {
+        return !firstGroupIndexList.contains(e.index) &&
+            e.layoutOffset >= minOffset &&
+            e.layoutOffset <= maxOffset;
+      }).toList();
+      // If the indexes of all the children currently being displayed are
+      // greater than curIndex, keep using currentTabIndex.
+      // Otherwise, using targetTabIndex.
+      for (var model in displayingChildModelList) {
+        if (model.index <= curIndex) {
+          return targetTabIndex;
         }
       }
     }
@@ -63,10 +114,10 @@ class ObserverUtils {
   /// Determines whether the offset at the bottom of the target child widget
   /// is below the specified offset.
   static bool isBelowOffsetWidgetInSliver({
-    required double listViewOffset,
+    required double scrollViewOffset,
     required Axis scrollDirection,
     required RenderBox targetChild,
-    required double toNextOverPercent,
+    double toNextOverPercent = 1,
   }) {
     if (targetChild is! RenderIndexedSemantics) return false;
     if (!targetChild.hasSize) return false;
@@ -84,20 +135,20 @@ class ObserverUtils {
     } catch (_) {
       return false;
     }
-    return listViewOffset <
+    return scrollViewOffset <
         targetFirstChildSize * toNextOverPercent + targetFirstChildOffset;
   }
 
   /// Determines whether the target child widget has reached the specified
   /// offset
   static bool isReachOffsetWidgetInSliver({
-    required double listViewOffset,
+    required double scrollViewOffset,
     required Axis scrollDirection,
     required RenderBox targetChild,
-    required double toNextOverPercent,
+    double toNextOverPercent = 1,
   }) {
     if (!isBelowOffsetWidgetInSliver(
-      listViewOffset: listViewOffset,
+      scrollViewOffset: scrollViewOffset,
       scrollDirection: scrollDirection,
       targetChild: targetChild,
       toNextOverPercent: toNextOverPercent,
@@ -107,15 +158,26 @@ class ObserverUtils {
       return false;
     }
     final targetFirstChildOffset = parentData.layoutOffset ?? 0;
-    return listViewOffset >= targetFirstChildOffset;
+    return scrollViewOffset >= targetFirstChildOffset;
   }
 
   /// Determines whether the target child widget is being displayed
   static bool isDisplayingChildInSliver({
     required RenderBox? targetChild,
-    required double listViewBottomOffset,
+    required double showingChildrenMaxOffset,
+    required double scrollViewOffset,
+    required Axis scrollDirection,
+    double toNextOverPercent = 1,
   }) {
     if (targetChild == null) {
+      return false;
+    }
+    if (!isBelowOffsetWidgetInSliver(
+      scrollViewOffset: scrollViewOffset,
+      scrollDirection: scrollDirection,
+      targetChild: targetChild,
+      toNextOverPercent: toNextOverPercent,
+    )) {
       return false;
     }
     final parentData = targetChild.parentData;
@@ -123,7 +185,7 @@ class ObserverUtils {
       return false;
     }
     final targetChildLayoutOffset = parentData.layoutOffset ?? 0;
-    return targetChildLayoutOffset < listViewBottomOffset;
+    return targetChildLayoutOffset < showingChildrenMaxOffset;
   }
 
   /// Find out the viewport

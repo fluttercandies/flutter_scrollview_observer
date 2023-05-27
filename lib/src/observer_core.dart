@@ -42,9 +42,9 @@ class ObserverCore {
     if (firstChild == null) return null;
 
     final offset = fetchLeadingOffset?.call() ?? 0;
-    final rawListViewOffset =
+    final rawScrollViewOffset =
         _obj.constraints.scrollOffset + _obj.constraints.overlap;
-    var listViewOffset = rawListViewOffset + offset;
+    var scrollViewOffset = rawScrollViewOffset + offset;
     var parentData = firstChild.parentData as SliverMultiBoxAdaptorParentData;
     var index = parentData.index ?? 0;
 
@@ -52,7 +52,7 @@ class ObserverCore {
     var targetFirstChild = firstChild;
 
     while (!ObserverUtils.isBelowOffsetWidgetInSliver(
-      listViewOffset: listViewOffset,
+      scrollViewOffset: scrollViewOffset,
       scrollDirection: scrollDirection,
       targetChild: targetFirstChild,
       toNextOverPercent: toNextOverPercent,
@@ -79,12 +79,15 @@ class ObserverCore {
     ];
 
     // Find the remaining children that are being displayed
-    final listViewBottomOffset =
-        rawListViewOffset + _obj.constraints.remainingPaintExtent;
+    final showingChildrenMaxOffset =
+        rawScrollViewOffset + _obj.constraints.remainingPaintExtent;
     var displayingChild = _obj.childAfter(targetFirstChild);
     while (ObserverUtils.isDisplayingChildInSliver(
       targetChild: displayingChild,
-      listViewBottomOffset: listViewBottomOffset,
+      showingChildrenMaxOffset: showingChildrenMaxOffset,
+      scrollViewOffset: scrollViewOffset,
+      scrollDirection: scrollDirection,
+      toNextOverPercent: toNextOverPercent,
     )) {
       if (displayingChild == null) {
         break;
@@ -140,16 +143,16 @@ class ObserverCore {
     if (firstChild == null) return null;
 
     final offset = fetchLeadingOffset?.call() ?? 0;
-    final rawListViewOffset =
+    final rawScrollViewOffset =
         _obj.constraints.scrollOffset + _obj.constraints.overlap;
-    var listViewOffset = rawListViewOffset + offset;
+    var scrollViewOffset = rawScrollViewOffset + offset;
 
     // Find out the first child which is displaying
     var targetFirstChild = firstChild;
     var lastFirstGroupChildWidget = targetFirstChild;
 
     while (!ObserverUtils.isBelowOffsetWidgetInSliver(
-      listViewOffset: listViewOffset,
+      scrollViewOffset: scrollViewOffset,
       scrollDirection: scrollDirection,
       targetChild: targetFirstChild,
       toNextOverPercent: toNextOverPercent,
@@ -160,6 +163,7 @@ class ObserverCore {
       targetFirstChild = nextChild;
     }
     if (targetFirstChild is! RenderIndexedSemantics) return null;
+    lastFirstGroupChildWidget = targetFirstChild;
 
     final firstModel = GridViewObserveDisplayingChildModel(
       sliverGrid: _obj,
@@ -169,17 +173,13 @@ class ObserverCore {
     List<GridViewObserveDisplayingChildModel> firstGroupChildModelList = [];
     firstGroupChildModelList.add(firstModel);
 
-    final listViewBottomOffset =
-        rawListViewOffset + _obj.constraints.remainingPaintExtent;
+    final showingChildrenMaxOffset =
+        rawScrollViewOffset + _obj.constraints.remainingPaintExtent;
     // Find out other child those have reached the specified offset.
     RenderBox? targetChild = _obj.childAfter(targetFirstChild);
     while (targetChild != null) {
-      if (!ObserverUtils.isDisplayingChildInSliver(
-        targetChild: targetChild,
-        listViewBottomOffset: listViewBottomOffset,
-      )) break;
       if (ObserverUtils.isReachOffsetWidgetInSliver(
-        listViewOffset: max(listViewOffset, firstModel.layoutOffset),
+        scrollViewOffset: max(scrollViewOffset, firstModel.layoutOffset),
         scrollDirection: scrollDirection,
         targetChild: targetChild,
         toNextOverPercent: toNextOverPercent,
@@ -203,19 +203,23 @@ class ObserverCore {
 
     // Find the remaining children that are being displayed
     var displayingChild = _obj.childAfter(lastFirstGroupChildWidget);
-    while (ObserverUtils.isDisplayingChildInSliver(
-      targetChild: displayingChild,
-      listViewBottomOffset: listViewBottomOffset,
-    )) {
-      if (displayingChild == null ||
-          displayingChild is! RenderIndexedSemantics) {
-        break;
+    while (displayingChild != null) {
+      if (ObserverUtils.isDisplayingChildInSliver(
+        targetChild: displayingChild,
+        showingChildrenMaxOffset: showingChildrenMaxOffset,
+        scrollViewOffset: scrollViewOffset,
+        scrollDirection: scrollDirection,
+        toNextOverPercent: toNextOverPercent,
+      )) {
+        if (displayingChild is! RenderIndexedSemantics) {
+          continue;
+        }
+        showingChildModelList.add(GridViewObserveDisplayingChildModel(
+          sliverGrid: _obj,
+          index: displayingChild.index,
+          renderObject: displayingChild,
+        ));
       }
-      showingChildModelList.add(GridViewObserveDisplayingChildModel(
-        sliverGrid: _obj,
-        index: displayingChild.index,
-        renderObject: displayingChild,
-      ));
       displayingChild = _obj.childAfter(displayingChild);
     }
 
