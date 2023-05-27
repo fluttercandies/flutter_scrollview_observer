@@ -1,3 +1,9 @@
+## 1.13.0
+- `ObserverUtils`
+  - `calcAnchorTabIndex` method supports GridView
+- `ObserverCore`
+  - Refine the logic of `handleGridObserve` method
+
 ## 1.12.0
 - `ObserverWidget` 
   - Support custom observation object and observation logic.
