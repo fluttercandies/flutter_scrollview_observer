@@ -79,8 +79,9 @@ class ObserverCore {
     ];
 
     // Find the remaining children that are being displayed
-    final showingChildrenMaxOffset =
-        rawScrollViewOffset + _obj.constraints.remainingPaintExtent;
+    final showingChildrenMaxOffset = rawScrollViewOffset +
+        _obj.constraints.remainingPaintExtent -
+        _obj.constraints.overlap;
     var displayingChild = _obj.childAfter(targetFirstChild);
     while (ObserverUtils.isDisplayingChildInSliver(
       targetChild: displayingChild,
@@ -173,8 +174,9 @@ class ObserverCore {
     List<GridViewObserveDisplayingChildModel> firstGroupChildModelList = [];
     firstGroupChildModelList.add(firstModel);
 
-    final showingChildrenMaxOffset =
-        rawScrollViewOffset + _obj.constraints.remainingPaintExtent;
+    final showingChildrenMaxOffset = rawScrollViewOffset +
+        _obj.constraints.remainingPaintExtent -
+        _obj.constraints.overlap;
     // Find out other child those have reached the specified offset.
     RenderBox? targetChild = _obj.childAfter(targetFirstChild);
     while (targetChild != null) {
