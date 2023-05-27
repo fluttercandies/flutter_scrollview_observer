@@ -60,8 +60,7 @@ class _VideoListAutoPlayPageState extends State<VideoListAutoPlayPage> {
       height: 300,
       child: _hitIndex == index
           ? const VideoWidget(
-              url:
-                  'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
+              url: 'https://www.w3schools.com/html/movie.mp4',
             )
           : Container(
               color: Colors.blue[100],
