@@ -198,7 +198,7 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
             ),
           );
         },
-        childCount: 10,
+        childCount: 20,
       ),
     );
   }
