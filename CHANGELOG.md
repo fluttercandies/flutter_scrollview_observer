@@ -1,8 +1,8 @@
 ## 1.13.0
 - `ObserverUtils`
-  - `calcAnchorTabIndex` method supports GridView
+  - The `calcAnchorTabIndex` method supports GridView.
 - `ObserverCore`
-  - Refine the logic of `handleGridObserve` method
+  - Refine the logic of `handleListObserve` method and `handleGridObserve` method.
 
 ## 1.12.0
 - `ObserverWidget` 
