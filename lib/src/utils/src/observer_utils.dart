@@ -11,6 +11,7 @@ import 'package:scrollview_observer/src/common/models/observe_model.dart';
 import 'package:scrollview_observer/src/gridview/models/gridview_observe_displaying_child_model.dart';
 import 'package:scrollview_observer/src/gridview/models/gridview_observe_model.dart';
 import 'package:scrollview_observer/src/listview/models/listview_observe_model.dart';
+import 'package:scrollview_observer/src/utils/src/log.dart';
 import 'dart:math' as math;
 
 class ObserverUtils {
@@ -28,7 +29,7 @@ class ObserverUtils {
   }) {
     assert(key != null || context != null);
     final ctx = key?.currentContext ?? context;
-    final obj = ctx?.findRenderObject();
+    final obj = ObserverUtils.findRenderObject(ctx);
     if (obj is! RenderSliverPersistentHeader) return 0;
     final maxExtent = obj.maxExtent;
     final minExtent = obj.minExtent;
@@ -239,5 +240,19 @@ class ObserverUtils {
   /// Determines whether it is a valid list index.
   static bool isValidListIndex(int index) {
     return index != -1;
+  }
+
+  /// Safely call findRenderObject method.
+  static RenderObject? findRenderObject(BuildContext? context) {
+    try {
+      // It throws an exception when getting renderObject of inactive element.
+      return context?.findRenderObject();
+    } catch (e) {
+      Log.warning(
+          'Cannot get renderObject of inactive element.\n'
+          'Please call the reattach method of ObserverController to re-record '
+          'BuildContext.');
+      return null;
+    }
   }
 }

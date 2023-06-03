@@ -22,7 +22,7 @@ class ObserverCore {
     double Function()? fetchLeadingOffset,
     double toNextOverPercent = 1,
   }) {
-    var _obj = context.findRenderObject();
+    var _obj = ObserverUtils.findRenderObject(context);
     if (_obj is! RenderSliverMultiBoxAdaptor) return null;
     if (kDebugMode) {
       final viewport = ObserverUtils.findViewport(_obj);
@@ -124,7 +124,7 @@ class ObserverCore {
     double Function()? fetchLeadingOffset,
     double toNextOverPercent = 1,
   }) {
-    final _obj = context.findRenderObject();
+    final _obj = ObserverUtils.findRenderObject(context);
     if (_obj is! RenderSliverMultiBoxAdaptor) return null;
     if (kDebugMode) {
       final viewport = ObserverUtils.findViewport(_obj);

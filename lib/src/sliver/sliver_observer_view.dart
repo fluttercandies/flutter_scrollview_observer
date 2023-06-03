@@ -87,7 +87,7 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
     if (widget.customHandleObserve != null) {
       return widget.customHandleObserve?.call(ctx);
     }
-    final _obj = ctx.findRenderObject();
+    final _obj = ObserverUtils.findRenderObject(ctx);
     if (_obj is RenderSliverList || _obj is RenderSliverFixedExtentList) {
       return ObserverCore.handleListObserve(
         context: ctx,
@@ -112,7 +112,7 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
     if (onObserveViewport == null) return;
 
     final ctxs = fetchTargetSliverContexts();
-    final objList = ctxs.map((e) => e.findRenderObject()).toList();
+    final objList = ctxs.map((e) => ObserverUtils.findRenderObject(e)).toList();
     if (objList.isEmpty) return;
     final firstObj = objList.first;
     if (firstObj == null) return;

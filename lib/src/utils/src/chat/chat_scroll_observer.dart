@@ -95,7 +95,7 @@ class ChatScrollObserver {
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
       final ctx = observerController.fetchSliverContext();
       if (ctx == null) return;
-      final obj = ctx.findRenderObject() as RenderSliver;
+      final obj = ObserverUtils.findRenderObject(ctx) as RenderSliver;
       final viewportMainAxisExtent = obj.constraints.viewportMainAxisExtent;
       final scrollExtent = obj.geometry?.scrollExtent ?? 0;
       if (viewportMainAxisExtent >= scrollExtent) {

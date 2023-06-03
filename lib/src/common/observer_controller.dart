@@ -129,7 +129,7 @@ mixin ObserverControllerForInfo on ObserverController {
     BuildContext? sliverContext,
   }) {
     final ctx = fetchSliverContext(sliverContext: sliverContext);
-    var obj = ctx?.findRenderObject();
+    var obj = ObserverUtils.findRenderObject(ctx);
     if (obj is! RenderSliverMultiBoxAdaptor) return null;
     var targetChild = findCurrentFirstChild(obj);
     if (targetChild == null) return null;
@@ -149,7 +149,7 @@ mixin ObserverControllerForInfo on ObserverController {
     BuildContext? sliverContext,
   }) {
     final ctx = fetchSliverContext(sliverContext: sliverContext);
-    var obj = ctx?.findRenderObject();
+    var obj = ObserverUtils.findRenderObject(ctx);
     if (obj == null || obj is! RenderSliverMultiBoxAdaptor) return null;
     final targetChild = findCurrentFirstChild(obj);
     if (targetChild == null) return null;
@@ -298,7 +298,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     if (_controller == null || !_controller.hasClients) return;
 
     final ctx = fetchSliverContext(sliverContext: sliverContext);
-    var obj = ctx?.findRenderObject();
+    var obj = ObserverUtils.findRenderObject(ctx);
     if (obj is! RenderSliverMultiBoxAdaptor) return;
 
     final viewport = _findViewport(obj);
