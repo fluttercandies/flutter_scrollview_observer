@@ -22,6 +22,7 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
   BuildContext? bottomDetector;
 
   BuildContext? firstChildCtxInViewport;
+  bool isRemoveSwipe = false;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +36,7 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
         triggerOnObserveType: ObserverTriggerOnObserveType.directly,
         extendedHandleObserve: (context) {
           // An extension of the original observation logic.
-          final _obj = context.findRenderObject();
+          final _obj = ObserverUtils.findRenderObject(context);
           if (_obj is RenderSliverWaterfallFlow) {
             return ObserverCore.handleGridObserve(context: context);
           }
@@ -43,7 +44,7 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
         },
         // customHandleObserve: (context) {
         //   // Here you can customize the observation logic.
-        //   final _obj = context.findRenderObject();
+        //   final _obj = ObserverUtils.findRenderObject(context);
         //   if (_obj is RenderSliverList) {
         //     ObserverCore.handleListObserve(context: context);
         //   }
@@ -93,6 +94,14 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
               }).toList()}');
             }
           }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.swipe),
+        onPressed: () {
+          setState(() {
+            isRemoveSwipe = !isRemoveSwipe;
+          });
         },
       ),
     );
@@ -158,6 +167,7 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
   }
 
   Widget _buildSwipeView() {
+    if (isRemoveSwipe) return const SliverToBoxAdapter(child: SizedBox());
     return SliverLayoutBuilder(
       builder: (context, _) {
         if (swipeContext != context) swipeContext = context;
