@@ -1,3 +1,9 @@
+## 1.13.1
+- `ObserverCore`
+  - Fix no getting all child widgets those are displayed when there are separators in `ListView`. [#31](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/31).
+- `ObserverUtils`
+  - Safely call `findRenderObject` method.
+
 ## 1.13.0
 - `ObserverUtils`
   - The `calcAnchorTabIndex` method supports GridView.
