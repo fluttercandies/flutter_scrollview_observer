@@ -119,7 +119,6 @@ class ObserverUtils {
     required RenderBox targetChild,
     double toNextOverPercent = 1,
   }) {
-    if (targetChild is! RenderIndexedSemantics) return false;
     if (!targetChild.hasSize) return false;
     final parentData = targetChild.parentData;
     if (parentData is! SliverMultiBoxAdaptorParentData) {
