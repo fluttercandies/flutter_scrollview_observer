@@ -10,6 +10,8 @@ Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_ob
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/T6T4JKVRP) [![wechat](https://img.shields.io/static/v1?label=WeChat&message=微信收款码&color=brightgreen&style=for-the-badge&logo=WeChat)](https://cdn.jsdelivr.net/gh/FullStackAction/PicBed@resource20220417121922/image/202303181116760.jpeg)
 
+微信技术交流群请看: [【微信群说明】](https://mp.weixin.qq.com/s/JBbMstn0qW6M71hh-BRKzw)
+
 ## 文章
 
 - [Flutter - 快速实现聊天会话列表的效果，完美💯](https://juejin.cn/post/7152307272436154405)
@@ -260,7 +262,7 @@ customTargetRenderSliverType: (renderObj) {
 ```dart
 customHandleObserve: (context) {
   // 完全自定义你的观察逻辑
-  final _obj = context.findRenderObject();
+  final _obj = ObserverUtils.findRenderObject(context);
   if (_obj is RenderSliverList) {
     ObserverCore.handleListObserve(context: context);
   }
@@ -280,7 +282,7 @@ customHandleObserve: (context) {
 ```dart
 extendedHandleObserve: (context) {
   // 在对原来的观察逻辑进行拓展
-  final _obj = context.findRenderObject();
+  final _obj = ObserverUtils.findRenderObject(context);
   if (_obj is RenderSliverWaterfallFlow) {
     return ObserverCore.handleGridObserve(context: context);
   }

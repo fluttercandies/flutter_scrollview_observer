@@ -11,6 +11,8 @@ This is a library of widget that can be used to listen for child widgets those a
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/T6T4JKVRP) [![wechat](https://img.shields.io/static/v1?label=WeChat&message=WeChat&nbsp;Pay&color=brightgreen&style=for-the-badge&logo=WeChat)](https://cdn.jsdelivr.net/gh/FullStackAction/PicBed@resource20220417121922/image/202303181116760.jpeg)
 
+Chat: [Join WeChat group](https://mp.weixin.qq.com/s/JBbMstn0qW6M71hh-BRKzw)
+
 ## Article
 
 - [Flutter - 快速实现聊天会话列表的效果，完美💯](https://juejin.cn/post/7152307272436154405)
@@ -263,7 +265,7 @@ This callback is used to customize the observation logic and is used when the bu
 ```dart
 customHandleObserve: (context) {
   // Here you can customize the observation logic.
-  final _obj = context.findRenderObject();
+  final _obj = ObserverUtils.findRenderObject(context);
   if (_obj is RenderSliverList) {
     ObserverCore.handleListObserve(context: context);
   }
@@ -283,7 +285,7 @@ This callback is used to supplement the original observation logic, which origin
 ```dart
 extendedHandleObserve: (context) {
   // An extension of the original observation logic.
-  final _obj = context.findRenderObject();
+  final _obj = ObserverUtils.findRenderObject(context);
   if (_obj is RenderSliverWaterfallFlow) {
     return ObserverCore.handleGridObserve(context: context);
   }
