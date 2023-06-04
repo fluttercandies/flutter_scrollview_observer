@@ -138,14 +138,14 @@ class ObserverWidgetState<
           if (innerAutoTriggerObserveScrollNotifications
               .contains(notification.runtimeType)) {
             if (kIsWeb) {
-              // Getting bad observation result becase scrolling in Flutter Web 
+              // Getting bad observation result because scrolling in Flutter Web 
               // with mouse wheel is not smooth.
               // https://github.com/flutter/flutter/issues/78708
               // https://github.com/flutter/flutter/issues/78634
               //
               // issue
               // https://github.com/LinXunFeng/flutter_scrollview_observer/issues/31
-              Future.delayed(const Duration(microseconds: 1), () {
+              Future.delayed(const Duration(milliseconds: 1), () {
                 handleContexts();
               });
             } else {
