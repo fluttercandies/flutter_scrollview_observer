@@ -26,7 +26,7 @@ class ChatItemWidget extends StatelessWidget {
     final isOwn = chatModel.isOwn;
     final nickName = isOwn ? 'LXF' : 'LQR';
     Widget resultWidget = Row(
-      textDirection: isOwn ? TextDirection.rtl : TextDirection.ltr,
+      textDirection: isOwn ? TextDirection.ltr : TextDirection.rtl,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(

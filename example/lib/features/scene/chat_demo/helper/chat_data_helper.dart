@@ -20,10 +20,15 @@ class ChatDataHelper {
     '📱 Swifty screen adaptation solution (Support Objective-C and Swift)\nhttps://github.com/LinXunFeng/SwiftyFitsize'
   ];
 
-  static ChatModel createChatModel() {
+  static ChatModel createChatModel({
+    bool? isOwn,
+  }) {
     final random = Random();
     final content =
         ChatDataHelper.chatContents[random.nextInt(chatContents.length)];
-    return ChatModel(isOwn: random.nextBool(), content: content);
+    return ChatModel(
+      isOwn: isOwn ?? random.nextBool(),
+      content: content,
+    );
   }
 }
