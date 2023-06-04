@@ -4,6 +4,7 @@
  * @Date: 2022-08-29 23:43:08
  */
 
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/helper/chat_data_helper.dart';
@@ -191,41 +192,76 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildListView() {
-    Widget resultWidget = ListView.builder(
-      physics: ChatObserverClampingScrollPhysics(observer: chatObserver),
-      padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
-      shrinkWrap: chatObserver.isShrinkWrap,
-      reverse: true,
-      controller: scrollController,
-      itemBuilder: ((context, index) {
-        return ChatItemWidget(
-          chatModel: chatModels[index],
-          index: index,
-          itemCount: chatModels.length,
-          onRemove: () {
-            chatObserver.standby(isRemove: true);
-            setState(() {
-              chatModels.removeAt(index);
-            });
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        Widget resultWidget = EasyRefresh.builder(
+          header: const MaterialHeader(),
+          footer: const MaterialFooter(),
+          onRefresh: () async {
+            await Future.delayed(const Duration(seconds: 2));
+          },
+          onLoad: () async {
+            await Future.delayed(const Duration(seconds: 2));
+          },
+          childBuilder: (context, physics) {
+            Widget resultWidget = ListView.builder(
+              physics: physics.applyTo(ChatObserverClampingScrollPhysics(
+                observer: chatObserver,
+              )),
+              padding: const EdgeInsets.only(
+                left: 10,
+                right: 10,
+                top: 15,
+                bottom: 15,
+              ),
+              shrinkWrap: chatObserver.isShrinkWrap,
+              reverse: true,
+              controller: scrollController,
+              itemBuilder: ((context, index) {
+                return ChatItemWidget(
+                  chatModel: chatModels[index],
+                  index: index,
+                  itemCount: chatModels.length,
+                  onRemove: () {
+                    chatObserver.standby(isRemove: true);
+                    setState(() {
+                      chatModels.removeAt(index);
+                    });
+                  },
+                );
+              }),
+              itemCount: chatModels.length,
+            );
+            if (chatObserver.isShrinkWrap) {
+              resultWidget = SingleChildScrollView(
+                reverse: true,
+                physics: physics,
+                child: Container(
+                  alignment: Alignment.topCenter,
+                  child: resultWidget,
+                  height: constraints.maxHeight + 0.001,
+                ),
+              );
+            }
+            return resultWidget;
           },
         );
-      }),
-      itemCount: chatModels.length,
-    );
 
-    resultWidget = ListViewObserver(
-      controller: observerController,
-      child: resultWidget,
+        resultWidget = ListViewObserver(
+          controller: observerController,
+          child: resultWidget,
+        );
+        resultWidget = Align(
+          child: resultWidget,
+          alignment: Alignment.topCenter,
+        );
+        return resultWidget;
+      },
     );
-    resultWidget = Align(
-      child: resultWidget,
-      alignment: Alignment.topCenter,
-    );
-    return resultWidget;
   }
 
   addUnreadTipView() {
-    Overlay.of(pageOverlayContext!)?.insert(OverlayEntry(
+    Overlay.of(pageOverlayContext!).insert(OverlayEntry(
       builder: (BuildContext context) => UnconstrainedBox(
         child: CompositedTransformFollower(
           link: layerLink,
