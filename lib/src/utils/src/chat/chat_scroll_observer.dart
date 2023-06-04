@@ -23,6 +23,10 @@ class ChatScrollObserver {
   int get refItemIndex => innerRefItemIndex;
   int innerRefItemIndex = 0;
 
+  /// The index of the reference after ScrollView children update.
+  int get refItemIndexAfterUpdate => innerRefItemIndexAfterUpdate;
+  int innerRefItemIndexAfterUpdate = 0;
+
   /// The [layoutOffset] of the reference.
   double get refItemLayoutOffset => innerRefItemLayoutOffset;
   double innerRefItemLayoutOffset = 0;
@@ -61,12 +65,13 @@ class ChatScrollObserver {
   void Function(ChatScrollObserverHandlePositionResultModel)?
       onHandlePositionResultCallback;
 
-  /// Observe the child widget of the reference.
-  ///
-  /// It is only called in the scene when a message is added.
+  /// The mode of processing.
+  ChatScrollObserverHandleMode innerMode = ChatScrollObserverHandleMode.normal;
+
+  /// Observation result of reference subparts after ScrollView children update.
   ListViewObserveDisplayingChildModel? observeRefItem() {
     return observerController.observeItem(
-      index: innerRefItemIndex + changeCount,
+      index: refItemIndexAfterUpdate,
     );
   }
 
@@ -74,21 +79,71 @@ class ChatScrollObserver {
   ///
   /// The [changeCount] parameter is used only when [isRemove] parameter is
   /// false.
+  ///
+  /// The [mode] parameter is used to specify the processing mode.
+  ///
+  /// [refItemRelativeIndex] parameter and [refItemRelativeIndexAfterUpdate]
+  /// parameter are only used when the mode is
+  /// [ChatScrollObserverHandleMode.specified].
+  /// Usage: When you insert a new message, assign [refItemRelativeIndex] to the
+  /// index of the reference message (latest message) before insertion, and
+  /// assign [refItemRelativeIndexAfterUpdate] to the index of the reference
+  /// message after insertion, they refer to the index of the same message.
   standby({
     BuildContext? sliverContext,
     bool isRemove = false,
     int changeCount = 1,
+    ChatScrollObserverHandleMode mode = ChatScrollObserverHandleMode.normal,
+    int refItemRelativeIndex = 0,
+    int refItemRelativeIndexAfterUpdate = 0,
   }) {
+    innerMode = mode;
     this.isRemove = isRemove;
     this.changeCount = changeCount;
     observeSwitchShrinkWrap();
-    final model = observerController.observeFirstItem(
+
+    final firstItemModel = observerController.observeFirstItem(
       sliverContext: sliverContext,
     );
-    if (model == null) return;
+    if (firstItemModel == null) return;
+    int _innerRefItemIndex;
+    int _innerRefItemIndexAfterUpdate;
+    double _innerRefItemLayoutOffset;
+    switch (mode) {
+      case ChatScrollObserverHandleMode.normal:
+        _innerRefItemIndex = firstItemModel.index;
+        _innerRefItemIndexAfterUpdate = _innerRefItemIndex + changeCount;
+        _innerRefItemLayoutOffset = firstItemModel.layoutOffset;
+        break;
+      case ChatScrollObserverHandleMode.generative:
+        int index = firstItemModel.index + changeCount;
+        final model = observerController.observeItem(
+          sliverContext: sliverContext,
+          index: index,
+        );
+        if (model == null) return;
+        _innerRefItemIndex = index;
+        _innerRefItemIndexAfterUpdate = index;
+        _innerRefItemLayoutOffset = model.layoutOffset;
+        break;
+      case ChatScrollObserverHandleMode.specified:
+        int index = firstItemModel.index + refItemRelativeIndex;
+        final model = observerController.observeItem(
+          sliverContext: sliverContext,
+          index: index,
+        );
+        if (model == null) return;
+        _innerRefItemIndex = index;
+        _innerRefItemIndexAfterUpdate =
+            firstItemModel.index + refItemRelativeIndexAfterUpdate;
+        _innerRefItemLayoutOffset = model.layoutOffset;
+        break;
+    }
+    // Record value.
     innerIsNeedFixedPosition = true;
-    innerRefItemIndex = model.index;
-    innerRefItemLayoutOffset = model.layoutOffset;
+    innerRefItemIndex = _innerRefItemIndex;
+    innerRefItemIndexAfterUpdate = _innerRefItemIndexAfterUpdate;
+    innerRefItemLayoutOffset = _innerRefItemLayoutOffset;
   }
 
   observeSwitchShrinkWrap() {

@@ -31,23 +31,26 @@ mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
         !isNeedFixedPosition ||
         observer.isRemove) {
       _handlePositionCallback(ChatScrollObserverHandlePositionResultModel(
-        ChatScrollObserverHandlePositionType.none,
-        observer.changeCount,
+        type: ChatScrollObserverHandlePositionType.none,
+        mode: observer.innerMode,
+        changeCount: observer.changeCount,
       ));
       return adjustPosition;
     }
     final model = observer.observeRefItem();
     if (model == null) {
       _handlePositionCallback(ChatScrollObserverHandlePositionResultModel(
-        ChatScrollObserverHandlePositionType.none,
-        observer.changeCount,
+        type: ChatScrollObserverHandlePositionType.none,
+        mode: observer.innerMode,
+        changeCount: observer.changeCount,
       ));
       return adjustPosition;
     }
 
     _handlePositionCallback(ChatScrollObserverHandlePositionResultModel(
-      ChatScrollObserverHandlePositionType.keepPosition,
-      observer.changeCount,
+      type: ChatScrollObserverHandlePositionType.keepPosition,
+      mode: observer.innerMode,
+      changeCount: observer.changeCount,
     ));
     final delta = model.layoutOffset - observer.innerRefItemLayoutOffset;
     return adjustPosition + delta;

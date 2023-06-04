@@ -33,7 +33,7 @@ class ListObserverController extends ObserverController
     final model = findChildInfo(index: index, sliverContext: sliverContext);
     if (model == null) return null;
     return ListViewObserveDisplayingChildModel(
-      sliverList: model.sliver as RenderSliverList,
+      sliverList: model.sliver as RenderSliverMultiBoxAdaptor,
       index: model.index,
       renderObject: model.renderObject,
     );
@@ -49,7 +49,7 @@ class ListObserverController extends ObserverController
     final model = findCurrentFirstChildInfo(sliverContext: sliverContext);
     if (model == null) return null;
     return ListViewObserveDisplayingChildModel(
-      sliverList: model.sliver as RenderSliverList,
+      sliverList: model.sliver as RenderSliverMultiBoxAdaptor,
       index: model.index,
       renderObject: model.renderObject,
     );

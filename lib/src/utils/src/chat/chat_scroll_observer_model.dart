@@ -9,11 +9,15 @@ class ChatScrollObserverHandlePositionResultModel {
   /// The type of processing location.
   final ChatScrollObserverHandlePositionType type;
 
+  /// The mode of processing.
+  final ChatScrollObserverHandleMode mode;
+
   /// The number of messages added.
   final int changeCount;
 
-  ChatScrollObserverHandlePositionResultModel(
-    this.type,
-    this.changeCount,
-  );
+  ChatScrollObserverHandlePositionResultModel({
+    required this.type,
+    required this.mode,
+    required this.changeCount,
+  });
 }
