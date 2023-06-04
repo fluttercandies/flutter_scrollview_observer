@@ -1,6 +1,10 @@
+## 1.13.2
+- `ObserverWidget` 
+  - Fix getting bad observation result on web. Thanks to @rmasarovic for the test in [#31](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/31)
+
 ## 1.13.1
 - `ObserverCore`
-  - Fix no getting all child widgets those are displayed when there are separators in `ListView`. [#31](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/31).
+  - Fix no getting all child widgets those are displayed when there are separators in `ListView`. [#31](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/31)
 - `ObserverUtils`
   - Safely call `findRenderObject` method.
 
