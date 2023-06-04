@@ -3,6 +3,7 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/common/observer_controller.dart';
@@ -136,7 +137,20 @@ class ObserverWidgetState<
         onNotification: (notification) {
           if (innerAutoTriggerObserveScrollNotifications
               .contains(notification.runtimeType)) {
-            handleContexts();
+            if (kIsWeb) {
+              // Getting bad observation result becase scrolling in Flutter Web 
+              // with mouse wheel is not smooth.
+              // https://github.com/flutter/flutter/issues/78708
+              // https://github.com/flutter/flutter/issues/78634
+              //
+              // issue
+              // https://github.com/LinXunFeng/flutter_scrollview_observer/issues/31
+              Future.delayed(const Duration(microseconds: 1), () {
+                handleContexts();
+              });
+            } else {
+              handleContexts();
+            }
           }
           return false;
         },
