@@ -5,6 +5,9 @@
  */
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer_example/features/scene/waterfall_flow_demo/waterfall_flow_grid_item_view.dart';
+import 'package:scrollview_observer_example/features/scene/waterfall_flow_demo/waterfall_flow_swipe_view.dart';
+import 'package:scrollview_observer_example/features/scene/waterfall_flow_demo/waterfall_flow_type.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 class WaterfallFlowPage extends StatefulWidget {
@@ -15,21 +18,25 @@ class WaterfallFlowPage extends StatefulWidget {
 }
 
 class WaterfallFlowPageState extends State<WaterfallFlowPage> {
-  PageController pageController = PageController(viewportFraction: 0.9);
   BuildContext? grid1Context;
   BuildContext? grid2Context;
   BuildContext? swipeContext;
-  BuildContext? bottomDetector;
 
   BuildContext? firstChildCtxInViewport;
   bool isRemoveSwipe = false;
+
+  int hitIndex = 0;
+  WaterFlowHitType hitType = WaterFlowHitType.firstGrid;
+
+  double observeOffset = 150;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Waterfall Flow')),
       body: SliverViewObserver(
-        child: _buildScrollView(),
+        child: _buildBody(),
+        leadingOffset: observeOffset,
         autoTriggerObserveTypes: const [
           ObserverAutoTriggerObserveType.scrollEnd,
         ],
@@ -38,7 +45,10 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
           // An extension of the original observation logic.
           final _obj = ObserverUtils.findRenderObject(context);
           if (_obj is RenderSliverWaterfallFlow) {
-            return ObserverCore.handleGridObserve(context: context);
+            return ObserverCore.handleGridObserve(
+              context: context,
+              fetchLeadingOffset: () => observeOffset,
+            );
           }
           return null;
         },
@@ -57,7 +67,6 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
           return [
             if (grid1Context != null) grid1Context!,
             if (swipeContext != null) swipeContext!,
-            if (bottomDetector != null) bottomDetector!,
             if (grid2Context != null) grid2Context!,
           ];
         },
@@ -65,34 +74,39 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
           firstChildCtxInViewport = result.firstChild.sliverContext;
           if (firstChildCtxInViewport == grid1Context) {
             debugPrint('current first sliver in viewport - gridView1');
+            if (WaterFlowHitType.firstGrid == hitType) return;
+            hitType = WaterFlowHitType.firstGrid;
+            hitIndex = -1;
           } else if (firstChildCtxInViewport == swipeContext) {
             debugPrint('current first sliver in viewport - swipeView');
+            if (WaterFlowHitType.swipe == hitType) return;
+            setState(() {
+              hitType = WaterFlowHitType.swipe;
+            });
           } else if (firstChildCtxInViewport == grid2Context) {
             debugPrint('current first sliver in viewport - gridView2');
+            if (WaterFlowHitType.secondGrid == hitType) return;
+            hitType = WaterFlowHitType.secondGrid;
+            hitIndex = -1;
           }
-          final displayingChildCtxs =
-              result.displayingChildModelList.map((e) => e.sliverContext);
-
-          debugPrint(
-              'displayingChildCtxs contains bottomDetector - ${displayingChildCtxs.contains(bottomDetector)}');
         },
         onObserveAll: (resultMap) {
           final result = resultMap[firstChildCtxInViewport];
           if (firstChildCtxInViewport == grid1Context) {
-            if (result != null && result is GridViewObserveModel) {
-              debugPrint(
-                  'grid1Context displaying -- ${result.firstGroupChildList.map((e) {
-                return e.index;
-              }).toList()}');
-            }
+            if (WaterFlowHitType.firstGrid != hitType) return;
+            if (result == null || result is! GridViewObserveModel) return;
+            final firstIndexList = result.firstGroupChildList.map((e) {
+              return e.index;
+            }).toList();
+            handleGridHitIndex(firstIndexList);
           } else if (firstChildCtxInViewport == swipeContext) {
           } else if (firstChildCtxInViewport == grid2Context) {
-            if (result != null && result is GridViewObserveModel) {
-              debugPrint(
-                  'grid2Context displaying -- ${result.firstGroupChildList.map((e) {
-                return e.index;
-              }).toList()}');
-            }
+            if (WaterFlowHitType.secondGrid != hitType) return;
+            if (result == null || result is! GridViewObserveModel) return;
+            final firstIndexList = result.firstGroupChildList.map((e) {
+              return e.index;
+            }).toList();
+            handleGridHitIndex(firstIndexList);
           }
         },
       ),
@@ -107,6 +121,23 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
     );
   }
 
+  handleGridHitIndex(List<int> firstIndexList) {
+    if (firstIndexList.isEmpty) return;
+    debugPrint('grid2Context displaying -- $firstIndexList');
+    int targetIndex = firstIndexList.indexOf(hitIndex);
+    if (targetIndex == -1) {
+      targetIndex = 0;
+    } else {
+      targetIndex = targetIndex + 1;
+      if (targetIndex >= firstIndexList.length) {
+        targetIndex = 0;
+      }
+    }
+    setState(() {
+      hitIndex = firstIndexList[targetIndex];
+    });
+  }
+
   Widget _buildScrollView() {
     return CustomScrollView(
       slivers: [
@@ -115,26 +146,25 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
         _buildSeparator(8),
         _buildSwipeView(),
         _buildSeparator(15),
-        _buildBottomDetector(),
         _buildGridView(isFirst: false, childCount: 20),
       ],
     );
   }
 
-  Widget _buildBottomDetector() {
-    return SliverLayoutBuilder(
-      builder: (ctx, _) {
-        if (bottomDetector != ctx) {
-          bottomDetector = ctx;
-        }
-        return SliverToBoxAdapter(
-          child: Container(
-            height: 10,
-            color: Colors.red,
-          ),
-        );
-      },
+  Widget _buildBody() {
+    Widget resultWidget = Stack(
+      children: [
+        _buildScrollView(),
+        Positioned(
+          left: 0,
+          right: 0,
+          height: 1,
+          top: observeOffset,
+          child: Container(color: Colors.red),
+        ),
+      ],
     );
+    return resultWidget;
   }
 
   Widget _buildGridView({
@@ -149,16 +179,19 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
       ),
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
+          WaterFlowHitType selfType;
           if (isFirst) {
             if (grid1Context != context) grid1Context = context;
+            selfType = WaterFlowHitType.firstGrid;
           } else {
             if (grid2Context != context) grid2Context = context;
+            selfType = WaterFlowHitType.secondGrid;
           }
-          return Container(
-            alignment: Alignment.center,
-            color: Colors.teal[100 * (index % 9)],
-            child: Text('grid item $index'),
-            height: 50.0 + 100.0 * (index % 9),
+          return WaterfallFlowGridItemView(
+            selfIndex: index,
+            selfType: selfType,
+            hitIndex: hitIndex,
+            hitType: hitType,
           );
         },
         childCount: childCount,
@@ -171,22 +204,7 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
     return SliverLayoutBuilder(
       builder: (context, _) {
         if (swipeContext != context) swipeContext = context;
-        Widget resultWidget = PageView.builder(
-          controller: pageController,
-          padEnds: true,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: Container(
-                color: Colors.blue,
-              ),
-            );
-          },
-        );
-        resultWidget = SizedBox(height: 200, child: resultWidget);
-
-        resultWidget = SliverToBoxAdapter(child: resultWidget);
-        return resultWidget;
+        return WaterfallFlowSwipeView(hitType: hitType);
       },
     );
   }
