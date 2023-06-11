@@ -123,7 +123,7 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
 
   handleGridHitIndex(List<int> firstIndexList) {
     if (firstIndexList.isEmpty) return;
-    debugPrint('grid2Context displaying -- $firstIndexList');
+    // debugPrint('gridContext displaying -- $firstIndexList');
     int targetIndex = firstIndexList.indexOf(hitIndex);
     if (targetIndex == -1) {
       targetIndex = 0;
@@ -141,6 +141,7 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
   Widget _buildScrollView() {
     return CustomScrollView(
       slivers: [
+        _buildBanner(),
         _buildSeparator(8),
         _buildGridView(isFirst: true, childCount: 5),
         _buildSeparator(8),
@@ -165,6 +166,21 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
       ],
     );
     return resultWidget;
+  }
+
+  Widget _buildBanner() {
+    return SliverToBoxAdapter(
+      child: Container(
+        color: Colors.green,
+        height: 120,
+        child: const Center(
+          child: Text(
+            'Banner',
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildGridView({
@@ -204,7 +220,9 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
     return SliverLayoutBuilder(
       builder: (context, _) {
         if (swipeContext != context) swipeContext = context;
-        return WaterfallFlowSwipeView(hitType: hitType);
+        return SliverToBoxAdapter(
+          child: WaterfallFlowSwipeView(hitType: hitType),
+        );
       },
     );
   }

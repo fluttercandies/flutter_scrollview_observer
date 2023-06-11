@@ -49,8 +49,6 @@ class _WaterfallFlowSwipeViewState extends State<WaterfallFlowSwipeView> {
       },
     );
     resultWidget = SizedBox(height: 200, child: resultWidget);
-
-    resultWidget = SliverToBoxAdapter(child: resultWidget);
     return resultWidget;
   }
 
