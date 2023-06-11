@@ -14,9 +14,10 @@ Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_ob
 
 ## 文章
 
-- [Flutter - 快速实现聊天会话列表的效果，完美💯](https://juejin.cn/post/7152307272436154405)
-- [Flutter - 列表滚动定位超强辅助库，墙裂推荐！🔥](https://juejin.cn/post/7129888644290068487)
-- [Flutter - 获取ListView当前正在显示的Widget信息](https://juejin.cn/post/7103058155692621837)
+- [Flutter - 获取ListView当前正在显示的Widget信息](https://mp.weixin.qq.com/s?__biz=Mzg4MTA4MDQzMQ==&mid=2247484946&idx=1&sn=3ac31edb56bff934df49b862b13b0012&chksm=cf6a2712f81dae04727edddadf2d6ac725ef29af854a9e23e4d7bed568d02bde45bf8adff8e4&token=1260106697&lang=zh_CN#rd) | [备用链接](https://juejin.cn/post/7103058155692621837)
+- [Flutter - 列表滚动定位超强辅助库，墙裂推荐！🔥](https://mp.weixin.qq.com/s?__biz=Mzg4MTA4MDQzMQ==&mid=2247485055&idx=1&sn=eab481355ed53e11d5ac4ec9f5fc3172&chksm=cf6a277ff81dae6946afd8fb89ea43d2b05cbf5b3b5ad108e951be4d7b1cf808fd81b0b591b8&token=1260106697&lang=zh_CN#rd) | [备用链接](https://juejin.cn/post/7129888644290068487)
+- [Flutter - 快速实现聊天会话列表的效果，完美💯](https://mp.weixin.qq.com/s?__biz=Mzg4MTA4MDQzMQ==&mid=2247485070&idx=1&sn=8dd84b714da27233f98f4acaa422ff5b&chksm=cf6a278ef81dae9829c4af95163ae9a553d3729627260b84b0a7d5391fc5c3945091d09a389b&token=1260106697&lang=zh_CN#rd) | [备用链接](https://juejin.cn/post/7152307272436154405)
+- [Flutter - 船新升级😱支持观察第三方构建的滚动视图💪](https://mp.weixin.qq.com/s?__biz=Mzg4MTA4MDQzMQ==&mid=2247485290&idx=1&sn=4e41637c0f740544dca59dbd1e9a9d8a&chksm=cf6a266af81daf7c2cf76b335c4de271991936d7d6d18d816d64113b29808aa686dcf5a192b5&token=1260106697&lang=zh_CN#rd) | [备用链接](https://juejin.cn/post/7240751116702269477)
 
 ## 功能点
 
