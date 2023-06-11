@@ -26,7 +26,7 @@ Chat: [Join WeChat group](https://mp.weixin.qq.com/s/JBbMstn0qW6M71hh-BRKzw)
 > You do not need to change the view you are currently using, just wrap a `ViewObserver` around the view to achieve the following features.
 
 - [x] Observing child widgets those are being displayed in the scroll view
-- [x] Supports scrolling to the specified index location
+- [x] Supports scrolling to the specified index position
 - [x] Quickly implement the chat session page effect
 
 ## Support
@@ -542,7 +542,7 @@ We only need three steps to implement the chat session page effect.
 - 1、All chat data are displayed at the top of the listView when there is less than one screen of chat data.
 - 2、When inserting a chat data
   - If the latest message is close to the bottom of the list, the listView will be pushed up.
-  - Otherwise, the listView will be fixed to the current chat location.
+  - Otherwise, the listView will be fixed to the current chat position.
 
 Step 1: Initialize the necessary `ListObserverController` and `ChatScrollObserver`.
 
@@ -553,7 +553,7 @@ observerController = ListObserverController(controller: scrollController)
 
 /// Initialize ChatScrollObserver
 chatObserver = ChatScrollObserver(observerController)
-  // Greater than this offset will be fixed to the current chat location.
+  // Greater than this offset will be fixed to the current chat position.
   ..fixedPositionOffset = 5
   ..toRebuildScrollViewCallback = () {
     // Here you can use other way to rebuild the specified listView instead of [setState]
@@ -566,7 +566,7 @@ Step 2: Configure `ListView` as follows and wrap it with `ListViewObserver`.
 ```dart
 Widget _buildListView() {
   Widget resultWidget = ListView.builder(
-    physics: ChatObserverClampinScrollPhysics(observer: chatObserver),
+    physics: ChatObserverClampingScrollPhysics(observer: chatObserver),
     shrinkWrap: chatObserver.isShrinkWrap,
     reverse: true,
     controller: scrollController,
@@ -617,18 +617,18 @@ _addMessage(int count) {
 
 Note: This feature relies on the latest message view before the message is inserted as a reference to calculate the offset, so if too many messages are inserted at once and the reference message view cannot be rendered, this feature will fail, and you need to try to avoid this problem by setting a reasonable value for `cacheExtent` of `ScrollView` by yourself!
 
-#### 3.2、The result callback for processing chat location.
+#### 3.2、The result callback for processing chat position.
 
 ```dart
 chatObserver = ChatScrollObserver(observerController)
   ..onHandlePositionResultCallback = (result) {
     switch (result.type) {
       case ChatScrollObserverHandlePositionType.keepPosition:
-        // Keep the current chat location.
+        // Keep the current chat position.
         // updateUnreadMsgCount(changeCount: result.changeCount);
         break;
       case ChatScrollObserverHandlePositionType.none:
-        // Do nothing about the chat location.
+        // Do nothing about the chat position.
         // updateUnreadMsgCount(isReset: true);
         break;
     }
@@ -636,6 +636,68 @@ chatObserver = ChatScrollObserver(observerController)
 ```
 
 This callback is mainly used to display the unread bubbles of new messages when adding chat messages.
+
+
+#### 3.3、Generative message keeps position
+
+The generative messages like `ChatGPT` also need to keep the message position when looking through old messages, you only need to adjust the processing mode in the `standby` method.
+
+```dart
+chatObserver.standby(
+  mode: ChatScrollObserverHandleMode.generative,
+  // changeCount: 1,
+);
+```
+
+Note: The referenced `item` will be determined internally based on `changeCount`, and this mode only supports the case where generative messages are continuous.
+
+#### 3.4、Specifies the referenced item
+
+If your generative messages are discontinuous, or there are generative message updates and the behavior of adding and deleting messages at the same time, in this complex case, you need to specify the referenced `item` by yourself, and This processing mode is more flexible.
+
+```dart
+chatObserver.standby(
+  changeCount: 1,
+  mode: ChatScrollObserverHandleMode.specified,
+  refItemRelativeIndex: 2,
+  refItemRelativeIndexAfterUpdate: 2,
+);
+```
+
+1. Set `mode` to `.specified`.
+2. Set `refItemRelativeIndex` to relative index of the referenced `item` before the update.
+3. Set `refItemRelativeIndexAfterUpdate` to relative index of the referenced `item` after the update.
+
+Note: The `relativeIndex` refers to the relative index of the `item` being displayed on screen, as shown below
+
+
+```shell
+     trailing        relativeIndex
+-----------------  -----------------
+|     item4     |          4
+|     item3     |          3
+|     item2     |          2
+|     item1     |          1
+|     item0     |          0 
+-----------------  -----------------
+     leading
+```
+
+
+```shell
+     trailing        relativeIndex
+-----------------  -----------------
+|     item14    |          4
+|     item13    |          3
+|     item12    |          2
+|     item11    |          1
+|     item10    |          0 
+-----------------  -----------------
+     leading
+```
+
+Remember, your `refItemRelativeIndex` and `refItemRelativeIndexAfterUpdate` should point to the same message object whatever you set!
+
 
 ### 4、Model Property
 

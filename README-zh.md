@@ -625,6 +625,67 @@ chatObserver = ChatScrollObserver(observerController)
 
 该回调的主要作用：在新增聊天消息时，处理新消息未读数气泡的展示
 
+#### 3.3、生成式消息保持位置
+
+像 `ChatGPT` 那样不断变化的生成式消息，在翻看旧消息时也需要保持消息位置，你只需要在 `standby` 方法中调整一下处理模式即可
+
+```dart
+chatObserver.standby(
+  mode: ChatScrollObserverHandleMode.generative,
+  // changeCount: 1,
+);
+```
+
+注: 内部会根据 `changeCount` 来决定参照的 `item`，且仅支持生成式消息为连续的情况。
+
+#### 3.4、指定参照的消息
+
+如果你的生成式消息是不连续的，或者同一时间内即有生成式消息更新，又有增加与删除消息的行为，在这种复杂的情况下，则需要你自己指定参照 `item`，且这个处理模式更具有灵活性。
+
+```dart
+chatObserver.standby(
+  changeCount: 1,
+  mode: ChatScrollObserverHandleMode.specified,
+  refItemRelativeIndex: 2,
+  refItemRelativeIndexAfterUpdate: 2,
+);
+```
+
+1. 设置 `mode` 为 `.specified`
+2. 设置更新 `前` 的参照 `item` 的相对下标
+3. 设置更新 `后` 的参照 `item` 的相对下标
+
+
+注: 相对下标指的是当前屏幕中正在显示的 `item` 所对应的相对下标，如下所示
+
+```shell
+     trailing        relativeIndex
+-----------------  -----------------
+|     item4     |          4
+|     item3     |          3
+|     item2     |          2
+|     item1     |          1
+|     item0     |          0 
+-----------------  -----------------
+     leading
+```
+
+
+```shell
+     trailing        relativeIndex
+-----------------  -----------------
+|     item14    |          4
+|     item13    |          3
+|     item12    |          2
+|     item11    |          1
+|     item10    |          0 
+-----------------  -----------------
+     leading
+```
+
+请记住，你的 `refItemRelativeIndex` 和 `refItemRelativeIndexAfterUpdate` 不论你如何设置，它都应该是指向同一个消息对象！
+
+
 ### 4、模型属性
 
 #### `ObserveModel`
