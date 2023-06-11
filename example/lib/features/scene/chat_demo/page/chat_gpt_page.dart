@@ -38,7 +38,7 @@ class _ChatGPTPageState extends State<ChatGPTPage> {
   void initState() {
     super.initState();
 
-    chatModels = createChatModels();
+    chatModels = createChatModels(num: 8);
 
     observerController = ListObserverController(controller: scrollController)
       ..cacheJumpIndexOffset = false;
