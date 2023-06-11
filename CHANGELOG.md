@@ -1,3 +1,7 @@
+## 1.14.0
+- Chat Observer
+  - Support for keeping position of generative messages (eg: ChatGPT)
+
 ## 1.13.2
 - `ObserverWidget` 
   - Fix getting bad observation result on web. Thanks to @rmasarovic for the test in [#31](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/31)
