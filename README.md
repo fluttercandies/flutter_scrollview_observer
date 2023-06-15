@@ -20,14 +20,16 @@ Chat: [Join WeChat group](https://mp.weixin.qq.com/s/JBbMstn0qW6M71hh-BRKzw)
 - [Flutter - 列表滚动定位超强辅助库，墙裂推荐！🔥](https://mp.weixin.qq.com/s?__biz=Mzg4MTA4MDQzMQ==&mid=2247485055&idx=1&sn=eab481355ed53e11d5ac4ec9f5fc3172&chksm=cf6a277ff81dae6946afd8fb89ea43d2b05cbf5b3b5ad108e951be4d7b1cf808fd81b0b591b8&token=1260106697&lang=zh_CN#rd) | [备用链接](https://juejin.cn/post/7129888644290068487)
 - [Flutter - 快速实现聊天会话列表的效果，完美💯](https://mp.weixin.qq.com/s?__biz=Mzg4MTA4MDQzMQ==&mid=2247485070&idx=1&sn=8dd84b714da27233f98f4acaa422ff5b&chksm=cf6a278ef81dae9829c4af95163ae9a553d3729627260b84b0a7d5391fc5c3945091d09a389b&token=1260106697&lang=zh_CN#rd) | [备用链接](https://juejin.cn/post/7152307272436154405)
 - [Flutter - 船新升级😱支持观察第三方构建的滚动视图💪](https://mp.weixin.qq.com/s?__biz=Mzg4MTA4MDQzMQ==&mid=2247485290&idx=1&sn=4e41637c0f740544dca59dbd1e9a9d8a&chksm=cf6a266af81daf7c2cf76b335c4de271991936d7d6d18d816d64113b29808aa686dcf5a192b5&token=1260106697&lang=zh_CN#rd) | [备用链接](https://juejin.cn/post/7240751116702269477)
+- [Flutter - 瀑布流交替播放视频 🎞](https://mp.weixin.qq.com/s/miP5CfKtcRhFGr08ot5wOg) | [备用链接](https://juejin.cn/post/7243240589293142077)
 
 ## Feature
 
 > You do not need to change the view you are currently using, just wrap a `ViewObserver` around the view to achieve the following features.
 
-- [x] Observing child widgets those are being displayed in the scroll view
-- [x] Supports scrolling to the specified index position
+- [x] Observing child widgets those are being displayed in ScrollView
+- [x] Support for scrolling to a specific item in ScrollView
 - [x] Quickly implement the chat session page effect
+- [x] Support for keeping IM message position when inserting or updating messages, avoiding jitter.
 
 ## Support
 
