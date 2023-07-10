@@ -1,3 +1,7 @@
+## 1.14.1
+- Chat Observer
+  - Improve the logic of the conversion type.
+
 ## 1.14.0
 - Chat Observer
   - Support for keeping position of generative messages (eg: ChatGPT)
