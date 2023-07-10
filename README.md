@@ -20,6 +20,7 @@ Chat: [Join WeChat group](https://mp.weixin.qq.com/s/JBbMstn0qW6M71hh-BRKzw)
 - [Flutter - 快速实现聊天会话列表的效果，完美💯](https://mp.weixin.qq.com/s/xNiGuSLcJtDAiLoHuGWp6A) | [备用链接](https://juejin.cn/post/7152307272436154405)
 - [Flutter - 船新升级😱支持观察第三方构建的滚动视图💪](https://mp.weixin.qq.com/s/FMXPyT-lX8YOXVmbLCsVUA) | [备用链接](https://juejin.cn/post/7240751116702269477)
 - [Flutter - 瀑布流交替播放视频 🎞](https://mp.weixin.qq.com/s/miP5CfKtcRhFGr08ot5wOg) | [备用链接](https://juejin.cn/post/7243240589293142077)
+- [Flutter - IM保持消息位置大升级(支持ChatGPT生成式消息) 🤖](https://mp.weixin.qq.com/s/Y3EN9ZpLb6HLke2vkw0Zwg) | [备用链接](https://juejin.cn/post/7245753944180523067)
 
 ## Feature
 
