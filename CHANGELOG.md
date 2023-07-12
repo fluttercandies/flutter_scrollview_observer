@@ -1,3 +1,7 @@
+## 1.14.2
+- `ObserverWidget` 
+  - Safe to use context. [#35](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/35).
+
 ## 1.14.1
 - Chat Observer
   - Improve the logic of the conversion type.
