@@ -10,6 +10,7 @@ import 'package:scrollview_observer/src/common/observer_controller.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
 import 'package:scrollview_observer/src/common/observer_typedef.dart';
 import 'package:scrollview_observer/src/notification.dart';
+import 'package:scrollview_observer/src/utils/src/log.dart';
 
 import 'models/observe_model.dart';
 
@@ -138,7 +139,7 @@ class ObserverWidgetState<
           if (innerAutoTriggerObserveScrollNotifications
               .contains(notification.runtimeType)) {
             if (kIsWeb) {
-              // Getting bad observation result because scrolling in Flutter Web 
+              // Getting bad observation result because scrolling in Flutter Web
               // with mouse wheel is not smooth.
               // https://github.com/flutter/flutter/issues/78708
               // https://github.com/flutter/flutter/issues/78634
@@ -198,7 +199,16 @@ class ObserverWidgetState<
           element.visitChildren(visitor);
         }
 
-        context.visitChildElements(visitor);
+        try {
+          // https://github.com/LinXunFeng/flutter_scrollview_observer/issues/35
+          context.visitChildElements(visitor);
+        } catch (e) {
+          Log.warning(
+            'This widget has been unmounted, so the State no longer has a context (and should be considered defunct). \n'
+            'Consider canceling any active work during "dispose" or using the "mounted" getter to determine if the State is still active.',
+          );
+        }
+
         ctxs = _ctxs;
       }
     }
