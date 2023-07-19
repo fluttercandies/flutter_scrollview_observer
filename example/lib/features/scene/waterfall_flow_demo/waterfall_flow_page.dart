@@ -216,13 +216,14 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
   }
 
   Widget _buildSwipeView() {
-    if (isRemoveSwipe) return const SliverToBoxAdapter(child: SizedBox());
-    return SliverLayoutBuilder(
-      builder: (context, _) {
+    if (isRemoveSwipe) {
+      swipeContext = null;
+      return const SliverToBoxAdapter(child: SizedBox());
+    }
+    return SliverObserveContextToBoxAdapter(
+      child: WaterfallFlowSwipeView(hitType: hitType),
+      onObserve: (context) {
         if (swipeContext != context) swipeContext = context;
-        return SliverToBoxAdapter(
-          child: WaterfallFlowSwipeView(hitType: hitType),
-        );
       },
     );
   }
