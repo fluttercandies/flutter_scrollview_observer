@@ -1,3 +1,6 @@
+## 1.15.0
+- Add `SliverObserveContextToBoxAdapter`
+
 ## 1.14.2
 - `ObserverWidget` 
   - Safe to use context. [#35](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/35).
