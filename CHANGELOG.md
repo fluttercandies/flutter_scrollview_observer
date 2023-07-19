@@ -1,5 +1,6 @@
 ## 1.15.0
-- Add `SliverObserveContextToBoxAdapter`
+- Slivers
+  - Add `SliverObserveContextToBoxAdapter`.
 
 ## 1.14.2
 - `ObserverWidget` 
