@@ -6,22 +6,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
 import 'package:scrollview_observer/src/common/observer_controller.dart';
+import 'package:scrollview_observer/src/common/typedefs.dart';
 
 class ListObserverController extends ObserverController
-    with ObserverControllerForInfo, ObserverControllerForScroll {
+    with
+        ObserverControllerForInfo,
+        ObserverControllerForScroll,
+        ObserverControllerForNotification<
+            ListViewObserveModel,
+            ObserverHandleContextsResultModel<ListViewObserveModel>,
+            ListViewOnceObserveNotificationResult> {
   ListObserverController({
     ScrollController? controller,
   }) : super(controller: controller);
 
   /// Dispatch a [ListViewOnceObserveNotification]
-  dispatchOnceObserve({
+  Future<ListViewOnceObserveNotificationResult> dispatchOnceObserve({
     BuildContext? sliverContext,
     bool isForce = false,
+    bool isDependObserveCallback = true,
   }) {
-    innerDispatchOnceObserve(
+    return innerDispatchOnceObserve(
       sliverContext: sliverContext,
-      notification: ListViewOnceObserveNotification(isForce: isForce),
+      notification: ListViewOnceObserveNotification(
+        isForce: isForce,
+        isDependObserveCallback: isDependObserveCallback,
+      ),
     );
   }
 
@@ -52,6 +64,20 @@ class ListObserverController extends ObserverController
       sliverList: model.sliver as RenderSliverMultiBoxAdaptor,
       index: model.index,
       renderObject: model.renderObject,
+    );
+  }
+
+  /// Create a observation notification result.
+  @override
+  ListViewOnceObserveNotificationResult
+      innerCreateOnceObserveNotificationResult({
+    required ObserverWidgetObserveResultType resultType,
+    required ObserverHandleContextsResultModel<ListViewObserveModel>?
+        resultModel,
+  }) {
+    return ListViewOnceObserveNotificationResult(
+      type: resultType,
+      observeResult: resultModel ?? ObserverHandleContextsResultModel(),
     );
   }
 }

@@ -6,6 +6,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
 import 'package:scrollview_observer/src/common/observer_controller.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
 import 'package:scrollview_observer/src/common/observer_typedef.dart';
@@ -28,7 +29,7 @@ class ObserverWidget<C extends ObserverController, M extends ObserveModel,
   /// The callback of getting observed result map.
   final Function(Map<BuildContext, M>)? onObserveAll;
 
-  /// The callback of getting observed result for first listView.
+  /// The callback of getting observed result for first sliver.
   final Function(M)? onObserve;
 
   /// Calculate offset.
@@ -131,7 +132,17 @@ class ObserverWidgetState<
   Widget build(BuildContext context) {
     return NotificationListener<N>(
       onNotification: (notification) {
-        handleContexts(isForceObserve: notification.isForce);
+        final result = handleContexts(
+          isForceObserve: notification.isForce,
+          isFromObserveNotification: true,
+          isDependObserveCallback: notification.isDependObserveCallback,
+        );
+        final sliverController = widget.sliverController;
+        if (sliverController is ObserverControllerForNotification) {
+          sliverController.innerHandleDispatchOnceObserveComplete(
+            resultModel: result,
+          );
+        }
         return true;
       },
       child: NotificationListener<ScrollNotification>(
@@ -233,16 +244,20 @@ class ObserverWidgetState<
   }
 
   /// Handle all buildContext
-  handleContexts({
+  ObserverHandleContextsResultModel<M>? handleContexts({
     bool isForceObserve = false,
+    bool isFromObserveNotification = false,
+    bool isDependObserveCallback = true,
   }) {
     final onObserve = widget.onObserve;
     final onObserveAll = widget.onObserveAll;
-    if (onObserve == null && onObserveAll == null) return;
+    if (isDependObserveCallback) {
+      if (onObserve == null && onObserveAll == null) return null;
+    }
 
     final isHandlingScroll =
         widget.sliverController?.innerIsHandlingScroll ?? false;
-    if (isHandlingScroll) return;
+    if (isHandlingScroll) return null;
 
     List<BuildContext> ctxs = fetchTargetSliverContexts();
 
@@ -276,13 +291,22 @@ class ObserverWidgetState<
 
     lastResultMap = resultMap;
 
-    if (onObserve != null && changeResultModel != null) {
+    if (isDependObserveCallback &&
+        onObserve != null &&
+        changeResultModel != null) {
       onObserve(changeResultModel);
     }
 
-    if (onObserveAll != null && changeResultMap.isNotEmpty) {
+    if (isDependObserveCallback &&
+        onObserveAll != null &&
+        changeResultMap.isNotEmpty) {
       onObserveAll(changeResultMap);
     }
+
+    return ObserverHandleContextsResultModel(
+      changeResultModel: changeResultModel,
+      changeResultMap: changeResultMap,
+    );
   }
 
   M? handleObserve(BuildContext ctx) {

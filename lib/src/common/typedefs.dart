@@ -19,3 +19,9 @@ T? ambiguate<T>(T? value) => value;
 /// The [targetOffset] property is the offset of the planned locate.
 typedef ObserverLocateIndexOffsetCallback = double Function(
     double targetOffset);
+
+/// Observation result types in ObserverWidget.
+enum ObserverWidgetObserveResultType {
+  success,
+  interrupted,
+}

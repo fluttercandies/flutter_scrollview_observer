@@ -11,6 +11,7 @@ import 'package:scrollview_observer/src/common/models/observe_model.dart';
 import 'package:scrollview_observer/src/common/observer_widget.dart';
 import 'package:scrollview_observer/src/notification.dart';
 import 'package:scrollview_observer/src/observer_core.dart';
+import 'package:scrollview_observer/src/sliver/models/sliver_observer_observe_result_model.dart';
 import 'package:scrollview_observer/src/sliver/models/sliver_viewport_observe_displaying_child_model.dart';
 import 'package:scrollview_observer/src/utils/observer_utils.dart';
 
@@ -72,14 +73,32 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
   SliverViewportObserveModel? lastViewportObserveResultModel;
 
   @override
-  handleContexts({
+  SliverObserverHandleContextsResultModel<ObserveModel>? handleContexts({
     bool isForceObserve = false,
+    bool isFromObserveNotification = false,
+    bool isDependObserveCallback = true,
   }) {
     // Viewport
-    handleObserveViewport(isForceObserve: isForceObserve);
+    final observeViewportResult = handleObserveViewport(
+      isForceObserve: isForceObserve,
+      isDependObserveCallback: isDependObserveCallback,
+    );
 
     // Slivers（SliverList, GridView etc.）
-    super.handleContexts(isForceObserve: isForceObserve);
+    final handleContextsResult = super.handleContexts(
+      isForceObserve: isForceObserve,
+      isFromObserveNotification: isFromObserveNotification,
+      isDependObserveCallback: isDependObserveCallback,
+    );
+
+    if (observeViewportResult == null && handleContextsResult == null) {
+      return null;
+    }
+    return SliverObserverHandleContextsResultModel(
+      changeResultModel: handleContextsResult?.changeResultModel,
+      changeResultMap: handleContextsResult?.changeResultMap ?? {},
+      observeViewportResultModel: observeViewportResult,
+    );
   }
 
   @override
@@ -105,22 +124,27 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
   }
 
   /// To observe the viewport.
-  handleObserveViewport({
+  SliverViewportObserveModel? handleObserveViewport({
     bool isForceObserve = false,
+    bool isDependObserveCallback = true,
   }) {
     final onObserveViewport = widget.onObserveViewport;
-    if (onObserveViewport == null) return;
+    if (isDependObserveCallback && onObserveViewport == null) return null;
+
+    final isHandlingScroll =
+        widget.sliverController?.innerIsHandlingScroll ?? false;
+    if (isHandlingScroll) return null;
 
     final ctxs = fetchTargetSliverContexts();
     final objList = ctxs.map((e) => ObserverUtils.findRenderObject(e)).toList();
-    if (objList.isEmpty) return;
+    if (objList.isEmpty) return null;
     final firstObj = objList.first;
-    if (firstObj == null) return;
+    if (firstObj == null) return null;
     final viewport = ObserverUtils.findViewport(firstObj);
-    if (viewport == null) return;
+    if (viewport == null) return null;
 
     var targetChild = viewport.firstChild;
-    if (targetChild == null) return;
+    if (targetChild == null) return null;
     var offset = widget.leadingOffset;
     if (widget.dynamicLeadingOffset != null) {
       offset = widget.dynamicLeadingOffset!();
@@ -149,7 +173,7 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
     }
 
     if (targetChild == null ||
-        !ObserverUtils.isValidListIndex(indexOfTargetChild)) return;
+        !ObserverUtils.isValidListIndex(indexOfTargetChild)) return null;
     final targetCtx = ctxs[indexOfTargetChild];
     final firstChild = SliverViewportObserveDisplayingChildModel(
       sliverContext: targetCtx,
@@ -188,12 +212,22 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
       firstChild: firstChild,
       displayingChildModelList: displayingChildModelList,
     );
+    bool canReturnResult = false;
     if (isForceObserve ||
         widget.triggerOnObserveType == ObserverTriggerOnObserveType.directly) {
-      onObserveViewport(model);
+      canReturnResult = true;
     } else if (model != lastViewportObserveResultModel) {
+      canReturnResult = true;
+    }
+    if (canReturnResult &&
+        isDependObserveCallback &&
+        onObserveViewport != null) {
       onObserveViewport(model);
     }
+
+    // Record it for the next comparison.
     lastViewportObserveResultModel = model;
+
+    return canReturnResult ? model : null;
   }
 }

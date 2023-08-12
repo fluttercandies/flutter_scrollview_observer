@@ -3,11 +3,15 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/models/observe_find_child_model.dart';
+import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
+import 'package:scrollview_observer/src/utils/src/log.dart';
 
 import 'models/observe_scroll_child_model.dart';
 
@@ -32,17 +36,6 @@ class ObserverController {
   /// The callback to call [ObserverWidget]'s [_setupSliverController] method.
   Function()? innerReattachCallBack;
 
-  /// Dispatch a observe notification
-  innerDispatchOnceObserve({
-    BuildContext? sliverContext,
-    required Notification notification,
-  }) {
-    BuildContext? _sliverContext = fetchSliverContext(
-      sliverContext: sliverContext,
-    );
-    notification.dispatch(_sliverContext);
-  }
-
   /// Reset all data
   innerReset() {
     indexOffsetMap = {};
@@ -64,6 +57,57 @@ class ObserverController {
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
       innerReattachCallBack!();
     });
+  }
+}
+
+mixin ObserverControllerForNotification<
+    M extends ObserveModel,
+    R extends ObserverHandleContextsResultModel<M>,
+    S extends CommonOnceObserveNotificationResult<M, R>> on ObserverController {
+  /// A completer for dispatch once observation
+  Completer<S>? innerDispatchOnceObserveCompleter;
+
+  /// Dispatch a observation notification
+  Future<S> innerDispatchOnceObserve({
+    BuildContext? sliverContext,
+    required Notification notification,
+  }) {
+    Completer<S> completer = Completer();
+    innerDispatchOnceObserveCompleter = completer;
+    BuildContext? _sliverContext = fetchSliverContext(
+      sliverContext: sliverContext,
+    );
+    notification.dispatch(_sliverContext);
+    return completer.future;
+  }
+
+  /// Complete the observation notification
+  innerHandleDispatchOnceObserveComplete({
+    required R? resultModel,
+  }) {
+    final completer = innerDispatchOnceObserveCompleter;
+    if (completer == null) return;
+    if (!completer.isCompleted) {
+      final isSuccess = resultModel != null;
+      final resultType = isSuccess
+          ? ObserverWidgetObserveResultType.success
+          : ObserverWidgetObserveResultType.interrupted;
+      final result = innerCreateOnceObserveNotificationResult(
+        resultType: resultType,
+        resultModel: resultModel,
+      );
+      completer.complete(result);
+    }
+    innerDispatchOnceObserveCompleter = null;
+  }
+
+  /// Create a observation notification result.
+  S innerCreateOnceObserveNotificationResult({
+    required ObserverWidgetObserveResultType resultType,
+    required R? resultModel,
+  }) {
+    // The class being mixed in will implement it and will not return null.
+    throw UnimplementedError();
   }
 }
 

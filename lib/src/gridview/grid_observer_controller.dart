@@ -6,22 +6,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
 import 'package:scrollview_observer/src/common/observer_controller.dart';
+import 'package:scrollview_observer/src/common/typedefs.dart';
 
 class GridObserverController extends ObserverController
-    with ObserverControllerForInfo, ObserverControllerForScroll {
+    with
+        ObserverControllerForInfo,
+        ObserverControllerForScroll,
+        ObserverControllerForNotification<
+            GridViewObserveModel,
+            ObserverHandleContextsResultModel<GridViewObserveModel>,
+            GridViewOnceObserveNotificationResult> {
   GridObserverController({
     ScrollController? controller,
   }) : super(controller: controller);
 
   /// Dispatch a [GridViewOnceObserveNotification]
-  dispatchOnceObserve({
+  Future<GridViewOnceObserveNotificationResult> dispatchOnceObserve({
     BuildContext? sliverContext,
     bool isForce = false,
+    bool isDependObserveCallback = true,
   }) {
-    innerDispatchOnceObserve(
+    return innerDispatchOnceObserve(
       sliverContext: sliverContext,
-      notification: GridViewOnceObserveNotification(isForce: isForce),
+      notification: GridViewOnceObserveNotification(
+        isForce: isForce,
+        isDependObserveCallback: isDependObserveCallback,
+      ),
     );
   }
 
@@ -52,6 +64,20 @@ class GridObserverController extends ObserverController
       sliverGrid: model.sliver as RenderSliverGrid,
       index: model.index,
       renderObject: model.renderObject,
+    );
+  }
+
+  /// Create a observation notification result.
+  @override
+  GridViewOnceObserveNotificationResult
+      innerCreateOnceObserveNotificationResult({
+    required ObserverWidgetObserveResultType resultType,
+    required ObserverHandleContextsResultModel<GridViewObserveModel>?
+        resultModel,
+  }) {
+    return GridViewOnceObserveNotificationResult(
+      type: resultType,
+      observeResult: resultModel ?? ObserverHandleContextsResultModel(),
     );
   }
 }
