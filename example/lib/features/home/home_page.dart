@@ -23,6 +23,7 @@ import 'package:scrollview_observer_example/features/scene/anchor_demo/anchor_wa
 import 'package:scrollview_observer_example/features/scene/chat_demo/page/chat_gpt_page.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/page/chat_page.dart';
 import 'package:scrollview_observer_example/features/scene/image_tab_demo/image_tab_page.dart';
+import 'package:scrollview_observer_example/features/scene/scrollview_form_demo/scrollview_form_demo_page.dart';
 import 'package:scrollview_observer_example/features/scene/video_auto_play_list/video_list_auto_play_page.dart';
 import 'package:scrollview_observer_example/features/scene/waterfall_flow_demo/waterfall_flow_page.dart';
 import 'package:tuple/tuple.dart';
@@ -189,6 +190,12 @@ class HomePage extends StatelessWidget {
         "Waterfall Flow",
         () {
           return const WaterfallFlowPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "ScrollView Form",
+        () {
+          return const ScrollViewFormDemoPage();
         },
       ),
     ];
