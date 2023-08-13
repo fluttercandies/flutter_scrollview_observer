@@ -36,29 +36,28 @@ class _ScrollViewFormDemoPageState extends State<ScrollViewFormDemoPage> {
   ];
 
   handleFormFocus() async {
-    if (formFocusNode.hasFocus) {
-      // Wait for the keyboard to fully display.
-      await Future.delayed(const Duration(milliseconds: 560));
-      // Trigger the observer to observe the ListView.
-      final result = await observerController.dispatchOnceObserve(
-        isForce: true,
-        isDependObserveCallback: false,
-      );
-      if (!result.isSuccess) return;
+    if (!formFocusNode.hasFocus) return;
+    // Wait for the keyboard to fully display.
+    await Future.delayed(const Duration(milliseconds: 600));
+    // Trigger the observer to observe the ListView.
+    final result = await observerController.dispatchOnceObserve(
+      isForce: true,
+      isDependObserveCallback: false,
+    );
+    if (!result.isSuccess) return;
 
-      // Find the observation result for the form item.
-      final formResultModel =
-          result.observeResult?.displayingChildModelList.firstWhere((element) {
-        return element.index == formIndex;
-      });
-      if (formResultModel == null) return;
-      // Let the bottom of the form item view be fully displayed.
-      observerController.controller?.animateTo(
-        formResultModel.scrollOffset - formResultModel.trailingMarginToViewport,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.ease,
-      );
-    }
+    // Find the observation result for the form item.
+    final formResultModel =
+        result.observeResult?.displayingChildModelList.firstWhere((element) {
+      return element.index == formIndex;
+    });
+    if (formResultModel == null) return;
+    // Let the bottom of the form item view be fully displayed.
+    observerController.controller?.animateTo(
+      formResultModel.scrollOffset - formResultModel.trailingMarginToViewport,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.ease,
+    );
   }
 
   @override
