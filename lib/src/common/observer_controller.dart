@@ -11,7 +11,6 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/models/observe_find_child_model.dart';
 import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
-import 'package:scrollview_observer/src/utils/src/log.dart';
 
 import 'models/observe_scroll_child_model.dart';
 
