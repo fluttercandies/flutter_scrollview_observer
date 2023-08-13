@@ -38,7 +38,7 @@ class _ScrollViewFormDemoPageState extends State<ScrollViewFormDemoPage> {
   handleFormFocus() async {
     if (formFocusNode.hasFocus) {
       // Wait for the keyboard to fully display.
-      await Future.delayed(const Duration(milliseconds: 650));
+      await Future.delayed(const Duration(milliseconds: 560));
       // Trigger the observer to observe the ListView.
       final result = await observerController.dispatchOnceObserve(
         isForce: true,
