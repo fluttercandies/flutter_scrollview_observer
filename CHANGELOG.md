@@ -1,9 +1,13 @@
+## 1.16.0
+- ObserverController
+  - `dispatchOnceObserve` method supports directly getting observation result.
+
 ## 1.15.0
 - Slivers
   - Add `SliverObserveContextToBoxAdapter`.
 
 ## 1.14.2
-- `ObserverWidget` 
+- ObserverWidget
   - Safe to use context. [#35](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/35).
 
 ## 1.14.1
@@ -15,56 +19,56 @@
   - Support for keeping position of generative messages (eg: ChatGPT)
 
 ## 1.13.2
-- `ObserverWidget` 
+- ObserverWidget 
   - Fix getting bad observation result on web. Thanks to @rmasarovic for the test in [#31](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/31)
 
 ## 1.13.1
-- `ObserverCore`
+- ObserverCore
   - Fix no getting all child widgets those are displayed when there are separators in `ListView`. [#31](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/31)
-- `ObserverUtils`
+- ObserverUtils
   - Safely call `findRenderObject` method.
 
 ## 1.13.0
-- `ObserverUtils`
+- ObserverUtils
   - The `calcAnchorTabIndex` method supports GridView.
-- `ObserverCore`
+- ObserverCore
   - Refine the logic of `handleListObserve` method and `handleGridObserve` method.
 
 ## 1.12.0
-- `ObserverWidget` 
+- ObserverWidget
   - Support custom observation object and observation logic.
   - Refine the logic for finding the first sliver in viewport.
 
 ## 1.11.0
 - Chat Observer
   - Support inserting multiple messages at once.
-- `ObserverWidget` 
+- ObserverWidget
   - `GridViewObserver` is compatible with waterfall flow.
   - `SliverViewObserver` supports observation of viewport.
 
 ## 1.10.1
-- `ObserverController` 
+- ObserverController
   - fix: targetOffset calculate may be negative by @zeqinjie in [#21](https://github.com/LinXunFeng/flutter_scrollview_observer/pull/21).
 
 ## 1.10.0
-- `ObserverController` 
+- ObserverController
   - Improve `[_calculateTargetLayoutOffset]` logic.
   - The `jumpTo` method and `animateTo` method both add a parameter `[padding]`.
-- `ObserverIndexPositionModel`
+- ObserverIndexPositionModel
   - Add property `[padding]`.
 
 ## 1.9.2
-- `ObserverWidget` 
+- ObserverWidget
   - Catch the exception thrown by getting size.
 
 ## 1.9.1
-- `ObserverController`
+- ObserverController
   - Modify offset calculation logic in method `[_calculateTargetLayoutOffset]`.
 
 ## 1.9.0
-- `ObserverWidget` 
+- ObserverWidget
   - Add property `[autoTriggerObserveTypes]` and property `[triggerOnObserveType]`.
-- `ObserverController`
+- ObserverController
   - Method `[dispatchOnceObserve]` adds parameter `[isForce]`.
 
 ## 1.8.0
