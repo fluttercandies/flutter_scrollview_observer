@@ -110,6 +110,28 @@ ListViewObserver(
 controller.dispatchOnceObserve();
 ```
 
+`dispatchOnceObserve` 方法的定义：
+
+以 `ListObserverController` 的为例
+
+```dart
+Future<ListViewOnceObserveNotificationResult> dispatchOnceObserve({
+  BuildContext? sliverContext,
+  bool isForce = false,
+  bool isDependObserveCallback = true,
+})
+```
+
+`dispatchOnceObserve` 的参数说明：
+
+| 参数                      | 必传 | 说明                                                                                                   |
+| ------------------------- | ---- | ------------------------------------------------------------------------------------------------------ |
+| `sliverContext`           | 否   | 滚动视图的 `BuildContext`，只有在 `CustomScrollView` 有多个 `Sliver` 时才会使用到                      |
+| `isForce`                 | 否   | 是否强制观察，等同于 `ObserverTriggerOnObserveType.directly`                                           |
+| `isDependObserveCallback` | 否   | 是否依赖于判断 `onObserve` 等回调有没有实现，如果传 `true`，即使没有实现对应的回调，也可以拿到观察结果 |
+
+其返回值可以直接拿到观察的结果！
+
 #### 方式二：指明 `Sliver` 的 `BuildContext`
 
 > 使用上相对复杂，应用范围小，存在多个 `Sliver` 时才有可能会用到该方式

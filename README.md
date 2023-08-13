@@ -113,6 +113,28 @@ ListViewObserver(
 controller.dispatchOnceObserve();
 ```
 
+Definition of `dispatchOnceObserve` method:
+
+Take `dispatchOnceObserve` of `ListObserverController` as an example.
+
+```dart
+Future<ListViewOnceObserveNotificationResult> dispatchOnceObserve({
+  BuildContext? sliverContext,
+  bool isForce = false,
+  bool isDependObserveCallback = true,
+})
+```
+
+Parameter description of `dispatchOnceObserve`:
+
+| `Parameter`               | `Required` | `Description`                                                                                                                                                                                                   |
+| ------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sliverContext`           | `no`       | The `BuildContext` of the scrollView is only used when `CustomScrollView` has multiple `Sliver`                                                                                                                 |
+| `isForce`                 | `no`       | Whether to enforce observation, equivalent to `ObserverTriggerOnObserveType.directly`                                                                                                                           |
+| `isDependObserveCallback` | `no`       | Whether it depends on judging whether `onObserve` and other callbacks are implemented. If `true` is passed, even if the corresponding callback is not implemented, the observation result can still be obtained |
+
+Its return value can directly get the result of observation!
+
 #### Method 2: Specify `BuildContext` for `Sliver`
 
 > Relatively complex to use, the scope of application is small, there are more than one `Sliver` is possible to use this method
