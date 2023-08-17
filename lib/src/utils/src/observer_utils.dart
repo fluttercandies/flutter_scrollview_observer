@@ -192,7 +192,14 @@ class ObserverUtils {
   static RenderViewportBase? findViewport(RenderObject obj) {
     int maxCycleCount = 10;
     int currentCycleCount = 1;
-    AbstractNode? parent = obj.parent;
+    // Starting from flutter version 3.13.0, the type of parent received 
+    // is RenderObject, while the type of the previous version is AbstractNode,
+    // but RenderObject is a subclass of AbstractNode, so for compatibility,
+    // we can use RenderObject.
+    var parent = obj.parent;
+    if (parent is! RenderObject) {
+      return null;
+    }
     while (parent != null && currentCycleCount <= maxCycleCount) {
       if (parent is RenderViewportBase) {
         return parent;
