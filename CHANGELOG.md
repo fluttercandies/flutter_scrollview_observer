@@ -1,3 +1,6 @@
+## 1.16.1
+- compatible with flutter 3.13.0
+
 ## 1.16.0
 - ObserverController
   - `dispatchOnceObserve` method supports directly getting observation result.
