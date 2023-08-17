@@ -4,7 +4,6 @@
  * @Date: 2022-08-21 00:53:44
  */
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
