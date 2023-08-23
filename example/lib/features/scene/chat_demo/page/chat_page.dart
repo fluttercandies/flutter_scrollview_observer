@@ -41,6 +41,8 @@ class _ChatPageState extends State<ChatPage> {
 
   final LayerLink layerLink = LayerLink();
 
+  bool isShowClassicHeaderAndFooter = false;
+
   @override
   void initState() {
     super.initState();
@@ -82,11 +84,23 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 7, 7, 7),
+      backgroundColor: const Color.fromARGB(255, 100, 100, 100),
       appBar: AppBar(
         title: const Text("Chat"),
         backgroundColor: const Color.fromARGB(255, 19, 19, 19),
         actions: [
+          TextButton(
+            onPressed: () {
+              isShowClassicHeaderAndFooter = !isShowClassicHeaderAndFooter;
+              setState(() {});
+            },
+            child: Text(
+              isShowClassicHeaderAndFooter ? "Classic" : "Material",
+              style: const TextStyle(
+                fontSize: 18,
+              ),
+            ),
+          ),
           IconButton(
             onPressed: () {
               editViewController.text = '';
@@ -195,8 +209,15 @@ class _ChatPageState extends State<ChatPage> {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         Widget resultWidget = EasyRefresh.builder(
-          header: const MaterialHeader(),
-          footer: const MaterialFooter(),
+          header: isShowClassicHeaderAndFooter
+              ? const ClassicHeader()
+              : const MaterialHeader(),
+          footer: isShowClassicHeaderAndFooter
+              ? const ClassicFooter(
+                  position: IndicatorPosition.above,
+                  infiniteOffset: null,
+                )
+              : const MaterialFooter(),
           onRefresh: () async {
             await Future.delayed(const Duration(seconds: 2));
           },
@@ -204,10 +225,14 @@ class _ChatPageState extends State<ChatPage> {
             await Future.delayed(const Duration(seconds: 2));
           },
           childBuilder: (context, physics) {
+            var scrollViewPhysics =
+                physics.applyTo(ChatObserverClampingScrollPhysics(
+              observer: chatObserver,
+            ));
             Widget resultWidget = ListView.builder(
-              physics: physics.applyTo(ChatObserverClampingScrollPhysics(
-                observer: chatObserver,
-              )),
+              physics: chatObserver.isShrinkWrap
+                  ? const NeverScrollableScrollPhysics()
+                  : scrollViewPhysics,
               padding: const EdgeInsets.only(
                 left: 10,
                 right: 10,
@@ -235,7 +260,7 @@ class _ChatPageState extends State<ChatPage> {
             if (chatObserver.isShrinkWrap) {
               resultWidget = SingleChildScrollView(
                 reverse: true,
-                physics: physics,
+                physics: scrollViewPhysics,
                 child: Container(
                   alignment: Alignment.topCenter,
                   child: resultWidget,
