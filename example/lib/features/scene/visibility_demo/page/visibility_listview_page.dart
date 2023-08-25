@@ -1,3 +1,9 @@
+/*
+ * @Author: LinXunFeng linxunfeng@yeah.net
+ * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
+ * @Date: 2023-08-25 23:14:20
+ */
+
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/scene/visibility_demo/mixin/visibility_exposure_mixin.dart';

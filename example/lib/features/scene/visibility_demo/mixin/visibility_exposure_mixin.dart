@@ -1,3 +1,9 @@
+/*
+ * @Author: LinXunFeng linxunfeng@yeah.net
+ * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
+ * @Date: 2023-08-24 22:55:19
+ */
+
 import 'package:scrollview_observer/scrollview_observer.dart';
 
 mixin VisibilityExposureMixin {
