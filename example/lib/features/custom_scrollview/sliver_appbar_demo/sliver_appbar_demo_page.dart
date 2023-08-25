@@ -80,6 +80,7 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
             debugPrint('1 firstChild.index -- ${model1.firstChild?.index}');
             debugPrint('1 firstChild.size -- ${model1.firstChild?.size}');
             debugPrint('1 displaying -- ${model1.displayingChildIndexList}');
+            debugPrint('1 displaying -- index${model1.firstChild?.index} -- ${model1.firstChild?.displayPercentage}');
             setState(() {
               _hitIndexForCtx1 = model1.firstChild?.index ?? 0;
             });

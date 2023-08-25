@@ -20,6 +20,9 @@ mixin ObserveDisplayingChildModelMixin on ObserveDisplayingChildModel {
   /// The scroll offset of sliver
   double get scrollOffset => sliver.constraints.scrollOffset;
 
+  /// The overlap of sliver
+  double get overlap => sliver.constraints.overlap;
+
   /// The layout offset of child widget.
   double get layoutOffset {
     final parentData = renderObject.parentData;
@@ -43,13 +46,14 @@ mixin ObserveDisplayingChildModelMixin on ObserveDisplayingChildModel {
   double calculateDisplayPercentage() {
     final currentChildLayoutOffset = layoutOffset;
     double remainingMainAxisSize = mainAxisSize;
-    if (scrollOffset > currentChildLayoutOffset) {
+    final rawScrollViewOffSet = scrollOffset + overlap;
+    if (rawScrollViewOffSet > currentChildLayoutOffset) {
       remainingMainAxisSize =
-          mainAxisSize - (scrollOffset - currentChildLayoutOffset);
+          mainAxisSize - (rawScrollViewOffSet - currentChildLayoutOffset);
     } else {
       final childWidgetMaxY = mainAxisSize + currentChildLayoutOffset;
       final listContentMaxY =
-          scrollOffset + sliver.constraints.remainingPaintExtent;
+          rawScrollViewOffSet + sliver.constraints.remainingPaintExtent;
       if (childWidgetMaxY > listContentMaxY) {
         remainingMainAxisSize =
             mainAxisSize - (childWidgetMaxY - listContentMaxY);
