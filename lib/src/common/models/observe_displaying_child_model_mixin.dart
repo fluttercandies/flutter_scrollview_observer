@@ -30,14 +30,16 @@ mixin ObserveDisplayingChildModelMixin on ObserveDisplayingChildModel {
     return parentData.layoutOffset ?? 0;
   }
 
+  /// The number of pixels the viewport can display in the main axis.
+  double get viewportMainAxisExtent =>
+      sliver.constraints.viewportMainAxisExtent;
+
   /// The margin from the top of the child widget to the viewport.
   double get leadingMarginToViewport => layoutOffset - scrollOffset;
 
   /// The margin from the bottom of the child widget to the viewport.
   double get trailingMarginToViewport =>
-      sliver.constraints.viewportMainAxisExtent -
-      leadingMarginToViewport -
-      mainAxisSize;
+      viewportMainAxisExtent - leadingMarginToViewport - mainAxisSize;
 
   /// The display percentage of the current widget
   double get displayPercentage => calculateDisplayPercentage();
@@ -45,20 +47,16 @@ mixin ObserveDisplayingChildModelMixin on ObserveDisplayingChildModel {
   /// Calculates the display percentage of the current widget
   double calculateDisplayPercentage() {
     final currentChildLayoutOffset = layoutOffset;
-    double remainingMainAxisSize = mainAxisSize;
+    double visibleMainAxisSize = mainAxisSize;
     final rawScrollViewOffSet = scrollOffset + overlap;
+    // Child widget moved out in the main axis.
     if (rawScrollViewOffSet > currentChildLayoutOffset) {
-      remainingMainAxisSize =
+      visibleMainAxisSize =
           mainAxisSize - (rawScrollViewOffSet - currentChildLayoutOffset);
     } else {
-      final childWidgetMaxY = mainAxisSize + currentChildLayoutOffset;
-      final listContentMaxY =
-          rawScrollViewOffSet + sliver.constraints.remainingPaintExtent;
-      if (childWidgetMaxY > listContentMaxY) {
-        remainingMainAxisSize =
-            mainAxisSize - (childWidgetMaxY - listContentMaxY);
-      }
+      visibleMainAxisSize =
+          scrollOffset + viewportMainAxisExtent - currentChildLayoutOffset;
     }
-    return (remainingMainAxisSize / mainAxisSize).clamp(0, 1);
+    return (visibleMainAxisSize / mainAxisSize).clamp(0, 1);
   }
 }
