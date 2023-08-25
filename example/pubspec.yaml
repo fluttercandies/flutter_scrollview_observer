@@ -38,6 +38,7 @@ dependencies:
   waterfall_flow: ^3.0.2
   loading_more_list: ^5.0.3
   easy_refresh: ^3.3.2+1
+  visibility_detector: ^0.4.0+2
 
   scrollview_observer:
     path: ../

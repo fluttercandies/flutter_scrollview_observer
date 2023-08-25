@@ -25,6 +25,8 @@ import 'package:scrollview_observer_example/features/scene/chat_demo/page/chat_p
 import 'package:scrollview_observer_example/features/scene/image_tab_demo/image_tab_page.dart';
 import 'package:scrollview_observer_example/features/scene/scrollview_form_demo/scrollview_form_demo_page.dart';
 import 'package:scrollview_observer_example/features/scene/video_auto_play_list/video_list_auto_play_page.dart';
+import 'package:scrollview_observer_example/features/scene/visibility_demo/page/visibility_listview_page.dart';
+import 'package:scrollview_observer_example/features/scene/visibility_demo/page/visibility_scrollview_page.dart';
 import 'package:scrollview_observer_example/features/scene/waterfall_flow_demo/waterfall_flow_page.dart';
 import 'package:tuple/tuple.dart';
 
@@ -196,6 +198,18 @@ class HomePage extends StatelessWidget {
         "ScrollView Form",
         () {
           return const ScrollViewFormDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "Visibility ListView",
+        () {
+          return const VisibilityListViewPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "Visibility ScrollView",
+        () {
+          return const VisibilityScrollViewPage();
         },
       ),
     ];
