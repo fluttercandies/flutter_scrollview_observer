@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer_example/features/scene/visibility_demo/mixin/visibility_exposure_mixin.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class VisibilityScrollViewPage extends StatefulWidget {
@@ -10,26 +11,12 @@ class VisibilityScrollViewPage extends StatefulWidget {
       _VisibilityScrollViewPageState();
 }
 
-class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage> {
+class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
+    with VisibilityExposureMixin {
   BuildContext? _sliverListCtx;
   BuildContext? _sliverGridCtx;
 
-  ScrollController scrollController = ScrollController();
-
-  late SliverObserverController observerController;
-
-  @override
-  void initState() {
-    super.initState();
-
-    observerController = SliverObserverController(controller: scrollController);
-  }
-
-  @override
-  void dispose() {
-    observerController.controller?.dispose();
-    super.dispose();
-  }
+  final observerController = SliverObserverController();
 
   @override
   Widget build(BuildContext context) {
@@ -43,14 +30,27 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage> {
             if (_sliverGridCtx != null) _sliverGridCtx!,
           ];
         },
-        autoTriggerObserveTypes: const [
-          ObserverAutoTriggerObserveType.scrollEnd,
-        ],
+        // autoTriggerObserveTypes: const [
+        //   ObserverAutoTriggerObserveType.scrollEnd,
+        // ],
         triggerOnObserveType: ObserverTriggerOnObserveType.directly,
         onObserveAll: (resultMap) {
-          final model1 = resultMap[_sliverListCtx];
-
-          final model2 = resultMap[_sliverGridCtx];
+          // Only handle SliverList.
+          final listResultModel = resultMap[_sliverListCtx];
+          if (listResultModel != null) {
+            handleExposure(
+              resultModel: listResultModel,
+              needExposeCallback: (index) {
+                // Only the item whose index is 6 needs to calculate whether it
+                // has been exposed.
+                return index == 6;
+              },
+              toExposeCallback: (index) {
+                // Meet the conditions, you can report exposure.
+                debugPrint('Exposure -- $index');
+              },
+            );
+          }
         },
       ),
     );
@@ -58,7 +58,6 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage> {
 
   Widget _buildScrollView() {
     return CustomScrollView(
-      controller: scrollController,
       slivers: [
         _buildSliverAppBar(),
         _buildSliverListView(),
@@ -87,7 +86,7 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage> {
           _sliverListCtx ??= ctx;
           final isEven = index % 2 == 0;
           return Container(
-            height: isEven ? 80 : 50,
+            height: isEven ? 200 : 100,
             color: isEven ? Colors.red : Colors.black12,
             child: Center(
               child: Text(
@@ -99,27 +98,12 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage> {
             ),
           );
         },
-        childCount: 20,
+        childCount: 10,
       ),
     );
   }
 
   Widget _buildMiddleSliver() {
-    return SliverToBoxAdapter(
-      child: VisibilityDetector(
-        key: const ValueKey('key'),
-        onVisibilityChanged: (info) {
-          debugPrint('visibleFraction: ${info.visibleFraction}');
-        },
-        child: Container(
-          height: 200,
-          color: Colors.blue,
-          child: const Center(
-            child: Text('Middle Sliver'),
-          ),
-        ),
-      ),
-    );
     return SliverVisibilityDetector(
       key: const ValueKey('key'),
       sliver: SliverToBoxAdapter(
