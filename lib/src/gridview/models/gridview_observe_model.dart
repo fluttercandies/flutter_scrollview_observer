@@ -12,12 +12,14 @@ import 'gridview_observe_displaying_child_model.dart';
 class GridViewObserveModel extends ObserveModel {
   GridViewObserveModel({
     required this.sliverGrid,
+    required RenderViewportBase viewport,
     required this.firstGroupChildList,
     required this.displayingChildModelList,
     required bool visible,
   }) : super(
           visible: visible,
           sliver: sliverGrid,
+          viewport: viewport,
           innerDisplayingChildModelList: displayingChildModelList,
         );
 

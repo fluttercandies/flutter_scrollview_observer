@@ -174,6 +174,8 @@ mixin ObserverControllerForInfo on ObserverController {
     final ctx = fetchSliverContext(sliverContext: sliverContext);
     var obj = ObserverUtils.findRenderObject(ctx);
     if (obj is! RenderSliverMultiBoxAdaptor) return null;
+    final viewport = ObserverUtils.findViewport(obj);
+    if (viewport == null) return null;
     var targetChild = findCurrentFirstChild(obj);
     if (targetChild == null) return null;
     while (targetChild != null && (targetChild.index != index)) {
@@ -182,6 +184,7 @@ mixin ObserverControllerForInfo on ObserverController {
     if (targetChild == null) return null;
     return ObserveFindChildModel(
       sliver: obj,
+      viewport: viewport,
       index: targetChild.index,
       renderObject: targetChild,
     );
