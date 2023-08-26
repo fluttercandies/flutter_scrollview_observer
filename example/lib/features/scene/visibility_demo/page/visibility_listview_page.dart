@@ -17,6 +17,8 @@ class VisibilityListViewPage extends StatefulWidget {
 
 class _VisibilityListViewPageState extends State<VisibilityListViewPage>
     with VisibilityExposureMixin {
+  int needExposeIndex = 6;
+
   final observerController = ListObserverController();
 
   @override
@@ -39,7 +41,7 @@ class _VisibilityListViewPageState extends State<VisibilityListViewPage>
             needExposeCallback: (index) {
               // Only the item whose index is 6 needs to calculate whether it
               // has been exposed.
-              return index == 6;
+              return index == needExposeIndex; // 6
             },
             toExposeCallback: (index) {
               // Meet the conditions, you can report exposure.
@@ -71,14 +73,19 @@ class _VisibilityListViewPageState extends State<VisibilityListViewPage>
 
   Widget _buildListItemView(int index) {
     final isEven = index % 2 == 0;
+    final needExpose = needExposeIndex == index;
     return Container(
       height: isEven ? 200 : 100,
-      color: isEven ? Colors.orange[300] : Colors.black12,
+      color: needExpose
+          ? Colors.red
+          : isEven
+              ? Colors.orange[300]
+              : Colors.black12,
       child: Center(
         child: Text(
           "index -- $index",
           style: TextStyle(
-            color: isEven ? Colors.white : Colors.black,
+            color: needExpose ? Colors.white : Colors.black,
           ),
         ),
       ),

@@ -22,6 +22,8 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
   BuildContext? _sliverListCtx;
   BuildContext? _sliverGridCtx;
 
+  int needExposeIndex = 6;
+
   final observerController = SliverObserverController();
 
   @override
@@ -49,7 +51,7 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
               needExposeCallback: (index) {
                 // Only the item whose index is 6 needs to calculate whether it
                 // has been exposed.
-                return index == 6;
+                return index == needExposeIndex; // 6
               },
               toExposeCallback: (index) {
                 // Meet the conditions, you can report exposure.
@@ -91,9 +93,14 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
         (ctx, index) {
           _sliverListCtx ??= ctx;
           final isEven = index % 2 == 0;
+          final needExpose = index == needExposeIndex;
           return Container(
             height: isEven ? 200 : 100,
-            color: isEven ? Colors.red : Colors.black12,
+            color: needExpose
+                ? Colors.purple
+                : isEven
+                    ? Colors.red
+                    : Colors.black12,
             child: Center(
               child: Text(
                 "index -- $index",
@@ -122,6 +129,8 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
         ),
       ),
       onVisibilityChanged: (info) {
+        // In the scene with PersistentHeader (such as AppBar), the value of 
+        // [info.visibleFraction] is incorrect.
         debugPrint('visibleFraction: ${info.visibleFraction}');
       },
     );
@@ -130,7 +139,7 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
   Widget _buildSliverGridView() {
     return SliverGrid(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, //Grid按两列显示
+        crossAxisCount: 2,
         mainAxisSpacing: 10.0,
         crossAxisSpacing: 10.0,
         childAspectRatio: 2.0,

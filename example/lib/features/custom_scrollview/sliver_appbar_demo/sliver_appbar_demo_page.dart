@@ -208,7 +208,7 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
   Widget _buildSliverGridView() {
     return SliverGrid(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, //Grid按两列显示
+        crossAxisCount: 2,
         mainAxisSpacing: 10.0,
         crossAxisSpacing: 10.0,
         childAspectRatio: 2.0,
