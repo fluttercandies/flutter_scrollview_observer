@@ -34,8 +34,9 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
     Key? key,
     required Widget child,
     this.controller,
-    @Deprecated('It will be removed in version 2, please use [sliverContexts] instead')
-        List<BuildContext> Function()? sliverListContexts,
+    @Deprecated(
+        'It will be removed in version 2, please use [sliverContexts] instead')
+    List<BuildContext> Function()? sliverListContexts,
     List<BuildContext> Function()? sliverContexts,
     Function(Map<BuildContext, ObserveModel>)? onObserveAll,
     Function(ObserveModel)? onObserve,
