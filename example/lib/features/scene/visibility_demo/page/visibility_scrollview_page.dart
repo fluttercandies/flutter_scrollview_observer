@@ -43,11 +43,12 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
         // ],
         triggerOnObserveType: ObserverTriggerOnObserveType.directly,
         onObserveAll: (resultMap) {
-          // Only handle SliverList.
+          // SliverList
           final listResultModel = resultMap[_sliverListCtx];
           if (listResultModel != null) {
             handleExposure(
               resultModel: listResultModel,
+              recordKeyCallback: (index) => 'list_$index',
               needExposeCallback: (index) {
                 // Only the item whose index is 6 needs to calculate whether it
                 // has been exposed.
@@ -55,7 +56,25 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
               },
               toExposeCallback: (index) {
                 // Meet the conditions, you can report exposure.
-                debugPrint('Exposure -- $index');
+                debugPrint('List Exposure -- $index');
+              },
+            );
+          }
+
+          // SliverGrid
+          final gridResultModel = resultMap[_sliverGridCtx];
+          if (gridResultModel != null) {
+            handleExposure(
+              resultModel: gridResultModel,
+              recordKeyCallback: (index) => 'grid_$index',
+              needExposeCallback: (index) {
+                // Only the item whose index is 6 needs to calculate whether it
+                // has been exposed.
+                return index == needExposeIndex; // 6
+              },
+              toExposeCallback: (index) {
+                // Meet the conditions, you can report exposure.
+                debugPrint('Grid Exposure -- $index');
               },
             );
           }
@@ -129,7 +148,7 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
         ),
       ),
       onVisibilityChanged: (info) {
-        // In the scene with PersistentHeader (such as AppBar), the value of 
+        // In the scene with PersistentHeader (such as AppBar), the value of
         // [info.visibleFraction] is incorrect.
         debugPrint('visibleFraction: ${info.visibleFraction}');
       },
@@ -147,10 +166,18 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           _sliverGridCtx ??= context;
+
+          final needExpose = index == needExposeIndex;
+
           return Container(
-            color: Colors.green,
+            color: needExpose ? Colors.purple : Colors.green,
             child: Center(
-              child: Text('index -- $index'),
+              child: Text(
+                'index -- $index',
+                style: TextStyle(
+                  color: needExpose ? Colors.white : Colors.black,
+                ),
+              ),
             ),
           );
         },
