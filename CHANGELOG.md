@@ -1,3 +1,10 @@
+## 1.16.2
+- ObserverWidget
+  - Adjust the conversion type of `viewport.offset` to `ScrollPosition` by @LiuDongCai in [#41](https://github.com/LinXunFeng/flutter_scrollview_observer/pull/41).
+- ObserveDisplayingChildModelMixin
+  - Adapt `displayPercentage` to scenes with SliverPersistentHeader by @percival888 in [#43](https://github.com/LinXunFeng/flutter_scrollview_observer/pull/43).
+  - Refine the logic of `calculateDisplayPercentage` method by @LinXunFeng.
+
 ## 1.16.1
 - compatible with flutter 3.13.0
 
