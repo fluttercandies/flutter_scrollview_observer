@@ -1,3 +1,8 @@
+## 1.16.3
+- Observation Model
+  - Add viewport property to observation model.
+  - Correct the calculation logic of some values to adapt to the scene of multiple slivers.
+
 ## 1.16.2
 - ObserverWidget
   - Adjust the conversion type of `viewport.offset` to `ScrollPosition` by @LiuDongCai in [#41](https://github.com/LinXunFeng/flutter_scrollview_observer/pull/41).
