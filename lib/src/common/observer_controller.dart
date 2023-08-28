@@ -210,7 +210,11 @@ mixin ObserverControllerForInfo on ObserverController {
 
   /// Getting [maxScrollExtent] of viewport
   double viewportMaxScrollExtent(RenderViewportBase viewport) {
-    return (viewport.offset as ScrollPositionWithSingleContext).maxScrollExtent;
+    final offset = viewport.offset;
+    if (offset is! ScrollPosition) {
+      return 0;
+    }
+    return offset.maxScrollExtent;
   }
 }
 
