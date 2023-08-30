@@ -1,3 +1,6 @@
+## 1.16.4
+- Supplement missing type conversion adjustments.
+
 ## 1.16.3
 - Observation Model
   - Add viewport property to observation model.
@@ -11,7 +14,7 @@
   - Refine the logic of `calculateDisplayPercentage` method by @LinXunFeng.
 
 ## 1.16.1
-- compatible with flutter 3.13.0
+- Compatible with flutter 3.13.0
 
 ## 1.16.0
 - ObserverController
