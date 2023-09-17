@@ -11,6 +11,7 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/models/observe_find_child_model.dart';
 import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
+import 'package:scrollview_observer/src/utils/src/log.dart';
 
 import 'models/observe_scroll_child_model.dart';
 
@@ -567,6 +568,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     Duration? duration,
     Curve? curve,
     ObserverLocateIndexOffsetCallback? offset,
+    double? lastPageTurningOffset,
   }) async {
     var _controller = controller;
     if (_controller == null || !_controller.hasClients) return;
@@ -595,6 +597,15 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       }
       double prevPageOffset = targetLeadingOffset + precedingScrollExtent;
       prevPageOffset = prevPageOffset < 0 ? 0 : prevPageOffset;
+      // The offset of this page turning is the same as the previous one,
+      // which means the [index] is wrong.
+      if (lastPageTurningOffset == prevPageOffset) {
+        innerIsHandlingScroll = false;
+        Log.warning('The child corresponding to the index cannot be found.\n'
+            'Please make sure the index is correct.');
+        return;
+      }
+      lastPageTurningOffset = prevPageOffset;
       if (isAnimateTo) {
         await _controller.animateTo(
           prevPageOffset,
@@ -625,6 +636,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           duration: duration,
           curve: curve,
           offset: offset,
+          lastPageTurningOffset: lastPageTurningOffset,
         );
       });
     } else if (index > lastChildIndex) {
@@ -643,6 +655,15 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           childLayoutOffset + childSize + precedingScrollExtent;
       nextPageOffset =
           nextPageOffset > maxScrollExtent ? maxScrollExtent : nextPageOffset;
+      // The offset of this page turning is the same as the previous one,
+      // which means the [index] is wrong.
+      if (lastPageTurningOffset == nextPageOffset) {
+        innerIsHandlingScroll = false;
+        Log.warning('The child corresponding to the index cannot be found.\n'
+            'Please make sure the index is correct.');
+        return;
+      }
+      lastPageTurningOffset = nextPageOffset;
       if (isAnimateTo) {
         await _controller.animateTo(
           nextPageOffset,
@@ -673,6 +694,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           duration: duration,
           curve: curve,
           offset: offset,
+          lastPageTurningOffset: lastPageTurningOffset,
         );
       });
     } else {
