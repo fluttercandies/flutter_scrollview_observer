@@ -1,3 +1,12 @@
+## 1.16.5
+- ObserverWidget
+  - Improve the processing logic of scroll notification when scrolling with the mouse wheel is not smooth by @qiangjindong in [#48](https://github.com/LinXunFeng/flutter_scrollview_observer/pull/48).
+- Chat Observer
+  - Update `isShrinkWrap` once during initialization by @LinXunFeng. [#47](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/47)
+- ObserverController
+  - Fix unable to jump when sliver is too far away and has no any child by @LinXunFeng. [#45](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/45)
+  - Fix continuous page turning due to incorrect index by @LinXunFeng.
+
 ## 1.16.4
 - Supplement missing type conversion adjustments.
 
