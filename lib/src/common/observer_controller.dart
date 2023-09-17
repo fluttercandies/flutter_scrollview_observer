@@ -359,27 +359,52 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     // Before the next sliver is shown, it may have an incorrect value for
     // precedingScrollExtent, so we need to scroll around to get
     // precedingScrollExtent correctly.
-    double precedingScrollExtent = obj.constraints.precedingScrollExtent;
     final objVisible = obj.geometry?.visible ?? false;
     if (!objVisible && viewport.offset.hasPixels) {
-      final viewportOffset = viewport.offset.pixels;
-      final isHorizontal = obj.constraints.axis == Axis.horizontal;
-      final viewportSize =
-          isHorizontal ? viewport.size.width : viewport.size.height;
-      final viewportBoundaryExtent =
-          viewportSize * 0.5 + (viewport.cacheExtent ?? 0);
-      if (precedingScrollExtent > (viewportOffset + viewportBoundaryExtent)) {
+      final maxScrollExtent = viewportMaxScrollExtent(viewport);
+      // If the target sliver does not paint any child because it is too far
+      // away, we need to let the ScrollView scroll near it first.
+      // https://github.com/LinXunFeng/flutter_scrollview_observer/issues/45
+      if (obj.firstChild == null) {
+        final constraints = obj.constraints;
+        final precedingScrollExtent = constraints.precedingScrollExtent;
+        double paintScrollExtent =
+            precedingScrollExtent + (obj.geometry?.maxPaintExtent ?? 0);
+        double targetScrollExtent = precedingScrollExtent;
+        if (_controller.position.pixels > paintScrollExtent) {
+          targetScrollExtent = paintScrollExtent;
+        }
+        if (targetScrollExtent > maxScrollExtent) {
+          targetScrollExtent = maxScrollExtent;
+        }
         innerIsHandlingScroll = true;
-        double targetOffset = precedingScrollExtent - viewportBoundaryExtent;
-        final maxScrollExtent = viewportMaxScrollExtent(viewport);
-        if (targetOffset > maxScrollExtent) targetOffset = maxScrollExtent;
         await _controller.animateTo(
-          targetOffset,
+          targetScrollExtent,
           duration: _findingDuration,
           curve: _findingCurve,
         );
-        await Future.delayed(_findingDuration);
-        precedingScrollExtent = obj.constraints.precedingScrollExtent;
+        await WidgetsBinding.instance.endOfFrame;
+        innerIsHandlingScroll = false;
+      } else {
+        final precedingScrollExtent = obj.constraints.precedingScrollExtent;
+        final viewportOffset = viewport.offset.pixels;
+        final isHorizontal = obj.constraints.axis == Axis.horizontal;
+        final viewportSize =
+            isHorizontal ? viewport.size.width : viewport.size.height;
+        final viewportBoundaryExtent =
+            viewportSize * 0.5 + (viewport.cacheExtent ?? 0);
+        if (precedingScrollExtent > (viewportOffset + viewportBoundaryExtent)) {
+          innerIsHandlingScroll = true;
+          double targetOffset = precedingScrollExtent - viewportBoundaryExtent;
+          if (targetOffset > maxScrollExtent) targetOffset = maxScrollExtent;
+          await _controller.animateTo(
+            targetOffset,
+            duration: _findingDuration,
+            curve: _findingCurve,
+          );
+          await WidgetsBinding.instance.endOfFrame;
+          innerIsHandlingScroll = false;
+        }
       }
     }
 
