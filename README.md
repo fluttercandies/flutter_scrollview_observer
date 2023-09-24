@@ -42,6 +42,8 @@ Chat: [Join WeChat group](https://mp.weixin.qq.com/s/JBbMstn0qW6M71hh-BRKzw)
 - [x] Mixing usage of `SliverPersistentHeader`, `SliverList` and `SliverGrid`
 - [x] `ScrollView` built by third-party package.
 
+🏞 Related [Example](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/Example)
+
 ## 📦 Installing
 
 Add `scrollview_observer` to your pubspec.yaml file:
@@ -61,7 +63,6 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 ## 📚 Wiki
 
 - [Wiki Home](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki)
-- [Example](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/Example)
 - [1、Observing child widgets those are being displayed in the scroll view](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/1%E3%80%81Observing-child-widgets-those-are-being-displayed-in-the-scroll-view)
 - [2、Scrolling to the specified index location](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/2%E3%80%81Scrolling-to-the-specified-index-location)
 - [3、Chat Observer](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/3%E3%80%81Chat-Observer)

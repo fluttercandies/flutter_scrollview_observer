@@ -40,6 +40,9 @@ Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_ob
 - [x] 支持 `SliverPersistentHeader`，`SliverList` 和 `SliverGrid` 混合使用
 - [x] 由第三方库构建的 `ScrollView`
 
+
+🏞 相关[示例](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/Example)
+
 ## 📦 安装
 
 在你的 `pubspec.yaml` 文件中添加 `scrollview_observer` 依赖:
@@ -57,7 +60,6 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 
 ## 📚 指南
 - [Wiki首页](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/%E9%A6%96%E9%A1%B5)
-- [示例](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/Example)
 - [1、监听滚动视图中正在显示的子部件](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/1%E3%80%81%E7%9B%91%E5%90%AC%E6%BB%9A%E5%8A%A8%E8%A7%86%E5%9B%BE%E4%B8%AD%E6%AD%A3%E5%9C%A8%E6%98%BE%E7%A4%BA%E7%9A%84%E5%AD%90%E9%83%A8%E4%BB%B6)
 - [2、滚动到指定下标位置](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/2%E3%80%81%E6%BB%9A%E5%8A%A8%E5%88%B0%E6%8C%87%E5%AE%9A%E4%B8%8B%E6%A0%87%E4%BD%8D%E7%BD%AE)
 - [3、聊天会话](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/3%E3%80%81%E8%81%8A%E5%A4%A9%E4%BC%9A%E8%AF%9D)
