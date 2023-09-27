@@ -11,6 +11,7 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/models/observe_find_child_model.dart';
 import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
+import 'package:scrollview_observer/src/utils/src/log.dart';
 
 import 'models/observe_scroll_child_model.dart';
 
@@ -174,6 +175,8 @@ mixin ObserverControllerForInfo on ObserverController {
     final ctx = fetchSliverContext(sliverContext: sliverContext);
     var obj = ObserverUtils.findRenderObject(ctx);
     if (obj is! RenderSliverMultiBoxAdaptor) return null;
+    final viewport = ObserverUtils.findViewport(obj);
+    if (viewport == null) return null;
     var targetChild = findCurrentFirstChild(obj);
     if (targetChild == null) return null;
     while (targetChild != null && (targetChild.index != index)) {
@@ -182,6 +185,7 @@ mixin ObserverControllerForInfo on ObserverController {
     if (targetChild == null) return null;
     return ObserveFindChildModel(
       sliver: obj,
+      viewport: viewport,
       index: targetChild.index,
       renderObject: targetChild,
     );
@@ -207,7 +211,11 @@ mixin ObserverControllerForInfo on ObserverController {
 
   /// Getting [maxScrollExtent] of viewport
   double viewportMaxScrollExtent(RenderViewportBase viewport) {
-    return (viewport.offset as ScrollPositionWithSingleContext).maxScrollExtent;
+    final offset = viewport.offset;
+    if (offset is! ScrollPosition) {
+      return 0;
+    }
+    return offset.maxScrollExtent;
   }
 }
 
@@ -352,27 +360,52 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     // Before the next sliver is shown, it may have an incorrect value for
     // precedingScrollExtent, so we need to scroll around to get
     // precedingScrollExtent correctly.
-    double precedingScrollExtent = obj.constraints.precedingScrollExtent;
     final objVisible = obj.geometry?.visible ?? false;
     if (!objVisible && viewport.offset.hasPixels) {
-      final viewportOffset = viewport.offset.pixels;
-      final isHorizontal = obj.constraints.axis == Axis.horizontal;
-      final viewportSize =
-          isHorizontal ? viewport.size.width : viewport.size.height;
-      final viewportBoundaryExtent =
-          viewportSize * 0.5 + (viewport.cacheExtent ?? 0);
-      if (precedingScrollExtent > (viewportOffset + viewportBoundaryExtent)) {
+      final maxScrollExtent = viewportMaxScrollExtent(viewport);
+      // If the target sliver does not paint any child because it is too far
+      // away, we need to let the ScrollView scroll near it first.
+      // https://github.com/LinXunFeng/flutter_scrollview_observer/issues/45
+      if (obj.firstChild == null) {
+        final constraints = obj.constraints;
+        final precedingScrollExtent = constraints.precedingScrollExtent;
+        double paintScrollExtent =
+            precedingScrollExtent + (obj.geometry?.maxPaintExtent ?? 0);
+        double targetScrollExtent = precedingScrollExtent;
+        if (_controller.position.pixels > paintScrollExtent) {
+          targetScrollExtent = paintScrollExtent;
+        }
+        if (targetScrollExtent > maxScrollExtent) {
+          targetScrollExtent = maxScrollExtent;
+        }
         innerIsHandlingScroll = true;
-        double targetOffset = precedingScrollExtent - viewportBoundaryExtent;
-        final maxScrollExtent = viewportMaxScrollExtent(viewport);
-        if (targetOffset > maxScrollExtent) targetOffset = maxScrollExtent;
         await _controller.animateTo(
-          targetOffset,
+          targetScrollExtent,
           duration: _findingDuration,
           curve: _findingCurve,
         );
-        await Future.delayed(_findingDuration);
-        precedingScrollExtent = obj.constraints.precedingScrollExtent;
+        await WidgetsBinding.instance.endOfFrame;
+        innerIsHandlingScroll = false;
+      } else {
+        final precedingScrollExtent = obj.constraints.precedingScrollExtent;
+        final viewportOffset = viewport.offset.pixels;
+        final isHorizontal = obj.constraints.axis == Axis.horizontal;
+        final viewportSize =
+            isHorizontal ? viewport.size.width : viewport.size.height;
+        final viewportBoundaryExtent =
+            viewportSize * 0.5 + (viewport.cacheExtent ?? 0);
+        if (precedingScrollExtent > (viewportOffset + viewportBoundaryExtent)) {
+          innerIsHandlingScroll = true;
+          double targetOffset = precedingScrollExtent - viewportBoundaryExtent;
+          if (targetOffset > maxScrollExtent) targetOffset = maxScrollExtent;
+          await _controller.animateTo(
+            targetOffset,
+            duration: _findingDuration,
+            curve: _findingCurve,
+          );
+          await WidgetsBinding.instance.endOfFrame;
+          innerIsHandlingScroll = false;
+        }
       }
     }
 
@@ -626,6 +659,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     Duration? duration,
     Curve? curve,
     ObserverLocateIndexOffsetCallback? offset,
+    double? lastPageTurningOffset,
   }) async {
     var _controller = controller;
     if (_controller == null || !_controller.hasClients) return;
@@ -654,6 +688,15 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       }
       double prevPageOffset = targetLeadingOffset + precedingScrollExtent;
       prevPageOffset = prevPageOffset < 0 ? 0 : prevPageOffset;
+      // The offset of this page turning is the same as the previous one,
+      // which means the [index] is wrong.
+      if (lastPageTurningOffset == prevPageOffset) {
+        innerIsHandlingScroll = false;
+        Log.warning('The child corresponding to the index cannot be found.\n'
+            'Please make sure the index is correct.');
+        return;
+      }
+      lastPageTurningOffset = prevPageOffset;
       if (isAnimateTo) {
         await _controller.animateTo(
           prevPageOffset,
@@ -684,6 +727,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           duration: duration,
           curve: curve,
           offset: offset,
+          lastPageTurningOffset: lastPageTurningOffset,
         );
       });
     } else if (index > lastChildIndex) {
@@ -702,6 +746,15 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           childLayoutOffset + childSize + precedingScrollExtent;
       nextPageOffset =
           nextPageOffset > maxScrollExtent ? maxScrollExtent : nextPageOffset;
+      // The offset of this page turning is the same as the previous one,
+      // which means the [index] is wrong.
+      if (lastPageTurningOffset == nextPageOffset) {
+        innerIsHandlingScroll = false;
+        Log.warning('The child corresponding to the index cannot be found.\n'
+            'Please make sure the index is correct.');
+        return;
+      }
+      lastPageTurningOffset = nextPageOffset;
       if (isAnimateTo) {
         await _controller.animateTo(
           nextPageOffset,
@@ -732,6 +785,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           duration: duration,
           curve: curve,
           offset: offset,
+          lastPageTurningOffset: lastPageTurningOffset,
         );
       });
     } else {

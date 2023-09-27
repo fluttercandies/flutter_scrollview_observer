@@ -14,6 +14,9 @@ abstract class ObserveModel {
   /// The target sliver.
   RenderSliver sliver;
 
+  /// The viewport of sliver.
+  RenderViewportBase viewport;
+
   /// Stores model list for children widgets those are displaying.
   List<ObserveDisplayingChildModel> innerDisplayingChildModelList;
 
@@ -30,6 +33,7 @@ abstract class ObserveModel {
   ObserveModel({
     required this.visible,
     required this.sliver,
+    required this.viewport,
     required this.innerDisplayingChildModelList,
   });
 }

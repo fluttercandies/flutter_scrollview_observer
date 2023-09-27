@@ -34,8 +34,9 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
     Key? key,
     required Widget child,
     this.controller,
-    @Deprecated('It will be removed in version 2, please use [sliverContexts] instead')
-        List<BuildContext> Function()? sliverListContexts,
+    @Deprecated(
+        'It will be removed in version 2, please use [sliverContexts] instead')
+    List<BuildContext> Function()? sliverListContexts,
     List<BuildContext> Function()? sliverContexts,
     Function(Map<BuildContext, ObserveModel>)? onObserveAll,
     Function(ObserveModel)? onObserve,
@@ -142,6 +143,8 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
     if (firstObj == null) return null;
     final viewport = ObserverUtils.findViewport(firstObj);
     if (viewport == null) return null;
+    final viewportOffset = viewport.offset;
+    if (viewportOffset is! ScrollPosition) return null;
 
     var targetChild = viewport.firstChild;
     if (targetChild == null) return null;
@@ -149,14 +152,13 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
     if (widget.dynamicLeadingOffset != null) {
       offset = widget.dynamicLeadingOffset!();
     }
-    final pixels = viewport.offset.pixels;
+    final pixels = viewportOffset.pixels;
     final startCalcPixels = pixels + offset;
 
     int indexOfTargetChild = objList.indexOf(targetChild);
 
     // Find out the first sliver which is displayed in viewport.
-    final dimension =
-        (viewport.offset as ScrollPositionWithSingleContext).viewportDimension;
+    final dimension = viewportOffset.viewportDimension;
     final viewportBottomOffset = pixels + dimension;
 
     while (!ObserverUtils.isValidListIndex(indexOfTargetChild) ||

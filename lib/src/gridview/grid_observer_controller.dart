@@ -46,6 +46,7 @@ class GridObserverController extends ObserverController
     if (model == null) return null;
     return GridViewObserveDisplayingChildModel(
       sliverGrid: model.sliver as RenderSliverGrid,
+      viewport: model.viewport,
       index: model.index,
       renderObject: model.renderObject,
     );
@@ -62,6 +63,7 @@ class GridObserverController extends ObserverController
     if (model == null) return null;
     return GridViewObserveDisplayingChildModel(
       sliverGrid: model.sliver as RenderSliverGrid,
+      viewport: model.viewport,
       index: model.index,
       renderObject: model.renderObject,
     );

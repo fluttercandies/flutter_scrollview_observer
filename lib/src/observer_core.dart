@@ -24,14 +24,15 @@ class ObserverCore {
   }) {
     var _obj = ObserverUtils.findRenderObject(context);
     if (_obj is! RenderSliverMultiBoxAdaptor) return null;
+    final viewport = ObserverUtils.findViewport(_obj);
+    if (viewport == null) return null;
     if (kDebugMode) {
-      final viewport = ObserverUtils.findViewport(_obj);
-      if (viewport == null) return null;
       if (viewport.debugNeedsPaint) return null;
     }
     if (!(_obj.geometry?.visible ?? true)) {
       return ListViewObserveModel(
         sliverList: _obj,
+        viewport: viewport,
         visible: false,
         firstChild: null,
         displayingChildModelList: [],
@@ -73,6 +74,7 @@ class ObserverCore {
     List<ListViewObserveDisplayingChildModel> displayingChildModelList = [
       ListViewObserveDisplayingChildModel(
         sliverList: _obj,
+        viewport: viewport,
         index: targetFirstChild.index,
         renderObject: targetFirstChild,
       ),
@@ -100,6 +102,7 @@ class ObserverCore {
       }
       displayingChildModelList.add(ListViewObserveDisplayingChildModel(
         sliverList: _obj,
+        viewport: viewport,
         index: displayingChild.index,
         renderObject: displayingChild,
       ));
@@ -108,9 +111,11 @@ class ObserverCore {
 
     return ListViewObserveModel(
       sliverList: _obj,
+      viewport: viewport,
       visible: true,
       firstChild: ListViewObserveDisplayingChildModel(
         sliverList: _obj,
+        viewport: viewport,
         index: targetFirstChild.index,
         renderObject: targetFirstChild,
       ),
@@ -126,14 +131,15 @@ class ObserverCore {
   }) {
     final _obj = ObserverUtils.findRenderObject(context);
     if (_obj is! RenderSliverMultiBoxAdaptor) return null;
+    final viewport = ObserverUtils.findViewport(_obj);
+    if (viewport == null) return null;
     if (kDebugMode) {
-      final viewport = ObserverUtils.findViewport(_obj);
-      if (viewport == null) return null;
       if (viewport.debugNeedsPaint) return null;
     }
     if (!(_obj.geometry?.visible ?? true)) {
       return GridViewObserveModel(
         sliverGrid: _obj,
+        viewport: viewport,
         visible: false,
         firstGroupChildList: [],
         displayingChildModelList: [],
@@ -168,6 +174,7 @@ class ObserverCore {
 
     final firstModel = GridViewObserveDisplayingChildModel(
       sliverGrid: _obj,
+      viewport: viewport,
       index: targetFirstChild.index,
       renderObject: targetFirstChild,
     );
@@ -189,6 +196,7 @@ class ObserverCore {
         if (targetChild is! RenderIndexedSemantics) break;
         firstGroupChildModelList.add(GridViewObserveDisplayingChildModel(
           sliverGrid: _obj,
+          viewport: viewport,
           index: targetChild.index,
           renderObject: targetChild,
         ));
@@ -218,6 +226,7 @@ class ObserverCore {
         }
         showingChildModelList.add(GridViewObserveDisplayingChildModel(
           sliverGrid: _obj,
+          viewport: viewport,
           index: displayingChild.index,
           renderObject: displayingChild,
         ));
@@ -227,6 +236,7 @@ class ObserverCore {
 
     return GridViewObserveModel(
       sliverGrid: _obj,
+      viewport: viewport,
       visible: true,
       firstGroupChildList: firstGroupChildModelList,
       displayingChildModelList: showingChildModelList,

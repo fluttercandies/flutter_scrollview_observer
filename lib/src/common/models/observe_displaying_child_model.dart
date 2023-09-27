@@ -9,6 +9,9 @@ abstract class ObserveDisplayingChildModel {
   /// The target sliverList.
   RenderSliver sliver;
 
+  /// The viewport of sliver.
+  RenderViewportBase viewport;
+
   /// The index of child widget.
   int index;
 
@@ -17,6 +20,7 @@ abstract class ObserveDisplayingChildModel {
 
   ObserveDisplayingChildModel({
     required this.sliver,
+    required this.viewport,
     required this.index,
     required this.renderObject,
   });

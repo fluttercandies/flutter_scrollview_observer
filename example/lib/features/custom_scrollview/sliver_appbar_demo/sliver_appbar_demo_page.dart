@@ -80,7 +80,8 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
             debugPrint('1 firstChild.index -- ${model1.firstChild?.index}');
             debugPrint('1 firstChild.size -- ${model1.firstChild?.size}');
             debugPrint('1 displaying -- ${model1.displayingChildIndexList}');
-            debugPrint('1 displaying -- index${model1.firstChild?.index} -- ${model1.firstChild?.displayPercentage}');
+            debugPrint(
+                '1 displaying -- index${model1.firstChild?.index} -- ${model1.firstChild?.displayPercentage}');
             setState(() {
               _hitIndexForCtx1 = model1.firstChild?.index ?? 0;
             });
@@ -207,7 +208,7 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
   Widget _buildSliverGridView() {
     return SliverGrid(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, //Grid按两列显示
+        crossAxisCount: 2,
         mainAxisSpacing: 10.0,
         crossAxisSpacing: 10.0,
         childAspectRatio: 2.0,

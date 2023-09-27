@@ -10,7 +10,12 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
 
 class ChatScrollObserver {
-  ChatScrollObserver(this.observerController);
+  ChatScrollObserver(this.observerController) {
+    // Ensure isShrinkWrap is correct at the end of this frame.
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      observeSwitchShrinkWrap();
+    });
+  }
 
   /// Used to obtain the necessary child widget information.
   final ListObserverController observerController;

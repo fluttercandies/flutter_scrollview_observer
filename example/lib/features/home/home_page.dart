@@ -5,6 +5,7 @@
  */
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer_example/features/custom_scrollview/custom_scrollview_demo/custom_scrollview_demo_page.dart';
+import 'package:scrollview_observer_example/features/custom_scrollview/custom_scrollview_demo/multi_sliver_demo_page.dart';
 import 'package:scrollview_observer_example/features/custom_scrollview/sliver_appbar_demo/sliver_appbar_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/gridview_ctx_demo/gridview_ctx_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/gridview_custom_demo/gridview_custom_demo_page.dart';
@@ -26,6 +27,8 @@ import 'package:scrollview_observer_example/features/scene/chat_demo/page/chat_p
 import 'package:scrollview_observer_example/features/scene/image_tab_demo/image_tab_page.dart';
 import 'package:scrollview_observer_example/features/scene/scrollview_form_demo/scrollview_form_demo_page.dart';
 import 'package:scrollview_observer_example/features/scene/video_auto_play_list/video_list_auto_play_page.dart';
+import 'package:scrollview_observer_example/features/scene/visibility_demo/page/visibility_listview_page.dart';
+import 'package:scrollview_observer_example/features/scene/visibility_demo/page/visibility_scrollview_page.dart';
 import 'package:scrollview_observer_example/features/scene/waterfall_flow_demo/waterfall_flow_page.dart';
 import 'package:tuple/tuple.dart';
 
@@ -152,6 +155,12 @@ class HomePage extends StatelessWidget {
         },
       ),
       Tuple2<String, PageBuilder>(
+        "MultiSliver",
+        () {
+          return const MultiSliverDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
         "SliverAppBar",
         () {
           return const SliverAppBarDemoPage();
@@ -203,6 +212,18 @@ class HomePage extends StatelessWidget {
         "ScrollView Form",
         () {
           return const ScrollViewFormDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "Visibility ListView",
+        () {
+          return const VisibilityListViewPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "Visibility ScrollView",
+        () {
+          return const VisibilityScrollViewPage();
         },
       ),
     ];

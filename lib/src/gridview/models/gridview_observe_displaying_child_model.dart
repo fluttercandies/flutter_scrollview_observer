@@ -11,9 +11,15 @@ class GridViewObserveDisplayingChildModel extends ObserveDisplayingChildModel
     with ObserveDisplayingChildModelMixin {
   GridViewObserveDisplayingChildModel({
     required this.sliverGrid,
+    required RenderViewportBase viewport,
     required int index,
     required RenderBox renderObject,
-  }) : super(sliver: sliverGrid, index: index, renderObject: renderObject);
+  }) : super(
+          sliver: sliverGrid,
+          viewport: viewport,
+          index: index,
+          renderObject: renderObject,
+        );
 
   /// The target sliverGrid
   RenderSliverMultiBoxAdaptor sliverGrid;

@@ -191,7 +191,7 @@ class ObserverUtils {
   static RenderViewportBase? findViewport(RenderObject obj) {
     int maxCycleCount = 10;
     int currentCycleCount = 1;
-    // Starting from flutter version 3.13.0, the type of parent received 
+    // Starting from flutter version 3.13.0, the type of parent received
     // is RenderObject, while the type of the previous version is AbstractNode,
     // but RenderObject is a subclass of AbstractNode, so for compatibility,
     // we can use RenderObject.
@@ -254,8 +254,7 @@ class ObserverUtils {
       // It throws an exception when getting renderObject of inactive element.
       return context?.findRenderObject();
     } catch (e) {
-      Log.warning(
-          'Cannot get renderObject of inactive element.\n'
+      Log.warning('Cannot get renderObject of inactive element.\n'
           'Please call the reattach method of ObserverController to re-record '
           'BuildContext.');
       return null;
