@@ -9,6 +9,7 @@ import 'package:scrollview_observer_example/features/custom_scrollview/sliver_ap
 import 'package:scrollview_observer_example/features/gridview/gridview_ctx_demo/gridview_ctx_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/gridview_custom_demo/gridview_custom_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/gridview_demo/gridview_demo_page.dart';
+import 'package:scrollview_observer_example/features/gridview/gridview_fixed_height_demo/gridView_fixed_height_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/horizontal_gridview_demo/horizontal_gridview_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/sliver_grid_demo/sliver_grid_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/horizontal_listview_demo/horizontal_listview_page.dart';
@@ -118,6 +119,12 @@ class HomePage extends StatelessWidget {
         "GridView - Context",
         () {
           return const GridViewCtxDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "GridView - Fixed Height",
+        () {
+          return const GridViewFixedHeightDemoPage();
         },
       ),
       Tuple2<String, PageBuilder>(

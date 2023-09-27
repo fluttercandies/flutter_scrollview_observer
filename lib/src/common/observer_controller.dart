@@ -468,34 +468,125 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     final targetChild = findCurrentFirstChild(obj);
     if (targetChild == null) return;
     final isHorizontal = obj.constraints.axis == Axis.horizontal;
-    var nextChild = obj.childAfter(targetChild);
-    nextChild ??= obj.childBefore(targetChild);
-    double separatorTotalHeight = 0;
-    if (nextChild != null && nextChild is! RenderIndexedSemantics) {
-      // It is separator
-      final nextChildPaintBounds = nextChild.paintBounds;
-      final nextChildSize = isHorizontal
-          ? nextChildPaintBounds.width
-          : nextChildPaintBounds.height;
-      separatorTotalHeight = index * nextChildSize;
-    }
     final childPaintBounds = targetChild.paintBounds;
-    final childSize =
+    double itemSeparatorHeight = 0;
+    int indexLineCount = index;
+    if (obj is RenderSliverList || obj is RenderSliverFixedExtentList) {
+      // ListView
+      var nextChild = obj.childAfter(targetChild);
+      nextChild ??= obj.childBefore(targetChild);
+      if (nextChild != null && nextChild is! RenderIndexedSemantics) {
+        // It is separator
+        final nextChildPaintBounds = nextChild.paintBounds;
+        itemSeparatorHeight = isHorizontal
+            ? nextChildPaintBounds.width
+            : nextChildPaintBounds.height;
+      }
+    } else if (obj is RenderSliverGrid) {
+      // GirdView
+      double crossAxisSpacing = 0;
+      bool isHaveSetCrossAxisSpacing = false;
+      var nextChild = obj.childAfter(targetChild);
+      var nextChildOrigin =
+          nextChild?.localToGlobal(Offset.zero) ?? Offset.zero;
+      final targetChildOrigin = targetChild.localToGlobal(Offset.zero);
+      while (nextChild != null &&
+          (isHorizontal
+              ? nextChildOrigin.dx == targetChildOrigin.dx
+              : nextChildOrigin.dy == targetChildOrigin.dy)) {
+        // calculate crossAxisSpacing
+        if (!isHaveSetCrossAxisSpacing) {
+          if (isHorizontal) {
+            crossAxisSpacing =
+                (nextChildOrigin.dy - targetChildOrigin.dy).abs() -
+                    childPaintBounds.height;
+          } else {
+            crossAxisSpacing =
+                (nextChildOrigin.dx - targetChildOrigin.dx).abs() -
+                    childPaintBounds.width;
+          }
+          isHaveSetCrossAxisSpacing = true;
+        }
+        nextChild = obj.childAfter(nextChild);
+        nextChildOrigin = nextChild?.localToGlobal(Offset.zero) ?? Offset.zero;
+      }
+      if (nextChild != null) {
+        if (isHorizontal) {
+          itemSeparatorHeight =
+              (nextChildOrigin.dx - targetChildOrigin.dx).abs() -
+                  childPaintBounds.width;
+        } else {
+          itemSeparatorHeight =
+              (nextChildOrigin.dy - targetChildOrigin.dy).abs() -
+                  childPaintBounds.height;
+        }
+      } else {
+        var previousChild = obj.childBefore(targetChild);
+        var previousChildOrigin =
+            previousChild?.localToGlobal(Offset.zero) ?? Offset.zero;
+        while (previousChild != null &&
+            (isHorizontal
+                ? previousChildOrigin.dx == targetChildOrigin.dx
+                : previousChildOrigin.dy == targetChildOrigin.dy)) {
+          // calculate crossAxisSpacing
+          if (!isHaveSetCrossAxisSpacing) {
+            double crossAxisOriginX1 =
+                isHorizontal ? previousChildOrigin.dy : previousChildOrigin.dx;
+            previousChild = obj.childBefore(previousChild);
+            previousChildOrigin =
+                previousChild?.localToGlobal(Offset.zero) ?? Offset.zero;
+            if (previousChild != null) {
+              double crossAxisOriginX2 = isHorizontal
+                  ? previousChildOrigin.dy
+                  : previousChildOrigin.dx;
+              crossAxisSpacing = (crossAxisOriginX1 - crossAxisOriginX2).abs() -
+                  (isHorizontal
+                      ? childPaintBounds.height
+                      : childPaintBounds.width);
+              isHaveSetCrossAxisSpacing = true;
+            }
+          } else {
+            previousChild = obj.childBefore(previousChild);
+            previousChildOrigin =
+                previousChild?.localToGlobal(Offset.zero) ?? Offset.zero;
+          }
+        }
+        if (previousChild != null) {
+          if (isHorizontal) {
+            itemSeparatorHeight =
+                (targetChildOrigin.dx - previousChildOrigin.dx).abs() -
+                    childPaintBounds.width;
+          } else {
+            itemSeparatorHeight =
+                (targetChildOrigin.dy - previousChildOrigin.dy).abs() -
+                    childPaintBounds.height;
+          }
+        }
+      }
+      final childCrossAxisSize =
+          isHorizontal ? childPaintBounds.height : childPaintBounds.width;
+      int itemsPerLine = ((obj.constraints.crossAxisExtent + crossAxisSpacing) /
+              (childCrossAxisSize + crossAxisSpacing))
+          .round();
+      indexLineCount = (index / itemsPerLine).floor();
+    }
+    final childMainAxisSize =
         isHorizontal ? childPaintBounds.width : childPaintBounds.height;
-    double childLayoutOffset = childSize * index + separatorTotalHeight;
+    double childLayoutOffset =
+        (childMainAxisSize + itemSeparatorHeight) * indexLineCount;
 
     _updateIndexOffsetMap(
       ctx: ctx,
       index: index,
       childLayoutOffset: childLayoutOffset,
-      childSize: childSize,
+      childSize: childMainAxisSize,
     );
 
     // Getting safety layout offset.
     childLayoutOffset = _calculateTargetLayoutOffset(
       obj: obj,
       childLayoutOffset: childLayoutOffset,
-      childSize: childSize,
+      childSize: childMainAxisSize,
       alignment: alignment,
       padding: padding,
       offset: offset,
