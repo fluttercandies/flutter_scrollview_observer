@@ -48,4 +48,68 @@ class SliverObserverController extends ObserverController
       observeResult: resultModel ?? SliverObserverHandleContextsResultModel(),
     );
   }
+
+  /// Jump to the specified index position with animation.
+  ///
+  /// If the height of the child widget and the height of the separator are
+  /// fixed, please pass the [isFixedHeight] parameter and the
+  /// [renderSliverType] parameter .
+  ///
+  /// The [alignment] specifies the desired position for the leading edge of the
+  /// child widget. It must be a value in the range [0.0, 1.0].
+  animateTo({
+    required int index,
+    required Duration duration,
+    required Curve curve,
+    EdgeInsets padding = EdgeInsets.zero,
+    BuildContext? sliverContext,
+    bool isFixedHeight = false,
+    double alignment = 0,
+    ObserverLocateIndexOffsetCallback? offset,
+    ObserverRenderSliverType? renderSliverType,
+  }) async {
+    await innerAnimateTo(
+      index: index,
+      duration: duration,
+      curve: curve,
+      padding: padding,
+      sliverContext: sliverContext,
+      isFixedHeight: isFixedHeight,
+      alignment: alignment,
+      offset: offset,
+      renderSliverType: renderSliverType,
+    );
+  }
+
+  /// Jump to the specified index position without animation.
+  ///
+  /// If the height of the child widget and the height of the separator are
+  /// fixed, please pass the [isFixedHeight] parameter and the
+  /// [renderSliverType] parameter.
+  ///
+  /// If you do not pass the [isFixedHeight] parameter, the package will
+  /// automatically gradually scroll around the target location before
+  /// locating, which will produce an animation.
+  ///
+  /// The [alignment] specifies the desired position for the leading edge of the
+  /// child widget. It must be a value in the range [0.0, 1.0].
+  jumpTo({
+    required int index,
+    BuildContext? sliverContext,
+    bool isFixedHeight = false,
+    double alignment = 0,
+    EdgeInsets padding = EdgeInsets.zero,
+    ObserverLocateIndexOffsetCallback? offset,
+    ObserverRenderSliverType? renderSliverType,
+  }) async {
+    await innerJumpTo(
+      index: index,
+      sliverContext: sliverContext,
+      isFixedHeight: isFixedHeight,
+      alignment: alignment,
+      padding: padding,
+      offset: offset,
+      renderSliverType: renderSliverType,
+    );
+  }
 }

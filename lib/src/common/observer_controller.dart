@@ -264,7 +264,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
   innerInitialIndexPosition() {
     final model = initialIndexModelBlock?.call() ?? initialIndexModel;
     if (model.sliverContext == null && model.index <= 0) return;
-    jumpTo(
+    innerJumpTo(
       index: model.index,
       sliverContext: model.sliverContext,
       isFixedHeight: model.isFixedHeight,
@@ -277,7 +277,8 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
   /// Jump to the specified index position without animation.
   ///
   /// If the height of the child widget and the height of the separator are
-  /// fixed, please pass the [isFixedHeight] parameter.
+  /// fixed, please pass the [isFixedHeight] parameter and the
+  /// [renderSliverType] parameter.
   ///
   /// If you do not pass the [isFixedHeight] parameter, the package will
   /// automatically gradually scroll around the target location before
@@ -285,13 +286,14 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
   ///
   /// The [alignment] specifies the desired position for the leading edge of the
   /// child widget. It must be a value in the range [0.0, 1.0].
-  jumpTo({
+  innerJumpTo({
     required int index,
     BuildContext? sliverContext,
     bool isFixedHeight = false,
     double alignment = 0,
     EdgeInsets padding = EdgeInsets.zero,
     ObserverLocateIndexOffsetCallback? offset,
+    ObserverRenderSliverType? renderSliverType,
   }) async {
     await _scrollToIndex(
       index: index,
@@ -300,17 +302,19 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       padding: padding,
       sliverContext: sliverContext,
       offset: offset,
+      renderSliverType: renderSliverType,
     );
   }
 
   /// Jump to the specified index position with animation.
   ///
   /// If the height of the child widget and the height of the separator are
-  /// fixed, please pass the [isFixedHeight] parameter.
+  /// fixed, please pass the [isFixedHeight] parameter and the
+  /// [renderSliverType] parameter.
   ///
   /// The [alignment] specifies the desired position for the leading edge of the
   /// child widget. It must be a value in the range [0.0, 1.0].
-  animateTo({
+  innerAnimateTo({
     required int index,
     required Duration duration,
     required Curve curve,
@@ -319,6 +323,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     bool isFixedHeight = false,
     double alignment = 0,
     ObserverLocateIndexOffsetCallback? offset,
+    ObserverRenderSliverType? renderSliverType,
   }) async {
     await _scrollToIndex(
       index: index,
@@ -329,6 +334,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       duration: duration,
       curve: curve,
       offset: offset,
+      renderSliverType: renderSliverType,
     );
   }
 
@@ -341,6 +347,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     Duration? duration,
     Curve? curve,
     ObserverLocateIndexOffsetCallback? offset,
+    ObserverRenderSliverType? renderSliverType,
   }) async {
     assert(alignment.clamp(0, 1) == alignment,
         'The [alignment] is expected to be a value in the range [0.0, 1.0]');
@@ -453,6 +460,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         duration: duration,
         curve: curve,
         offset: offset,
+        renderSliverType: renderSliverType,
       );
       return;
     }
@@ -491,6 +499,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     Duration? duration,
     Curve? curve,
     ObserverLocateIndexOffsetCallback? offset,
+    ObserverRenderSliverType? renderSliverType,
   }) async {
     assert(controller != null);
     var _controller = controller;
@@ -503,8 +512,10 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     final isHorizontal = obj.constraints.axis == Axis.horizontal;
     final childPaintBounds = targetChild.paintBounds;
     double itemSeparatorHeight = 0;
-    int indexLineCount = index;
-    if (obj is RenderSliverList || obj is RenderSliverFixedExtentList) {
+    int indexOfLine = index;
+    if (obj is RenderSliverList ||
+        obj is RenderSliverFixedExtentList ||
+        renderSliverType == ObserverRenderSliverType.list) {
       // ListView
       var nextChild = obj.childAfter(targetChild);
       nextChild ??= obj.childBefore(targetChild);
@@ -515,11 +526,14 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
             ? nextChildPaintBounds.width
             : nextChildPaintBounds.height;
       }
-    } else if (obj is RenderSliverGrid) {
+    } else if (obj is RenderSliverGrid ||
+        renderSliverType == ObserverRenderSliverType.grid) {
       // GirdView
       double crossAxisSpacing = 0;
       bool isHaveSetCrossAxisSpacing = false;
       var nextChild = obj.childAfter(targetChild);
+      // Find the next child that is not on the same line and calculate the
+      // mainAxisSpacing.
       var nextChildOrigin =
           nextChild?.localToGlobal(Offset.zero) ?? Offset.zero;
       final targetChildOrigin = targetChild.localToGlobal(Offset.zero);
@@ -527,8 +541,9 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           (isHorizontal
               ? nextChildOrigin.dx == targetChildOrigin.dx
               : nextChildOrigin.dy == targetChildOrigin.dy)) {
-        // calculate crossAxisSpacing
         if (!isHaveSetCrossAxisSpacing) {
+          // Find the next child on the same line and calculate the
+          // crossAxisSpacing.
           if (isHorizontal) {
             crossAxisSpacing =
                 (nextChildOrigin.dy - targetChildOrigin.dy).abs() -
@@ -554,6 +569,9 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
                   childPaintBounds.height;
         }
       } else {
+        // Can't find the next child that is not on the same line.
+        // Find the before child that is not on the same line and calculate the
+        // mainAxisSpacing.
         var previousChild = obj.childBefore(targetChild);
         var previousChildOrigin =
             previousChild?.localToGlobal(Offset.zero) ?? Offset.zero;
@@ -561,21 +579,24 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
             (isHorizontal
                 ? previousChildOrigin.dx == targetChildOrigin.dx
                 : previousChildOrigin.dy == targetChildOrigin.dy)) {
-          // calculate crossAxisSpacing
           if (!isHaveSetCrossAxisSpacing) {
-            double crossAxisOriginX1 =
+            // Find two child on the same line and calculate the
+            // crossAxisSpacing.
+            double firstBeforeCrossAxisOrigin =
                 isHorizontal ? previousChildOrigin.dy : previousChildOrigin.dx;
             previousChild = obj.childBefore(previousChild);
             previousChildOrigin =
                 previousChild?.localToGlobal(Offset.zero) ?? Offset.zero;
             if (previousChild != null) {
-              double crossAxisOriginX2 = isHorizontal
+              double secondBeforeCrossAxisOrigin = isHorizontal
                   ? previousChildOrigin.dy
                   : previousChildOrigin.dx;
-              crossAxisSpacing = (crossAxisOriginX1 - crossAxisOriginX2).abs() -
-                  (isHorizontal
-                      ? childPaintBounds.height
-                      : childPaintBounds.width);
+              crossAxisSpacing =
+                  (firstBeforeCrossAxisOrigin - secondBeforeCrossAxisOrigin)
+                          .abs() -
+                      (isHorizontal
+                          ? childPaintBounds.height
+                          : childPaintBounds.width);
               isHaveSetCrossAxisSpacing = true;
             }
           } else {
@@ -598,15 +619,18 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       }
       final childCrossAxisSize =
           isHorizontal ? childPaintBounds.height : childPaintBounds.width;
+      // Calculate the number of lines.
+      // round() for avoiding precision errors.
       int itemsPerLine = ((obj.constraints.crossAxisExtent + crossAxisSpacing) /
               (childCrossAxisSize + crossAxisSpacing))
           .round();
-      indexLineCount = (index / itemsPerLine).floor();
+      // Calculate the number of lines.
+      indexOfLine = (index / itemsPerLine).floor();
     }
     final childMainAxisSize =
         isHorizontal ? childPaintBounds.width : childPaintBounds.height;
     double childLayoutOffset =
-        (childMainAxisSize + itemSeparatorHeight) * indexLineCount;
+        (childMainAxisSize + itemSeparatorHeight) * indexOfLine;
 
     _updateIndexOffsetMap(
       ctx: ctx,

@@ -16,3 +16,12 @@ enum ObserverTriggerOnObserveType {
   directly,
   displayingItemsChange,
 }
+
+/// Define type of the observed render sliver.
+enum ObserverRenderSliverType {
+  /// listView
+  list,
+
+  /// gridView
+  grid,
+}
