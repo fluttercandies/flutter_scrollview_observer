@@ -10,6 +10,7 @@ import 'package:scrollview_observer_example/features/custom_scrollview/sliver_ap
 import 'package:scrollview_observer_example/features/gridview/gridview_ctx_demo/gridview_ctx_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/gridview_custom_demo/gridview_custom_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/gridview_demo/gridview_demo_page.dart';
+import 'package:scrollview_observer_example/features/gridview/gridview_fixed_height_demo/gridview_fixed_height_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/horizontal_gridview_demo/horizontal_gridview_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/sliver_grid_demo/sliver_grid_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/horizontal_listview_demo/horizontal_listview_page.dart';
@@ -29,6 +30,7 @@ import 'package:scrollview_observer_example/features/scene/video_auto_play_list/
 import 'package:scrollview_observer_example/features/scene/visibility_demo/page/visibility_listview_page.dart';
 import 'package:scrollview_observer_example/features/scene/visibility_demo/page/visibility_scrollview_page.dart';
 import 'package:scrollview_observer_example/features/scene/waterfall_flow_demo/waterfall_flow_page.dart';
+import 'package:scrollview_observer_example/features/scene/waterfall_flow_fixed_height_demo/waterfall_flow_fixed_height_page.dart';
 import 'package:tuple/tuple.dart';
 
 typedef PageBuilder = Widget Function();
@@ -124,6 +126,12 @@ class HomePage extends StatelessWidget {
         },
       ),
       Tuple2<String, PageBuilder>(
+        "GridView - Fixed Height",
+        () {
+          return const GridViewFixedHeightDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
         "GridView - Horizontal",
         () {
           return const HorizontalGridViewDemoPage();
@@ -199,6 +207,12 @@ class HomePage extends StatelessWidget {
         "Waterfall Flow",
         () {
           return const WaterfallFlowPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "Waterfall Flow - Fixed Height",
+        () {
+          return const WaterfallFlowFixedHeightPage();
         },
       ),
       Tuple2<String, PageBuilder>(

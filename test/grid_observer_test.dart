@@ -62,25 +62,25 @@ void main() {
     );
     await tester.pumpWidget(widget);
 
-    int targeItemIndex = 30;
-    gridObserverController.jumpTo(index: targeItemIndex);
+    int targetItemIndex = 30;
+    gridObserverController.jumpTo(index: targetItemIndex);
     await tester.pumpAndSettle();
     expect(
       (observeResult?.firstGroupChildList.map((e) => e.index) ?? [])
-          .contains(targeItemIndex),
+          .contains(targetItemIndex),
       true,
     );
 
-    targeItemIndex = 60;
+    targetItemIndex = 60;
     gridObserverController.animateTo(
-      index: targeItemIndex,
+      index: targetItemIndex,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
     await tester.pumpAndSettle();
     expect(
       (observeResult?.firstGroupChildList.map((e) => e.index) ?? [])
-          .contains(targeItemIndex),
+          .contains(targetItemIndex),
       true,
     );
 
