@@ -105,22 +105,17 @@ class WaterfallFlowFixedHeightPageState
         (BuildContext context, int index) {
           if (grid1Context != context) grid1Context = context;
           return Container(
-              height: 50,
-              color: Colors.primaries[index % Colors.primaries.length],
-              alignment: Alignment.topLeft,
-              child: Text(
-                'item: $index',
-                style: const TextStyle(fontSize: 20, color: Colors.white),
-              ));
+            height: 50,
+            color: Colors.primaries[index % Colors.primaries.length],
+            alignment: Alignment.topLeft,
+            child: Text(
+              'item: $index',
+              style: const TextStyle(fontSize: 20, color: Colors.white),
+            ),
+          );
         },
         childCount: childCount,
       ),
-    );
-  }
-
-  Widget _buildSeparator(double size) {
-    return SliverToBoxAdapter(
-      child: Container(height: size),
     );
   }
 }

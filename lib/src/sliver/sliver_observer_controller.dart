@@ -91,6 +91,11 @@ class SliverObserverController extends ObserverController
   /// automatically gradually scroll around the target location before
   /// locating, which will produce an animation.
   ///
+  /// The [renderSliverType] parameter is used to specify the type of sliver.
+  /// If you do not pass the [renderSliverType] parameter, the sliding position
+  /// will be calculated based on the actual type of obj, and there may be
+  /// deviations in the calculation of elements for third-party libraries.
+  ///
   /// The [alignment] specifies the desired position for the leading edge of the
   /// child widget. It must be a value in the range [0.0, 1.0].
   jumpTo({
