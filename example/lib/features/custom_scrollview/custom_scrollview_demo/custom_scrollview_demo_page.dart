@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
+import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class CustomScrollViewDemoPage extends StatefulWidget {
   const CustomScrollViewDemoPage({Key? key}) : super(key: key);
@@ -92,7 +93,7 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
           children: [
             IconButton(
               onPressed: () {
-                _showSnackBar(
+                SnackBarUtil.showSnackBar(
                   context: context,
                   text: 'SliverList - Jumping to row 29',
                 );
@@ -107,7 +108,7 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
             ),
             IconButton(
               onPressed: () {
-                _showSnackBar(
+                SnackBarUtil.showSnackBar(
                   context: context,
                   text: 'SliverGrid - Jumping to item 20',
                 );
@@ -122,19 +123,6 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  _showSnackBar({
-    required BuildContext context,
-    required String text,
-  }) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(text),
-        duration: const Duration(milliseconds: 2000),
       ),
     );
   }

@@ -8,6 +8,7 @@ import 'package:extended_list/src/rendering/sliver_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_more_list/loading_more_list.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class GridViewCustomDemoPage extends StatefulWidget {
   const GridViewCustomDemoPage({Key? key}) : super(key: key);
@@ -56,6 +57,10 @@ class _GridViewCustomDemoPageState extends State<GridViewCustomDemoPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.airline_stops_sharp),
         onPressed: () {
+          SnackBarUtil.showSnackBar(
+            context: context,
+            text: 'Jump to item 10',
+          );
           observerController.jumpTo(
             index: 10,
           );

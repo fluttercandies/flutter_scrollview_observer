@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer_example/utils/snackbar.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 class WaterfallFlowFixedHeightPage extends StatefulWidget {
@@ -79,6 +80,10 @@ class WaterfallFlowFixedHeightPageState
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.airline_stops_outlined),
         onPressed: () {
+          SnackBarUtil.showSnackBar(
+            context: context,
+            text: 'Jump to item 13',
+          );
           observerController.jumpTo(
             index: 13,
             isFixedHeight: true,

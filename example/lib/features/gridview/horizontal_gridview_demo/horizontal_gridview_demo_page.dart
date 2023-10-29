@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
+import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class HorizontalGridViewDemoPage extends StatefulWidget {
   const HorizontalGridViewDemoPage({Key? key}) : super(key: key);
@@ -85,6 +86,10 @@ class _HorizontalGridViewDemoPageState
         child: const Icon(Icons.airline_stops_outlined),
         onPressed: () {
           if (_sliverGridViewContext != null) {
+            SnackBarUtil.showSnackBar(
+              context: context,
+              text: 'Jump to item 87',
+            );
             observerController.jumpTo(
               index: 87,
               sliverContext: _sliverGridViewContext,

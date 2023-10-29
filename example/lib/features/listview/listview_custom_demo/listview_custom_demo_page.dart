@@ -8,6 +8,7 @@ import 'package:extended_list/src/rendering/sliver_list.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_more_list/loading_more_list.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class ListViewCustomDemoPage extends StatefulWidget {
   const ListViewCustomDemoPage({Key? key}) : super(key: key);
@@ -55,6 +56,10 @@ class _ListViewCustomDemoPageState extends State<ListViewCustomDemoPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.airline_stops_sharp),
         onPressed: () {
+          SnackBarUtil.showSnackBar(
+            context: context,
+            text: 'Jump to row 10',
+          );
           observerController.jumpTo(
             index: 10,
             isFixedHeight: true,

@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
+import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class GridViewFixedHeightDemoPage extends StatefulWidget {
   const GridViewFixedHeightDemoPage({Key? key}) : super(key: key);
@@ -77,6 +78,10 @@ class _GridViewFixedHeightDemoPageState
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.airline_stops_outlined),
         onPressed: () {
+          SnackBarUtil.showSnackBar(
+            context: context,
+            text: 'Jump to item 21',
+          );
           observerController.jumpTo(
             index: 21,
             padding: _padding,

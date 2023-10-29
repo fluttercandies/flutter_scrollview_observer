@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
+import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class ListViewFixedHeightDemoPage extends StatefulWidget {
   const ListViewFixedHeightDemoPage({Key? key}) : super(key: key);
@@ -83,6 +84,10 @@ class _ListViewFixedHeightDemoPageState
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.airline_stops_outlined),
         onPressed: () {
+          SnackBarUtil.showSnackBar(
+            context: context,
+            text: 'Jump to row 100',
+          );
           observerController.jumpTo(index: 100, isFixedHeight: true);
           // observerController.animateTo(
           //   index: 100,
