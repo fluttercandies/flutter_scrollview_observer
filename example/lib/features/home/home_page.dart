@@ -22,6 +22,7 @@ import 'package:scrollview_observer_example/features/listview/listview_fixed_hei
 import 'package:scrollview_observer_example/features/listview/sliver_list_demo/sliver_list_demo_page.dart';
 import 'package:scrollview_observer_example/features/scene/anchor_demo/anchor_page.dart';
 import 'package:scrollview_observer_example/features/scene/anchor_demo/anchor_waterfall_page.dart';
+import 'package:scrollview_observer_example/features/scene/azlist_demo/azlist_page.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/page/chat_gpt_page.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/page/chat_page.dart';
 import 'package:scrollview_observer_example/features/scene/image_tab_demo/image_tab_page.dart';
@@ -231,6 +232,12 @@ class HomePage extends StatelessWidget {
         "Visibility ScrollView",
         () {
           return const VisibilityScrollViewPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "AzList",
+        () {
+          return const AzListPage();
         },
       ),
     ];
