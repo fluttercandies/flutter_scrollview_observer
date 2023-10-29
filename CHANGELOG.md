@@ -1,3 +1,7 @@
+## 1.17.0
+- ObserverController
+  - The parameter `isFixedHeight` in the `jumpTo` method and `animateTo` method supports GridView and supports ScrollView built by third-party package by @percival888 in [#52](https://github.com/fluttercandies/flutter_scrollview_observer/pull/52).
+
 ## 1.16.5
 - ObserverWidget
   - Improve the processing logic of scroll notification when scrolling with the mouse wheel is not smooth by @qiangjindong in [#48](https://github.com/LinXunFeng/flutter_scrollview_observer/pull/48).
