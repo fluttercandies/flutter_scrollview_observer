@@ -22,6 +22,7 @@ Language: 中文 | [English](https://github.com/LinXunFeng/flutter_scrollview_ob
 - [Flutter - IM保持消息位置大升级(支持ChatGPT生成式消息) 🤖](https://mp.weixin.qq.com/s/Y3EN9ZpLb6HLke2vkw0Zwg) | [备用链接](https://juejin.cn/post/7245753944180523067)
 - [Flutter - 滚动视图中的表单防遮挡 🗒](https://mp.weixin.qq.com/s/iaHyYMjZSPBggLw2yZv8dQ) | [备用链接](https://juejin.cn/spost/7266455050632921107)
 - [Flutter - 秒杀1/2曝光统计 📊](https://mp.weixin.qq.com/s/gNFX4Au4esftgTPXHvB4LQ) | [备用链接](https://juejin.cn/post/7271248528998121512)
+- [Flutter - 如何快速搓一个微信通讯录列表(azlist) 📓](https://mp.weixin.qq.com/s/1bmYSvtOYX83DLncvnBjqA) | [备用链接](https://juejin.cn/post/7294884963631497254)
 
 ## 🔨 功能点
 
