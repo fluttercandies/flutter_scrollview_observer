@@ -11,6 +11,7 @@ import 'package:scrollview_observer_example/features/scene/chat_demo/helper/chat
 import 'package:scrollview_observer_example/features/scene/chat_demo/model/chat_model.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/widget/chat_item_widget.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/widget/chat_unread_tip_view.dart';
+import 'package:scrollview_observer_example/utils/keyboard.dart';
 import 'package:scrollview_observer_example/utils/random.dart';
 
 class ChatPage extends StatefulWidget {
@@ -20,7 +21,7 @@ class ChatPage extends StatefulWidget {
   State<ChatPage> createState() => _ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   ScrollController scrollController = ScrollController();
 
   late ListObserverController observerController;
@@ -46,6 +47,8 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
 
     chatModels = createChatModels();
 
@@ -76,9 +79,28 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     observerController.controller?.dispose();
     editViewController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    // Update shrinkWrap in real time as the keyboard pops up or closes.
+    chatObserver.observeSwitchShrinkWrap();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        if (MediaQuery.of(context).viewInsets.bottom == 0) {
+          // Keyboard closes
+        } else {
+          // Keyboard pops up
+          scrollController.jumpTo(0);
+        }
+      }
+    });
   }
 
   @override
@@ -126,9 +148,21 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildBody() {
-    Widget resultWidget = Column(
+    Widget resultWidget = _buildListView();
+    // Dismiss keyboard when clicking or dragging ScrollView.
+    resultWidget = GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        KeyboardTool.dismissKeyboard(context);
+      },
+      onPanDown: (_) {
+        KeyboardTool.dismissKeyboard(context);
+      },
+      child: resultWidget,
+    );
+    resultWidget = Column(
       children: [
-        Expanded(child: _buildListView()),
+        Expanded(child: resultWidget),
         CompositedTransformTarget(
           link: layerLink,
           child: Container(),
