@@ -392,7 +392,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       return;
     }
 
-    // Start executing scroll task.
+    // Start executing scrolling task.
     _handleScrollStart(context: ctx);
 
     bool isAnimateTo = (duration != null) && (curve != null);
@@ -1052,7 +1052,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     indexOffsetMap[ctx] = map;
   }
 
-  /// Called when starting the scroll task.
+  /// Called when starting the scrolling task.
   _handleScrollStart({
     required BuildContext? context,
   }) {
@@ -1060,7 +1060,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     ObserverScrollStartNotification().dispatch(context);
   }
 
-  /// Called when the scroll task is interrupted.
+  /// Called when the scrolling task is interrupted.
   ///
   /// For example, the conditions are not met, or the item with the specified
   /// index cannot be found, etc.
@@ -1080,7 +1080,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     ObserverScrollDecisionNotification().dispatch(context);
   }
 
-  /// Called after completing the scroll task.
+  /// Called after completing the scrolling task.
   _handleScrollEnd({
     required BuildContext? context,
     required Completer completer,

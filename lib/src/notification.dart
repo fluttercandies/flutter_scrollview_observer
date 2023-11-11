@@ -62,7 +62,7 @@ class ObserverScrollInterruptionNotification
     extends ObserverScrollNotification {}
 
 /// A notification that the data of the specified index item is determined
-/// during the execution of the scroll task.
+/// during the execution of the scrolling task.
 class ObserverScrollDecisionNotification extends ObserverScrollNotification {}
 
 /// A notification that a scrolling task has stopped due to calling the jumpTo
