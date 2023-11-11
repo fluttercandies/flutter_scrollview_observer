@@ -1,3 +1,9 @@
+## 1.18.0
+- ObserverController
+  - The `jumpTo` method and `animateTo` method method supports `await`.
+  - Add `isForbidObserveCallback` property.
+  - Add `isForbidObserveViewportCallback` property.
+
 ## 1.17.0
 - ObserverController
   - The parameter `isFixedHeight` in the `jumpTo` method and `animateTo` method supports GridView and supports ScrollView built by third-party package by @percival888 in [#52](https://github.com/fluttercandies/flutter_scrollview_observer/pull/52).

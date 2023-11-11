@@ -222,7 +222,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.17.0"
+    version: "1.18.0"
   sky_engine:
     dependency: transitive
     description: flutter
