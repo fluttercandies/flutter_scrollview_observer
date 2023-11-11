@@ -28,6 +28,9 @@ class ObserverController {
   /// Target sliver [BuildContext]
   List<BuildContext> sliverContexts = [];
 
+  /// Whether to forbid the onObserve callback and onObserveAll callback.
+  bool isForbidObserveCallback = false;
+
   /// A flag used to ignore unnecessary calculations during scrolling.
   bool innerIsHandlingScroll = false;
 
@@ -292,7 +295,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
   ///
   /// The [alignment] specifies the desired position for the leading edge of the
   /// child widget. It must be a value in the range [0.0, 1.0].
-  innerJumpTo({
+  Future innerJumpTo({
     required int index,
     BuildContext? sliverContext,
     bool isFixedHeight = false,
@@ -300,8 +303,10 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     EdgeInsets padding = EdgeInsets.zero,
     ObserverLocateIndexOffsetCallback? offset,
     ObserverRenderSliverType? renderSliverType,
-  }) async {
-    await _scrollToIndex(
+  }) {
+    Completer completer = Completer();
+    _scrollToIndex(
+      completer: completer,
       index: index,
       isFixedHeight: isFixedHeight,
       alignment: alignment,
@@ -310,6 +315,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       offset: offset,
       renderSliverType: renderSliverType,
     );
+    return completer.future;
   }
 
   /// Jump to the specified index position with animation.
@@ -325,7 +331,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
   ///
   /// The [alignment] specifies the desired position for the leading edge of the
   /// child widget. It must be a value in the range [0.0, 1.0].
-  innerAnimateTo({
+  Future innerAnimateTo({
     required int index,
     required Duration duration,
     required Curve curve,
@@ -335,8 +341,10 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     double alignment = 0,
     ObserverLocateIndexOffsetCallback? offset,
     ObserverRenderSliverType? renderSliverType,
-  }) async {
-    await _scrollToIndex(
+  }) {
+    Completer completer = Completer();
+    _scrollToIndex(
+      completer: completer,
       index: index,
       isFixedHeight: isFixedHeight,
       alignment: alignment,
@@ -347,9 +355,11 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       offset: offset,
       renderSliverType: renderSliverType,
     );
+    return completer.future;
   }
 
   _scrollToIndex({
+    required Completer completer,
     required int index,
     required bool isFixedHeight,
     required double alignment,
@@ -364,14 +374,26 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         'The [alignment] is expected to be a value in the range [0.0, 1.0]');
     assert(controller != null);
     var _controller = controller;
-    if (_controller == null || !_controller.hasClients) return;
-
     final ctx = fetchSliverContext(sliverContext: sliverContext);
+    if (_controller == null || !_controller.hasClients) {
+      _handleScrollInterruption(context: ctx, completer: completer);
+      return;
+    }
+
     var obj = ObserverUtils.findRenderObject(ctx);
-    if (obj is! RenderSliverMultiBoxAdaptor) return;
+    if (obj is! RenderSliverMultiBoxAdaptor) {
+      _handleScrollInterruption(context: ctx, completer: completer);
+      return;
+    }
 
     final viewport = _findViewport(obj);
-    if (viewport == null) return;
+    if (viewport == null) {
+      _handleScrollInterruption(context: ctx, completer: completer);
+      return;
+    }
+
+    // Start executing scroll task.
+    _handleScrollStart(context: ctx);
 
     bool isAnimateTo = (duration != null) && (curve != null);
 
@@ -396,14 +418,12 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         if (targetScrollExtent > maxScrollExtent) {
           targetScrollExtent = maxScrollExtent;
         }
-        innerIsHandlingScroll = true;
         await _controller.animateTo(
           targetScrollExtent,
           duration: _findingDuration,
           curve: _findingCurve,
         );
         await WidgetsBinding.instance.endOfFrame;
-        innerIsHandlingScroll = false;
       } else {
         final precedingScrollExtent = obj.constraints.precedingScrollExtent;
         final viewportOffset = viewport.offset.pixels;
@@ -413,7 +433,6 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         final viewportBoundaryExtent =
             viewportSize * 0.5 + (viewport.cacheExtent ?? 0);
         if (precedingScrollExtent > (viewportOffset + viewportBoundaryExtent)) {
-          innerIsHandlingScroll = true;
           double targetOffset = precedingScrollExtent - viewportBoundaryExtent;
           if (targetOffset > maxScrollExtent) targetOffset = maxScrollExtent;
           await _controller.animateTo(
@@ -422,7 +441,6 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
             curve: _findingCurve,
           );
           await WidgetsBinding.instance.endOfFrame;
-          innerIsHandlingScroll = false;
         }
       }
     }
@@ -430,7 +448,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     var targetScrollChildModel = indexOffsetMap[ctx]?[index];
     // There is a cache offset, scroll to the offset directly.
     if (targetScrollChildModel != null) {
-      innerIsHandlingScroll = true;
+      _handleScrollDecision(context: ctx);
       var targetOffset = _calculateTargetLayoutOffset(
         obj: obj,
         childLayoutOffset: targetScrollChildModel.layoutOffset,
@@ -448,14 +466,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       } else {
         _controller.jumpTo(targetOffset);
       }
-      if (innerNeedOnceObserveCallBack != null) {
-        ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
-          innerIsHandlingScroll = false;
-          innerNeedOnceObserveCallBack!();
-        });
-      } else {
-        innerIsHandlingScroll = false;
-      }
+      _handleScrollEnd(context: ctx, completer: completer);
       return;
     }
 
@@ -463,6 +474,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     // locating.
     if (isFixedHeight) {
       _handleScrollToIndexForFixedHeight(
+        completer: completer,
         ctx: ctx!,
         obj: obj,
         index: index,
@@ -481,11 +493,15 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     var lastChildIndex = 0;
     final firstChild = findCurrentFirstChild(obj);
     final lastChild = findCurrentLastChild(obj);
-    if (firstChild == null || lastChild == null) return;
+    if (firstChild == null || lastChild == null) {
+      _handleScrollInterruption(context: ctx, completer: completer);
+      return;
+    }
     firstChildIndex = firstChild.index;
     lastChildIndex = lastChild.index;
 
     _handleScrollToIndex(
+      completer: completer,
       ctx: ctx!,
       obj: obj,
       index: index,
@@ -502,6 +518,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
   /// Scrolling to the specified index location when the child widgets have a
   /// fixed height.
   _handleScrollToIndexForFixedHeight({
+    required Completer completer,
     required BuildContext ctx,
     required RenderSliverMultiBoxAdaptor obj,
     required int index,
@@ -514,12 +531,17 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
   }) async {
     assert(controller != null);
     var _controller = controller;
-    if (_controller == null || !_controller.hasClients) return;
-    innerIsHandlingScroll = true;
+    if (_controller == null || !_controller.hasClients) {
+      _handleScrollInterruption(context: ctx, completer: completer);
+      return;
+    }
     bool isAnimateTo = (duration != null) && (curve != null);
 
     final targetChild = findCurrentFirstChild(obj);
-    if (targetChild == null) return;
+    if (targetChild == null) {
+      _handleScrollInterruption(context: ctx, completer: completer);
+      return;
+    }
     ObserveScrollToIndexFixedHeightResultModel resultModel;
     if (obj is RenderSliverList ||
         obj is RenderSliverFixedExtentList ||
@@ -540,8 +562,11 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       );
     } else {
       // Other
+      _handleScrollInterruption(context: ctx, completer: completer);
       return;
     }
+    _handleScrollDecision(context: ctx);
+
     double childMainAxisSize = resultModel.childMainAxisSize;
     double childLayoutOffset = resultModel.targetChildLayoutOffset;
 
@@ -573,19 +598,13 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     } else {
       _controller.jumpTo(childLayoutOffset);
     }
-    if (innerNeedOnceObserveCallBack != null) {
-      ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
-        innerIsHandlingScroll = false;
-        innerNeedOnceObserveCallBack!();
-      });
-    } else {
-      innerIsHandlingScroll = false;
-    }
+    _handleScrollEnd(context: ctx, completer: completer);
   }
 
   /// Scrolling to the specified index location by gradually scrolling around
   /// the target index location.
   _handleScrollToIndex({
+    required Completer completer,
     required BuildContext ctx,
     required RenderSliverMultiBoxAdaptor obj,
     required int index,
@@ -599,10 +618,16 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     double? lastPageTurningOffset,
   }) async {
     var _controller = controller;
-    if (_controller == null || !_controller.hasClients) return;
+    if (_controller == null || !_controller.hasClients) {
+      _handleScrollInterruption(context: ctx, completer: completer);
+      return;
+    }
 
     final viewport = _findViewport(obj);
-    if (viewport == null) return;
+    if (viewport == null) {
+      _handleScrollInterruption(context: ctx, completer: completer);
+      return;
+    }
     final maxScrollExtent = viewportMaxScrollExtent(viewport);
 
     final isHorizontal = obj.constraints.axis == Axis.horizontal;
@@ -610,7 +635,6 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     final precedingScrollExtent = obj.constraints.precedingScrollExtent;
 
     if (index < firstChildIndex) {
-      innerIsHandlingScroll = true;
       final sliverSize =
           isHorizontal ? obj.paintBounds.width : obj.paintBounds.height;
       double childLayoutOffset = 0;
@@ -628,9 +652,9 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       // The offset of this page turning is the same as the previous one,
       // which means the [index] is wrong.
       if (lastPageTurningOffset == prevPageOffset) {
-        innerIsHandlingScroll = false;
         Log.warning('The child corresponding to the index cannot be found.\n'
             'Please make sure the index is correct.');
+        _handleScrollInterruption(context: ctx, completer: completer);
         return;
       }
       lastPageTurningOffset = prevPageOffset;
@@ -648,12 +672,13 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         final firstChild = findCurrentFirstChild(obj);
         final lastChild = findCurrentLastChild(obj);
         if (firstChild == null || lastChild == null) {
-          innerIsHandlingScroll = false;
+          _handleScrollInterruption(context: ctx, completer: completer);
           return;
         }
         firstChildIndex = firstChild.index;
         lastChildIndex = lastChild.index;
         _handleScrollToIndex(
+          completer: completer,
           ctx: ctx,
           obj: obj,
           index: index,
@@ -668,7 +693,6 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         );
       });
     } else if (index > lastChildIndex) {
-      innerIsHandlingScroll = true;
       final lastChild = findCurrentLastChild(obj);
       final childSize = (isHorizontal
               ? lastChild?.paintBounds.width
@@ -686,9 +710,9 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       // The offset of this page turning is the same as the previous one,
       // which means the [index] is wrong.
       if (lastPageTurningOffset == nextPageOffset) {
-        innerIsHandlingScroll = false;
         Log.warning('The child corresponding to the index cannot be found.\n'
             'Please make sure the index is correct.');
+        _handleScrollInterruption(context: ctx, completer: completer);
         return;
       }
       lastPageTurningOffset = nextPageOffset;
@@ -706,12 +730,13 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         final firstChild = findCurrentFirstChild(obj);
         final lastChild = findCurrentLastChild(obj);
         if (firstChild == null || lastChild == null) {
-          innerIsHandlingScroll = false;
+          _handleScrollInterruption(context: ctx, completer: completer);
           return;
         }
         firstChildIndex = firstChild.index;
         lastChildIndex = lastChild.index;
         _handleScrollToIndex(
+          completer: completer,
           ctx: ctx,
           obj: obj,
           index: index,
@@ -753,6 +778,8 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           targetChild = obj.childAfter(targetChild);
           continue;
         } else {
+          _handleScrollDecision(context: ctx);
+
           var targetOffset = _calculateTargetLayoutOffset(
             obj: obj,
             childLayoutOffset: childLayoutOffset,
@@ -773,18 +800,11 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           } else {
             _controller.jumpTo(targetOffset);
           }
-          if (innerNeedOnceObserveCallBack != null) {
-            ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
-              innerIsHandlingScroll = false;
-              innerNeedOnceObserveCallBack!();
-            });
-          } else {
-            innerIsHandlingScroll = false;
-          }
+
+          _handleScrollEnd(context: ctx, completer: completer);
         }
         break;
       }
-      innerIsHandlingScroll = false;
     }
   }
 
@@ -1030,5 +1050,52 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       size: childSize,
     );
     indexOffsetMap[ctx] = map;
+  }
+
+  /// Called when starting the scroll task.
+  _handleScrollStart({
+    required BuildContext? context,
+  }) {
+    innerIsHandlingScroll = true;
+    ObserverScrollStartNotification().dispatch(context);
+  }
+
+  /// Called when the scroll task is interrupted.
+  ///
+  /// For example, the conditions are not met, or the item with the specified
+  /// index cannot be found, etc.
+  _handleScrollInterruption({
+    required BuildContext? context,
+    required Completer completer,
+  }) {
+    innerIsHandlingScroll = false;
+    completer.complete();
+    ObserverScrollInterruptionNotification().dispatch(context);
+  }
+
+  /// Called when the item with the specified index has been found.
+  _handleScrollDecision({
+    required BuildContext? context,
+  }) {
+    ObserverScrollDecisionNotification().dispatch(context);
+  }
+
+  /// Called after completing the scroll task.
+  _handleScrollEnd({
+    required BuildContext? context,
+    required Completer completer,
+  }) {
+    if (innerNeedOnceObserveCallBack != null) {
+      ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
+        innerIsHandlingScroll = false;
+        innerNeedOnceObserveCallBack!();
+        completer.complete();
+        ObserverScrollEndNotification().dispatch(context);
+      });
+    } else {
+      innerIsHandlingScroll = false;
+      completer.complete();
+      ObserverScrollEndNotification().dispatch(context);
+    }
   }
 }

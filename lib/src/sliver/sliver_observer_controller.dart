@@ -17,6 +17,9 @@ class SliverObserverController extends ObserverController
             ObserveModel,
             SliverObserverHandleContextsResultModel<ObserveModel>,
             ScrollViewOnceObserveNotificationResult> {
+  /// Whether to forbid the onObserveViewport callback.
+  bool isForbidObserveViewportCallback = false;
+
   SliverObserverController({
     ScrollController? controller,
   }) : super(controller: controller);
@@ -57,7 +60,7 @@ class SliverObserverController extends ObserverController
   ///
   /// The [alignment] specifies the desired position for the leading edge of the
   /// child widget. It must be a value in the range [0.0, 1.0].
-  animateTo({
+  Future animateTo({
     required int index,
     required Duration duration,
     required Curve curve,
@@ -67,8 +70,8 @@ class SliverObserverController extends ObserverController
     double alignment = 0,
     ObserverLocateIndexOffsetCallback? offset,
     ObserverRenderSliverType? renderSliverType,
-  }) async {
-    await innerAnimateTo(
+  }) {
+    return innerAnimateTo(
       index: index,
       duration: duration,
       curve: curve,
@@ -98,7 +101,7 @@ class SliverObserverController extends ObserverController
   ///
   /// The [alignment] specifies the desired position for the leading edge of the
   /// child widget. It must be a value in the range [0.0, 1.0].
-  jumpTo({
+  Future jumpTo({
     required int index,
     BuildContext? sliverContext,
     bool isFixedHeight = false,
@@ -106,8 +109,8 @@ class SliverObserverController extends ObserverController
     EdgeInsets padding = EdgeInsets.zero,
     ObserverLocateIndexOffsetCallback? offset,
     ObserverRenderSliverType? renderSliverType,
-  }) async {
-    await innerJumpTo(
+  }) {
+    return innerJumpTo(
       index: index,
       sliverContext: sliverContext,
       isFixedHeight: isFixedHeight,

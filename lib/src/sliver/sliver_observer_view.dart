@@ -34,9 +34,8 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
     Key? key,
     required Widget child,
     this.controller,
-    @Deprecated(
-        'It will be removed in version 2, please use [sliverContexts] instead')
-    List<BuildContext> Function()? sliverListContexts,
+    @Deprecated('It will be removed in version 2, please use [sliverContexts] instead')
+        List<BuildContext> Function()? sliverListContexts,
     List<BuildContext> Function()? sliverContexts,
     Function(Map<BuildContext, ObserveModel>)? onObserveAll,
     Function(ObserveModel)? onObserve,
@@ -129,7 +128,10 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
     bool isForceObserve = false,
     bool isDependObserveCallback = true,
   }) {
-    final onObserveViewport = widget.onObserveViewport;
+    final isForbidObserveViewportCallback =
+        widget.sliverController?.isForbidObserveViewportCallback ?? false;
+    final onObserveViewport =
+        isForbidObserveViewportCallback ? null : widget.onObserveViewport;
     if (isDependObserveCallback && onObserveViewport == null) return null;
 
     final isHandlingScroll =

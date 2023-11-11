@@ -250,8 +250,10 @@ class ObserverWidgetState<
     bool isFromObserveNotification = false,
     bool isDependObserveCallback = true,
   }) {
-    final onObserve = widget.onObserve;
-    final onObserveAll = widget.onObserveAll;
+    final isForbidObserveCallback =
+        widget.sliverController?.isForbidObserveCallback ?? false;
+    final onObserve = isForbidObserveCallback ? null : widget.onObserve;
+    final onObserveAll = isForbidObserveCallback ? null : widget.onObserveAll;
     if (isDependObserveCallback) {
       if (onObserve == null && onObserveAll == null) return null;
     }

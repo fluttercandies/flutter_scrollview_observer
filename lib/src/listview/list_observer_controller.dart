@@ -90,7 +90,7 @@ class ListObserverController extends ObserverController
   ///
   /// The [alignment] specifies the desired position for the leading edge of the
   /// child widget. It must be a value in the range [0.0, 1.0].
-  animateTo({
+  Future animateTo({
     required int index,
     required Duration duration,
     required Curve curve,
@@ -99,8 +99,8 @@ class ListObserverController extends ObserverController
     bool isFixedHeight = false,
     double alignment = 0,
     ObserverLocateIndexOffsetCallback? offset,
-  }) async {
-    await innerAnimateTo(
+  }) {
+    return innerAnimateTo(
       index: index,
       duration: duration,
       curve: curve,
@@ -124,15 +124,15 @@ class ListObserverController extends ObserverController
   ///
   /// The [alignment] specifies the desired position for the leading edge of the
   /// child widget. It must be a value in the range [0.0, 1.0].
-  jumpTo({
+  Future jumpTo({
     required int index,
     BuildContext? sliverContext,
     bool isFixedHeight = false,
     double alignment = 0,
     EdgeInsets padding = EdgeInsets.zero,
     ObserverLocateIndexOffsetCallback? offset,
-  }) async {
-    await innerJumpTo(
+  }) {
+    return innerJumpTo(
       index: index,
       sliverContext: sliverContext,
       isFixedHeight: isFixedHeight,
