@@ -1,7 +1,7 @@
 ## 1.18.0
 - ObserverController
   - Add some scrolling task notifications extending from `ObserverScrollNotification`.
-  - The `jumpTo` method and `animateTo` method method supports `await`.
+  - The `jumpTo` method and `animateTo` method support `await`.
   - Add `isForbidObserveCallback` property.
   - Add `isForbidObserveViewportCallback` property.
 
