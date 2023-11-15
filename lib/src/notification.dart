@@ -50,7 +50,16 @@ class GridViewOnceObserveNotification
 /// Sequence:
 /// [ObserverScrollStartNotification] -> [ObserverScrollDecisionNotification]
 /// -> [ObserverScrollEndNotification].
-class ObserverScrollNotification extends Notification {}
+class ObserverScrollNotification extends Notification {
+  @override
+  void dispatch(BuildContext? target) {
+    bool isMounted = target?.mounted ?? false;
+    if (!isMounted) {
+      return;
+    }
+    super.dispatch(target);
+  }
+}
 
 /// A notification that a scrolling task has started due to calling the jumpTo
 /// or animateTo method of [ObserverController].

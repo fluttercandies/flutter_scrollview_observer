@@ -250,6 +250,10 @@ class ObserverUtils {
 
   /// Safely call findRenderObject method.
   static RenderObject? findRenderObject(BuildContext? context) {
+    bool isMounted = context?.mounted ?? false;
+    if (!isMounted) {
+      return null;
+    }
     try {
       // It throws an exception when getting renderObject of inactive element.
       return context?.findRenderObject();
