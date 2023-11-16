@@ -1,3 +1,6 @@
+## 1.18.1
+- Add a check to determine whether the BuildContext is mounted by @LinXunFeng in [#62](https://github.com/fluttercandies/flutter_scrollview_observer/issues/62)
+
 ## 1.18.0
 - ObserverController
   - Add some scrolling task notifications extending from `ObserverScrollNotification`.
