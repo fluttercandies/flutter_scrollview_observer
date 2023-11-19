@@ -1,8 +1,8 @@
 # Flutter ScrollView Observer
 
-[![author](https://img.shields.io/badge/author-LinXunFeng-blue.svg?style=flat-square&logo=Iconify)](https://github.com/LinXunFeng/) [![pub](https://img.shields.io/pub/v/scrollview_observer?&style=flat-square&label=pub&logo=dart)](https://pub.dev/packages/scrollview_observer) [![stars](https://img.shields.io/github/stars/LinXunFeng/flutter_scrollview_observer?style=flat-square&logo=github)](https://github.com/LinXunFeng/flutter_scrollview_observer)
+[![author](https://img.shields.io/badge/author-LinXunFeng-blue.svg?style=flat-square&logo=Iconify)](https://github.com/LinXunFeng/) [![pub](https://img.shields.io/pub/v/scrollview_observer?&style=flat-square&label=pub&logo=dart)](https://pub.dev/packages/scrollview_observer) [![stars](https://img.shields.io/github/stars/fluttercandies/flutter_scrollview_observer?style=flat-square&logo=github)](https://github.com/fluttercandies/flutter_scrollview_observer)
 
-Language: English | [中文](https://github.com/LinXunFeng/flutter_scrollview_observer/blob/main/README-zh.md)
+Language: English | [中文](https://github.com/fluttercandies/flutter_scrollview_observer/blob/main/README-zh.md)
 
 
 This is a library of widget that can be used to listen for child widgets those are being displayed in the scroll view.
@@ -15,7 +15,7 @@ Chat: [Join WeChat group](https://mp.weixin.qq.com/s/JBbMstn0qW6M71hh-BRKzw)
 
 ## 📖 Article
 
-- [Flutter - Getting the items information those are currently displaying in ScrollView](https://medium.com/@linxunfeng/flutter-gets-the-items-information-those-are-currently-displaying-in-scrollview-6cb4f27f2536?source=your_stories_page-------------------------------------) | [WeChat](https://mp.weixin.qq.com/s/cN3qeinBPlo5rtEpoQBVVA) | [JueJin](https://juejin.cn/post/7103058155692621837)
+- [Flutter - Getting the items information those are currently displaying in ScrollView](https://medium.com/@linxunfeng/flutter-gets-the-items-information-those-are-currently-displaying-in-scrollview-6cb4f27f2536) | [WeChat](https://mp.weixin.qq.com/s/cN3qeinBPlo5rtEpoQBVVA) | [JueJin](https://juejin.cn/post/7103058155692621837)
 - [Flutter - Scrolling to a specific item in the ScrollView！🔥](https://medium.com/@linxunfeng/flutter-scrolling-to-a-specific-item-in-the-scrollview-b89d3f10eee0) | [WeChat](https://mp.weixin.qq.com/s/fplqfBpXwvx6mEO6vflkww) | [JueJin](https://juejin.cn/post/7129888644290068487)
 - [Flutter - Quickly implement the effect of the chat session list, perfect 💯](https://medium.com/@linxunfeng/flutter-quickly-implement-the-effect-of-the-chat-session-list-perfect-68c8acea4568) | [WeChat](https://mp.weixin.qq.com/s/xNiGuSLcJtDAiLoHuGWp6A) | [JueJin](https://juejin.cn/post/7152307272436154405)
 - [Flutter - New upgrade😱Supports observing ScrollView built by third package💪](https://medium.com/@linxunfeng/flutter-new-upgrade-supports-observing-scrollview-built-by-third-package-2e5af3d84c64) | [WeChat](https://mp.weixin.qq.com/s/FMXPyT-lX8YOXVmbLCsVUA) | [JueJin](https://juejin.cn/post/7240751116702269477)
@@ -43,7 +43,7 @@ Chat: [Join WeChat group](https://mp.weixin.qq.com/s/JBbMstn0qW6M71hh-BRKzw)
 - [x] Mixing usage of `SliverPersistentHeader`, `SliverList` and `SliverGrid`
 - [x] `ScrollView` built by third-party package.
 
-🏞 Related [Example](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/Example)
+🏞 Related [Example](https://github.com/fluttercandies/flutter_scrollview_observer/wiki/Example)
 
 ## 📦 Installing
 
@@ -63,10 +63,10 @@ import 'package:scrollview_observer/scrollview_observer.dart';
 
 ## 📚 Wiki
 
-- [Wiki Home](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki)
-- [1、Observing child widgets those are being displayed in the scroll view](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/1%E3%80%81Observing-child-widgets-those-are-being-displayed-in-the-scroll-view)
-- [2、Scrolling to the specified index location](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/2%E3%80%81Scrolling-to-the-specified-index-location)
-- [3、Chat Observer](https://github.com/LinXunFeng/flutter_scrollview_observer/wiki/3%E3%80%81Chat-Observer)
+- [Wiki Home](https://github.com/fluttercandies/flutter_scrollview_observer/wiki)
+- [1、Observing child widgets those are being displayed in the scroll view](https://github.com/fluttercandies/flutter_scrollview_observer/wiki/1%E3%80%81Observing-child-widgets-those-are-being-displayed-in-the-scroll-view)
+- [2、Scrolling to the specified index location](https://github.com/fluttercandies/flutter_scrollview_observer/wiki/2%E3%80%81Scrolling-to-the-specified-index-location)
+- [3、Chat Observer](https://github.com/fluttercandies/flutter_scrollview_observer/wiki/3%E3%80%81Chat-Observer)
 
 ## 🖨 About Me
 
