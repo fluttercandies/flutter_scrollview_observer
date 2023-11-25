@@ -154,7 +154,7 @@ class ChatScrollObserver {
     // [performLayout], In this case, the [adjustPositionForNewDimensions] of
     // [ScrollPhysics] will not be called, which makes the function of keeping
     // position invalid.
-    // 
+    //
     // So here let it record a layout-time correction to the scroll offset, and
     // call [markNeedsLayout] to prompt the viewport to be re-layout to solve
     // the above problem.
