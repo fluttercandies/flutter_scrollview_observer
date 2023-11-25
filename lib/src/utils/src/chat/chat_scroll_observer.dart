@@ -149,6 +149,27 @@ class ChatScrollObserver {
     innerRefItemIndex = _innerRefItemIndex;
     innerRefItemIndexAfterUpdate = _innerRefItemIndexAfterUpdate;
     innerRefItemLayoutOffset = _innerRefItemLayoutOffset;
+
+    // When the heights of items are similar, the viewport will not call
+    // [performLayout], In this case, the [adjustPositionForNewDimensions] of
+    // [ScrollPhysics] will not be called, which makes the function of keeping
+    // position invalid.
+    // 
+    // So here let it record a layout-time correction to the scroll offset, and
+    // call [markNeedsLayout] to prompt the viewport to be re-layout to solve
+    // the above problem.
+    //
+    // Related issue
+    // https://github.com/fluttercandies/flutter_scrollview_observer/issues/64
+    final ctx = observerController.fetchSliverContext();
+    if (ctx == null) return;
+    final obj = ObserverUtils.findRenderObject(ctx);
+    if (obj == null) return;
+    final viewport = ObserverUtils.findViewport(obj);
+    if (viewport == null) return;
+    if (!viewport.offset.hasPixels) return;
+    viewport.offset.correctBy(0);
+    viewport.markNeedsLayout();
   }
 
   observeSwitchShrinkWrap() {
