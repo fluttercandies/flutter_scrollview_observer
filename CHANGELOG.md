@@ -1,3 +1,7 @@
+## 1.18.2
+- Chat Observer
+  - Fix keeping position not working by @LinXunFeng in [#64](https://github.com/fluttercandies/flutter_scrollview_observer/issues/64)
+
 ## 1.18.1
 - Add a check to determine whether the BuildContext is mounted by @LinXunFeng in [#62](https://github.com/fluttercandies/flutter_scrollview_observer/issues/62)
 
