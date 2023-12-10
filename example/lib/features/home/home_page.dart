@@ -20,6 +20,7 @@ import 'package:scrollview_observer_example/features/listview/listview_demo/list
 import 'package:scrollview_observer_example/features/listview/listview_dynamic_offset/listview_dynamic_offset_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_fixed_height_demo/listview_fixed_height_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/sliver_list_demo/sliver_list_demo_page.dart';
+import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_demo/nested_scrollview_demo_page.dart';
 import 'package:scrollview_observer_example/features/scene/anchor_demo/anchor_page.dart';
 import 'package:scrollview_observer_example/features/scene/anchor_demo/anchor_waterfall_page.dart';
 import 'package:scrollview_observer_example/features/scene/azlist_demo/azlist_page.dart';
@@ -166,6 +167,12 @@ class HomePage extends StatelessWidget {
         "SliverAppBar",
         () {
           return const SliverAppBarDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "NestedScrollView",
+        () {
+          return const NestedScrollViewDemoPage();
         },
       ),
       Tuple2<String, PageBuilder>(
