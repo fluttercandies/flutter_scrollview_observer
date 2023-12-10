@@ -20,7 +20,7 @@ class ObserverController {
   ObserverController({this.controller});
 
   /// Target scroll controller.
-  final ScrollController? controller;
+  ScrollController? controller;
 
   /// The map which stores the offset of child in the sliver
   Map<BuildContext, Map<int, ObserveScrollChildModel>> indexOffsetMap = {};
@@ -375,6 +375,11 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     assert(controller != null);
     var _controller = controller;
     final ctx = fetchSliverContext(sliverContext: sliverContext);
+    if (ctx == null) {
+      _handleScrollInterruption(context: ctx, completer: completer);
+      return;
+    }
+
     if (_controller == null || !_controller.hasClients) {
       _handleScrollInterruption(context: ctx, completer: completer);
       return;
@@ -475,7 +480,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     if (isFixedHeight) {
       _handleScrollToIndexForFixedHeight(
         completer: completer,
-        ctx: ctx!,
+        ctx: ctx,
         obj: obj,
         index: index,
         alignment: alignment,
@@ -502,7 +507,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
 
     _handleScrollToIndex(
       completer: completer,
-      ctx: ctx!,
+      ctx: ctx,
       obj: obj,
       index: index,
       alignment: alignment,
