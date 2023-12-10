@@ -264,4 +264,54 @@ class ObserverUtils {
       return null;
     }
   }
+
+  /// Walks the children of this context.
+  static BuildContext? findChildContext({
+    required BuildContext context,
+    required bool Function(Element) isTargetType,
+  }) {
+    BuildContext? childContext;
+    void visitor(Element element) {
+      if (isTargetType(element)) {
+        /// Find the target child BuildContext
+        childContext = element;
+        return;
+      }
+      element.visitChildren(visitor);
+    }
+
+    try {
+      // https://github.com/fluttercandies/flutter_scrollview_observer/issues/35
+      context.visitChildElements(visitor);
+    } catch (e) {
+      Log.warning(
+        'This widget has been unmounted, so the State no longer has a context (and should be considered defunct). \n'
+        'Consider canceling any active work during "dispose" or using the "mounted" getter to determine if the State is still active.',
+      );
+    }
+    return childContext;
+  }
+
+  /// Convert the given point from the local coordinate system for this context
+  /// to the global coordinate system in logical pixels.
+  ///
+  /// If `ancestor` is non-null, this function converts the given point to the
+  /// coordinate system of `ancestor` (which must be an ancestor of this render
+  /// object of context) instead of to the global coordinate system.
+  ///
+  /// This method is implemented in terms of [getTransformTo]. If the transform
+  /// matrix puts the given `point` on the line at infinity (for instance, when
+  /// the transform matrix is the zero matrix), this method returns (NaN, NaN).
+  static Offset? localToGlobal({
+    required BuildContext context,
+    required Offset point,
+    BuildContext? ancestor,
+  }) {
+    final renderObject = findRenderObject(context);
+    if (renderObject == null) return null;
+    return MatrixUtils.transformPoint(
+      renderObject.getTransformTo(findRenderObject(ancestor)),
+      point,
+    );
+  }
 }
