@@ -20,6 +20,7 @@ class ObserverCore {
   static ListViewObserveModel? handleListObserve({
     required BuildContext context,
     double Function()? fetchLeadingOffset,
+    double? Function(BuildContext)? customOverlap,
     double toNextOverPercent = 1,
   }) {
     var _obj = ObserverUtils.findRenderObject(context);
@@ -29,7 +30,9 @@ class ObserverCore {
     if (kDebugMode) {
       if (viewport.debugNeedsPaint) return null;
     }
-    if (!(_obj.geometry?.visible ?? true)) {
+    // The geometry.visible is not absolutely reliable.
+    if (!(_obj.geometry?.visible ?? false) ||
+        _obj.constraints.remainingPaintExtent < 1e-10) {
       return ListViewObserveModel(
         sliverList: _obj,
         viewport: viewport,
@@ -43,8 +46,8 @@ class ObserverCore {
     if (firstChild == null) return null;
 
     final offset = fetchLeadingOffset?.call() ?? 0;
-    final rawScrollViewOffset =
-        _obj.constraints.scrollOffset + _obj.constraints.overlap;
+    final overlap = customOverlap?.call(context) ?? _obj.constraints.overlap;
+    final rawScrollViewOffset = _obj.constraints.scrollOffset + overlap;
     var scrollViewOffset = rawScrollViewOffset + offset;
     var parentData = firstChild.parentData as SliverMultiBoxAdaptorParentData;
     var index = parentData.index ?? 0;
@@ -81,9 +84,8 @@ class ObserverCore {
     ];
 
     // Find the remaining children that are being displayed
-    final showingChildrenMaxOffset = rawScrollViewOffset +
-        _obj.constraints.remainingPaintExtent -
-        _obj.constraints.overlap;
+    final showingChildrenMaxOffset =
+        rawScrollViewOffset + _obj.constraints.remainingPaintExtent - overlap;
     var displayingChild = _obj.childAfter(targetFirstChild);
     while (ObserverUtils.isDisplayingChildInSliver(
       targetChild: displayingChild,
@@ -127,6 +129,7 @@ class ObserverCore {
   static GridViewObserveModel? handleGridObserve({
     required BuildContext context,
     double Function()? fetchLeadingOffset,
+    double? Function(BuildContext)? customOverlap,
     double toNextOverPercent = 1,
   }) {
     final _obj = ObserverUtils.findRenderObject(context);
@@ -136,7 +139,9 @@ class ObserverCore {
     if (kDebugMode) {
       if (viewport.debugNeedsPaint) return null;
     }
-    if (!(_obj.geometry?.visible ?? true)) {
+    // The geometry.visible is not absolutely reliable.
+    if (!(_obj.geometry?.visible ?? false) ||
+        _obj.constraints.remainingPaintExtent < 1e-10) {
       return GridViewObserveModel(
         sliverGrid: _obj,
         viewport: viewport,
@@ -150,8 +155,8 @@ class ObserverCore {
     if (firstChild == null) return null;
 
     final offset = fetchLeadingOffset?.call() ?? 0;
-    final rawScrollViewOffset =
-        _obj.constraints.scrollOffset + _obj.constraints.overlap;
+    final overlap = customOverlap?.call(context) ?? _obj.constraints.overlap;
+    final rawScrollViewOffset = _obj.constraints.scrollOffset + overlap;
     var scrollViewOffset = rawScrollViewOffset + offset;
 
     // Find out the first child which is displaying
@@ -181,9 +186,9 @@ class ObserverCore {
     List<GridViewObserveDisplayingChildModel> firstGroupChildModelList = [];
     firstGroupChildModelList.add(firstModel);
 
-    final showingChildrenMaxOffset = rawScrollViewOffset +
-        _obj.constraints.remainingPaintExtent -
-        _obj.constraints.overlap;
+    final showingChildrenMaxOffset =
+        rawScrollViewOffset + _obj.constraints.remainingPaintExtent - overlap;
+
     // Find out other child those have reached the specified offset.
     RenderBox? targetChild = _obj.childAfter(targetFirstChild);
     while (targetChild != null) {

@@ -28,6 +28,11 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
   /// [RenderSliverGrid].
   final ObserveModel? Function(BuildContext context)? extendedHandleObserve;
 
+  /// The callback that specifies a custom overlap corresponds to sliverContext.
+  ///
+  /// If null is returned then use the overlap of sliverContext.
+  final double? Function(BuildContext sliverContext)? customOverlap;
+
   final SliverObserverController? controller;
 
   const SliverViewObserver({
@@ -43,6 +48,7 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
     this.onObserveViewport,
     double leadingOffset = 0,
     double Function()? dynamicLeadingOffset,
+    this.customOverlap,
     double toNextOverPercent = 1,
     List<ObserverAutoTriggerObserveType>? autoTriggerObserveTypes,
     ObserverTriggerOnObserveType triggerOnObserveType =
@@ -112,12 +118,14 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
       return ObserverCore.handleListObserve(
         context: ctx,
         fetchLeadingOffset: fetchLeadingOffset,
+        customOverlap: widget.customOverlap,
         toNextOverPercent: widget.toNextOverPercent,
       );
     } else if (_obj is RenderSliverGrid) {
       return ObserverCore.handleGridObserve(
         context: ctx,
         fetchLeadingOffset: fetchLeadingOffset,
+        customOverlap: widget.customOverlap,
         toNextOverPercent: widget.toNextOverPercent,
       );
     }
