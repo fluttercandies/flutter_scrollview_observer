@@ -1,3 +1,13 @@
+## 1.19.0
+- SliverViewObserver
+  - Add `customOverlap` property.
+- NestedScrollUtil
+  - To better support `NestedScrollView`.
+- ObserverCore
+  - Improve the judgment logic of whether the sliver is visible.
+- ObserverController
+  - Adjust the controller to be modifiable.
+
 ## 1.18.2
 - Chat Observer
   - Fix keeping position not working by @LinXunFeng in [#64](https://github.com/fluttercandies/flutter_scrollview_observer/issues/64)
