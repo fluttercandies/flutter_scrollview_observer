@@ -37,8 +37,9 @@ Language: 中文 | [English](https://github.com/fluttercandies/flutter_scrollvie
 - [x] `ListView`
 - [x] `SliverList`
 - [x] `GridView`
-- [x] `SliverGrid` 
+- [x] `SliverGrid`
 - [x] 支持 `SliverPersistentHeader`，`SliverList` 和 `SliverGrid` 混合使用
+- [x] `NestedScrollView`
 - [x] 由第三方库构建的 `ScrollView`
 
 
