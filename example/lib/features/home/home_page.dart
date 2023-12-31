@@ -14,6 +14,7 @@ import 'package:scrollview_observer_example/features/gridview/gridview_fixed_hei
 import 'package:scrollview_observer_example/features/gridview/horizontal_gridview_demo/horizontal_gridview_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/sliver_grid_demo/sliver_grid_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/horizontal_listview_demo/horizontal_listview_page.dart';
+import 'package:scrollview_observer_example/features/listview/infinite_listview_demo/infinite_listview_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_ctx_demo/listview_ctx_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_custom_demo/listview_custom_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_demo/listview_demo_page.dart';
@@ -107,6 +108,12 @@ class HomePage extends StatelessWidget {
         "ListView - Custom",
         () {
           return const ListViewCustomDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "ListView - Infinite",
+        () {
+          return const InfiniteListViewPage();
         },
       ),
       Tuple2<String, PageBuilder>(
