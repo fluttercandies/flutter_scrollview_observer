@@ -47,6 +47,8 @@ class _InfiniteListViewPageState extends State<InfiniteListViewPage> {
     );
     // Keeping position
     chatObserver.standby(changeCount: generateCount);
+    // Clearing the offset cache
+    observerController.clearScrollIndexCache();
     setState(() {});
 
     isLoadingForHeader = false;
