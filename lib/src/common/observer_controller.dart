@@ -8,6 +8,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer/src/common/extends.dart';
 import 'package:scrollview_observer/src/common/models/observe_find_child_model.dart';
 import 'package:scrollview_observer/src/common/models/observe_scroll_to_index_fixed_height_result_model.dart';
 import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
@@ -221,6 +222,22 @@ mixin ObserverControllerForInfo on ObserverController {
     }
     return offset.maxScrollExtent;
   }
+
+  /// Getting the extreme scroll extent of viewport.
+  /// The [maxScrollExtent] will be returned when growthDirection is forward.
+  /// The [minScrollExtent] will be returned when growthDirection is reverse.
+  double viewportExtremeScrollExtent({
+    required RenderViewportBase viewport,
+    required RenderSliverMultiBoxAdaptor obj,
+  }) {
+    final offset = viewport.offset;
+    if (offset is! ScrollPosition) {
+      return 0;
+    }
+    return obj.isForwardGrowthDirection
+        ? offset.maxScrollExtent
+        : offset.minScrollExtent;
+  }
 }
 
 mixin ObserverControllerForScroll on ObserverControllerForInfo {
@@ -407,7 +424,11 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     // precedingScrollExtent correctly.
     final objVisible = obj.geometry?.visible ?? false;
     if (!objVisible && viewport.offset.hasPixels) {
-      final maxScrollExtent = viewportMaxScrollExtent(viewport);
+      final extremeScrollExtent = viewportExtremeScrollExtent(
+        viewport: viewport,
+        obj: obj,
+      );
+      final maxScrollExtent = extremeScrollExtent.rectify(obj);
       // If the target sliver does not paint any child because it is too far
       // away, we need to let the ScrollView scroll near it first.
       // https://github.com/LinXunFeng/flutter_scrollview_observer/issues/45
@@ -417,21 +438,22 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         double paintScrollExtent =
             precedingScrollExtent + (obj.geometry?.maxPaintExtent ?? 0);
         double targetScrollExtent = precedingScrollExtent;
-        if (_controller.position.pixels > paintScrollExtent) {
+        final pixels = _controller.position.pixels.rectify(obj);
+        if (pixels > paintScrollExtent) {
           targetScrollExtent = paintScrollExtent;
         }
         if (targetScrollExtent > maxScrollExtent) {
           targetScrollExtent = maxScrollExtent;
         }
         await _controller.animateTo(
-          targetScrollExtent,
+          targetScrollExtent.rectify(obj),
           duration: _findingDuration,
           curve: _findingCurve,
         );
         await WidgetsBinding.instance.endOfFrame;
       } else {
         final precedingScrollExtent = obj.constraints.precedingScrollExtent;
-        final viewportOffset = viewport.offset.pixels;
+        final viewportOffset = viewport.offset.pixels.rectify(obj);
         final isHorizontal = obj.constraints.axis == Axis.horizontal;
         final viewportSize =
             isHorizontal ? viewport.size.width : viewport.size.height;
@@ -441,7 +463,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           double targetOffset = precedingScrollExtent - viewportBoundaryExtent;
           if (targetOffset > maxScrollExtent) targetOffset = maxScrollExtent;
           await _controller.animateTo(
-            targetOffset,
+            targetOffset.rectify(obj),
             duration: _findingDuration,
             curve: _findingCurve,
           );
@@ -633,7 +655,11 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       _handleScrollInterruption(context: ctx, completer: completer);
       return;
     }
-    final maxScrollExtent = viewportMaxScrollExtent(viewport);
+    final extremeScrollExtent = viewportExtremeScrollExtent(
+      viewport: viewport,
+      obj: obj,
+    );
+    final maxScrollExtent = extremeScrollExtent.rectify(obj);
 
     final isHorizontal = obj.constraints.axis == Axis.horizontal;
     bool isAnimateTo = (duration != null) && (curve != null);
@@ -663,14 +689,15 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         return;
       }
       lastPageTurningOffset = prevPageOffset;
+      final prevPageOffsetRectified = prevPageOffset.rectify(obj);
       if (isAnimateTo) {
         await _controller.animateTo(
-          prevPageOffset,
+          prevPageOffsetRectified,
           duration: _findingDuration,
           curve: _findingCurve,
         );
       } else {
-        _controller.jumpTo(prevPageOffset);
+        _controller.jumpTo(prevPageOffsetRectified);
       }
 
       ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
@@ -721,14 +748,15 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         return;
       }
       lastPageTurningOffset = nextPageOffset;
+      final nextPageOffsetRectified = nextPageOffset.rectify(obj);
       if (isAnimateTo) {
         await _controller.animateTo(
-          nextPageOffset,
+          nextPageOffsetRectified,
           duration: _findingDuration,
           curve: _findingCurve,
         );
       } else {
-        _controller.jumpTo(nextPageOffset);
+        _controller.jumpTo(nextPageOffsetRectified);
       }
 
       ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
@@ -834,8 +862,12 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     if (this is SliverObserverController) {
       final viewport = _findViewport(obj);
       if (viewport != null && viewport.offset.hasPixels) {
-        scrollOffset = viewport.offset.pixels;
-        final maxScrollExtent = viewportMaxScrollExtent(viewport);
+        scrollOffset = viewport.offset.pixels.rectify(obj);
+        final extremeScrollExtent = viewportExtremeScrollExtent(
+          viewport: viewport,
+          obj: obj,
+        );
+        final maxScrollExtent = extremeScrollExtent.rectify(obj);
         remainingBottomExtent = maxScrollExtent - scrollOffset;
         needScrollExtent = childLayoutOffset +
             precedingScrollExtent +
@@ -874,7 +906,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     // The remainingBottomExtent may be negative when the scrollView has too
     // few items.
     targetOffset = targetOffset.clamp(0, double.maxFinite);
-    return targetOffset;
+    return targetOffset.rectify(obj);
   }
 
   /// Calculate the information about scrolling to the specified index location
