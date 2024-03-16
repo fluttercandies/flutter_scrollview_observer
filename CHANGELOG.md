@@ -1,3 +1,11 @@
+## 1.19.1
+- ListViewObserver
+  - Support `SliverVariedExtentList` in [74](https://github.com/fluttercandies/flutter_scrollview_observer/issues/74).
+- Chat Observer
+  - Safely obtain the `constraints` of RenderSliver.
+- ObserverController
+  - Adapt to scenes where `CustomScrollView` specifies `center`.
+
 ## 1.19.0
 - SliverViewObserver
   - Add `customOverlap` property.
