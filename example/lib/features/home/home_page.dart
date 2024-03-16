@@ -5,6 +5,7 @@
  */
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer_example/features/custom_scrollview/custom_scrollview_demo/custom_scrollview_demo_page.dart';
+import 'package:scrollview_observer_example/features/custom_scrollview/custom_scrollview_demo/custom_scrollview_center_demo_page.dart';
 import 'package:scrollview_observer_example/features/custom_scrollview/custom_scrollview_demo/multi_sliver_demo_page.dart';
 import 'package:scrollview_observer_example/features/custom_scrollview/sliver_appbar_demo/sliver_appbar_demo_page.dart';
 import 'package:scrollview_observer_example/features/gridview/gridview_ctx_demo/gridview_ctx_demo_page.dart';
@@ -162,6 +163,12 @@ class HomePage extends StatelessWidget {
         "CustomScrollView",
         () {
           return const CustomScrollViewDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "CustomScrollView - Center",
+        () {
+          return const CustomScrollViewCenterDemoPage();
         },
       ),
       Tuple2<String, PageBuilder>(

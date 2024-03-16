@@ -33,7 +33,7 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
 
   final scrollController = ScrollController();
   late final SliverObserverController sliverObserverController;
-  List<BuildContext> contextList = [];
+  Map<int, BuildContext> contextList = {};
 
   @override
   void initState() {
@@ -57,7 +57,7 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
     return Scaffold(
       body: SliverViewObserver(
         controller: sliverObserverController,
-        sliverContexts: () => contextList,
+        sliverContexts: () => contextList.values.toList(),
         child: CustomScrollView(
           controller: scrollController,
           physics: const ClampingScrollPhysics(),
@@ -145,9 +145,7 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
         itemExtent: 120,
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            if (contextList.length < mainIndex + 1) {
-              contextList.add(context);
-            }
+            contextList[mainIndex] = context;
             return Container(
               padding: const EdgeInsets.only(left: 12),
               color: RandomTool.color(),
