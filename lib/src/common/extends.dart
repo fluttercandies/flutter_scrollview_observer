@@ -12,13 +12,13 @@ extension ObserverDouble on double {
   /// If the growthDirection is [GrowthDirection.forward], the value is
   /// returned directly, otherwise the opposite value is returned.
   double rectify(
-    RenderSliverMultiBoxAdaptor obj,
+    RenderSliver obj,
   ) {
     return obj.isForwardGrowthDirection ? this : -this;
   }
 }
 
-extension ObserverRenderSliverMultiBoxAdaptor on RenderSliverMultiBoxAdaptor {
+extension ObserverRenderSliverMultiBoxAdaptor on RenderSliver {
   /// Determine whether the current growthDirection of sliver is
   /// [GrowthDirection.forward].
   bool get isForwardGrowthDirection {
