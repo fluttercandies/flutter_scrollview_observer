@@ -178,7 +178,9 @@ class ChatScrollObserver {
       if (ctx == null) return;
       final obj = ObserverUtils.findRenderObject(ctx);
       if (obj is! RenderSliver) return;
-      final viewportMainAxisExtent = obj.constraints.viewportMainAxisExtent;
+      final constraints = ObserverUtils.sliverConstraints(obj);
+      if (constraints == null) return;
+      final viewportMainAxisExtent = constraints.viewportMainAxisExtent;
       final scrollExtent = obj.geometry?.scrollExtent ?? 0;
       if (viewportMainAxisExtent >= scrollExtent) {
         if (innerIsShrinkWrap) return;

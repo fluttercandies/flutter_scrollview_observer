@@ -314,4 +314,19 @@ class ObserverUtils {
       point,
     );
   }
+
+  /// Safely obtain [RenderSliver.constraints].
+  static SliverConstraints? sliverConstraints(
+    RenderSliver sliver,
+  ) {
+    SliverConstraints? _constraints;
+    try {
+      _constraints = sliver.constraints;
+    } catch (e) {
+      Log.warning(
+        'A RenderObject does not have any constraints before it has been laid out.',
+      );
+    }
+    return _constraints;
+  }
 }
