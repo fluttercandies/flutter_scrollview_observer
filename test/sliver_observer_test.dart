@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
-import 'package:scrollview_observer/src/common/extends.dart';
 
 void main() {
   GlobalKey sliverListKey = GlobalKey();
