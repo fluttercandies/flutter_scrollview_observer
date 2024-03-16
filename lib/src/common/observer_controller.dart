@@ -569,8 +569,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       return;
     }
     ObserveScrollToIndexFixedHeightResultModel resultModel;
-    if (obj is RenderSliverList ||
-        obj is RenderSliverFixedExtentList ||
+    if (ListViewObserver.isSupportRenderSliverType(obj) ||
         renderSliverType == ObserverRenderSliverType.list) {
       // ListView
       resultModel = _calculateScrollToIndexForFixedHeightResultForList(

@@ -54,6 +54,21 @@ class ListViewObserver extends ObserverWidget<ListObserverController,
 
   @override
   State<ListViewObserver> createState() => ListViewObserverState();
+
+  /// Determine whether the [obj] is a supported RenderSliver type.
+  static bool isSupportRenderSliverType(RenderObject? obj) {
+    if (obj == null) return false;
+    if (obj is RenderSliverList || obj is RenderSliverFixedExtentList) {
+      return true;
+    }
+    final objRuntimeTypeStr = obj.runtimeType.toString();
+    final types = [
+      // New type added in flutter 3.16.0.
+      // https://github.com/fluttercandies/flutter_scrollview_observer/issues/74
+      'RenderSliverVariedExtentList',
+    ];
+    return types.contains(objRuntimeTypeStr);
+  }
 }
 
 class ListViewObserverState extends ObserverWidgetState<ListObserverController,
@@ -76,6 +91,6 @@ class ListViewObserverState extends ObserverWidgetState<ListObserverController,
     if (widget.customTargetRenderSliverType != null) {
       return widget.customTargetRenderSliverType!.call(obj);
     }
-    return obj is RenderSliverList || obj is RenderSliverFixedExtentList;
+    return ListViewObserver.isSupportRenderSliverType(obj);
   }
 }

@@ -9,6 +9,7 @@ import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/common/observer_typedef.dart';
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
 import 'package:scrollview_observer/src/common/observer_widget.dart';
+import 'package:scrollview_observer/src/listview/list_observer_view.dart';
 import 'package:scrollview_observer/src/notification.dart';
 import 'package:scrollview_observer/src/observer_core.dart';
 import 'package:scrollview_observer/src/sliver/models/sliver_observer_observe_result_model.dart';
@@ -114,7 +115,7 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
       return widget.customHandleObserve?.call(ctx);
     }
     final _obj = ObserverUtils.findRenderObject(ctx);
-    if (_obj is RenderSliverList || _obj is RenderSliverFixedExtentList) {
+    if (ListViewObserver.isSupportRenderSliverType(_obj)) {
       return ObserverCore.handleListObserve(
         context: ctx,
         fetchLeadingOffset: fetchLeadingOffset,
