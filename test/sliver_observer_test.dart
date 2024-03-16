@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer/src/common/extends.dart';
 
 void main() {
   GlobalKey sliverListKey = GlobalKey();
@@ -483,6 +485,302 @@ void main() {
           expect(nestedScrollUtil?.bodySliverContexts.length, 0);
           expect(nestedScrollUtil?.remainingSliverContext, null);
           expect(nestedScrollUtil?.remainingSliverRenderObj, null);
+        },
+      );
+    },
+  );
+
+  group(
+    'Configure center in CustomScrollView',
+    () {
+      late Widget widget;
+      BuildContext? _sliverListCtx1;
+      BuildContext? _sliverListCtx2;
+      BuildContext? _sliverListCtx3;
+      BuildContext? _sliverListCtx4;
+      final _centerKey = GlobalKey();
+      ScrollController scrollController = ScrollController();
+      late SliverObserverController observerController;
+      Map<BuildContext, ObserveModel> resultMap = {};
+
+      Widget _buildSliverListView({
+        required Color color,
+        Function(BuildContext)? onBuild,
+      }) {
+        return SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (ctx, index) {
+              onBuild?.call(ctx);
+              final int itemIndex = index ~/ 2;
+              return Container(
+                height: (itemIndex % 2 == 0) ? 80 : 50,
+                color: color,
+                child: Center(
+                  child: Text(
+                    "index -- $index",
+                  ),
+                ),
+              );
+            },
+            childCount: 100,
+          ),
+        );
+      }
+
+      Widget _buildScrollView({
+        required double anchor,
+      }) {
+        return CustomScrollView(
+          center: _centerKey,
+          anchor: anchor,
+          controller: scrollController,
+          slivers: [
+            _buildSliverListView(
+              color: Colors.redAccent,
+              onBuild: (ctx) {
+                _sliverListCtx1 = ctx;
+              },
+            ),
+            _buildSliverListView(
+              color: Colors.blueGrey,
+              onBuild: (ctx) {
+                _sliverListCtx2 = ctx;
+              },
+            ),
+            SliverPadding(padding: EdgeInsets.zero, key: _centerKey),
+            _buildSliverListView(
+              color: Colors.teal,
+              onBuild: (ctx) {
+                _sliverListCtx3 = ctx;
+              },
+            ),
+            _buildSliverListView(
+              color: Colors.purple,
+              onBuild: (ctx) {
+                _sliverListCtx4 = ctx;
+              },
+            ),
+          ],
+        );
+      }
+
+      Widget resetAll({
+        required double anchor,
+      }) {
+        resultMap = {};
+        scrollController = ScrollController();
+        observerController = SliverObserverController(
+          controller: scrollController,
+        );
+
+        widget = _buildScrollView(anchor: anchor);
+
+        widget = SliverViewObserver(
+          controller: observerController,
+          child: widget,
+          sliverContexts: () {
+            return [
+              if (_sliverListCtx1 != null) _sliverListCtx1!,
+              if (_sliverListCtx2 != null) _sliverListCtx2!,
+              if (_sliverListCtx3 != null) _sliverListCtx3!,
+              if (_sliverListCtx4 != null) _sliverListCtx4!,
+            ];
+          },
+          onObserveAll: (result) {
+            resultMap = result;
+          },
+        );
+        widget = MaterialApp(
+          home: Material(child: widget),
+        );
+        return widget;
+      }
+
+      tearDown(() {
+        scrollController.dispose();
+        _sliverListCtx1 = null;
+        _sliverListCtx2 = null;
+        _sliverListCtx3 = null;
+        _sliverListCtx4 = null;
+      });
+
+      testWidgets('Check isForwardGrowthDirection', (tester) async {
+        resetAll(anchor: 0.5);
+        await tester.pumpWidget(widget);
+
+        final _sliverListObj1 = ObserverUtils.findRenderObject(_sliverListCtx1);
+        expect(_sliverListObj1 is RenderSliverMultiBoxAdaptor, true);
+        _sliverListObj1 as RenderSliverMultiBoxAdaptor;
+        expect(_sliverListObj1.isForwardGrowthDirection, false);
+
+        final _sliverListObj2 = ObserverUtils.findRenderObject(_sliverListCtx2);
+        expect(_sliverListObj2 is RenderSliverMultiBoxAdaptor, true);
+        _sliverListObj2 as RenderSliverMultiBoxAdaptor;
+        expect(_sliverListObj2.isForwardGrowthDirection, false);
+
+        final _sliverListObj3 = ObserverUtils.findRenderObject(_sliverListCtx3);
+        expect(_sliverListObj3 is RenderSliverMultiBoxAdaptor, true);
+        _sliverListObj3 as RenderSliverMultiBoxAdaptor;
+        expect(_sliverListObj3.isForwardGrowthDirection, true);
+
+        final _sliverListObj4 = ObserverUtils.findRenderObject(_sliverListCtx4);
+        expect(_sliverListObj4 is RenderSliverMultiBoxAdaptor, true);
+        _sliverListObj4 as RenderSliverMultiBoxAdaptor;
+        expect(_sliverListObj4.isForwardGrowthDirection, true);
+      });
+
+      testWidgets('Check viewportExtremeScrollExtent and rectify',
+          (tester) async {
+        resetAll(anchor: 0.5);
+        await tester.pumpWidget(widget);
+
+        final _sliverListObj1 = ObserverUtils.findRenderObject(_sliverListCtx1);
+        expect(_sliverListObj1 != null, true);
+        expect(_sliverListObj1 is RenderSliverMultiBoxAdaptor, true);
+        _sliverListObj1 as RenderSliverMultiBoxAdaptor;
+        var extremeScrollExtent =
+            observerController.viewportExtremeScrollExtent(
+          viewport: ObserverUtils.findViewport(_sliverListObj1)!,
+          obj: _sliverListObj1,
+        );
+        expect(extremeScrollExtent <= 0, true);
+        expect(extremeScrollExtent.rectify(_sliverListObj1) >= 0, true);
+
+        final _sliverListObj2 = ObserverUtils.findRenderObject(_sliverListCtx2);
+        expect(_sliverListObj2 != null, true);
+        expect(_sliverListObj2 is RenderSliverMultiBoxAdaptor, true);
+        _sliverListObj2 as RenderSliverMultiBoxAdaptor;
+        extremeScrollExtent = observerController.viewportExtremeScrollExtent(
+          viewport: ObserverUtils.findViewport(_sliverListObj2)!,
+          obj: _sliverListObj2,
+        );
+        expect(extremeScrollExtent <= 0, true);
+        expect(extremeScrollExtent.rectify(_sliverListObj2) >= 0, true);
+
+        final _sliverListObj3 = ObserverUtils.findRenderObject(_sliverListCtx3);
+        expect(_sliverListObj3 != null, true);
+        expect(_sliverListObj3 is RenderSliverMultiBoxAdaptor, true);
+        _sliverListObj3 as RenderSliverMultiBoxAdaptor;
+        extremeScrollExtent = observerController.viewportExtremeScrollExtent(
+          viewport: ObserverUtils.findViewport(_sliverListObj3)!,
+          obj: _sliverListObj3,
+        );
+        expect(extremeScrollExtent >= 0, true);
+        expect(extremeScrollExtent.rectify(_sliverListObj3) >= 0, true);
+
+        final _sliverListObj4 = ObserverUtils.findRenderObject(_sliverListCtx4);
+        expect(_sliverListObj4 != null, true);
+        expect(_sliverListObj4 is RenderSliverMultiBoxAdaptor, true);
+        _sliverListObj4 as RenderSliverMultiBoxAdaptor;
+        extremeScrollExtent = observerController.viewportExtremeScrollExtent(
+          viewport: ObserverUtils.findViewport(_sliverListObj4)!,
+          obj: _sliverListObj4,
+        );
+        expect(extremeScrollExtent >= 0, true);
+        expect(extremeScrollExtent.rectify(_sliverListObj4) >= 0, true);
+      });
+
+      testWidgets(
+        'Scroll to index with anchor 1.0',
+        (tester) async {
+          resetAll(anchor: 1.0);
+          await tester.pumpWidget(widget);
+
+          observerController.jumpTo(
+            index: 1,
+            sliverContext: _sliverListCtx1,
+          );
+          await tester.pumpAndSettle();
+          final sliverList1ObservationResult =
+              (resultMap[_sliverListCtx1] as ListViewObserveModel);
+          expect(sliverList1ObservationResult.firstChild?.index, 1);
+
+          observerController.jumpTo(
+            index: 5,
+            sliverContext: _sliverListCtx2,
+          );
+          await tester.pumpAndSettle();
+          final sliverList2ObservationResult =
+              (resultMap[_sliverListCtx2] as ListViewObserveModel);
+          expect(sliverList2ObservationResult.firstChild?.index, 5);
+
+          observerController.jumpTo(
+            index: 10,
+            sliverContext: _sliverListCtx3,
+            alignment: 1,
+          );
+          await tester.pumpAndSettle();
+          final sliverList3ObservationResult =
+              (resultMap[_sliverListCtx3] as ListViewObserveModel);
+          expect(
+            sliverList3ObservationResult.displayingChildModelList.last.index,
+            10,
+          );
+
+          observerController.jumpTo(
+            index: 8,
+            sliverContext: _sliverListCtx4,
+            alignment: 1,
+          );
+          await tester.pumpAndSettle();
+          final sliverList4ObservationResult =
+              (resultMap[_sliverListCtx4] as ListViewObserveModel);
+          expect(
+            sliverList4ObservationResult.displayingChildModelList.last.index,
+            8,
+          );
+        },
+      );
+
+      testWidgets(
+        'Scroll to index with anchor 0.0',
+        (tester) async {
+          resetAll(anchor: 0.0);
+          await tester.pumpWidget(widget);
+
+          observerController.jumpTo(
+            index: 1,
+            sliverContext: _sliverListCtx1,
+            alignment: 1,
+          );
+          await tester.pumpAndSettle();
+          final sliverList1ObservationResult =
+              (resultMap[_sliverListCtx1] as ListViewObserveModel);
+          expect(
+            sliverList1ObservationResult.displayingChildModelList.last.index,
+            1,
+          );
+
+          observerController.jumpTo(
+            index: 5,
+            sliverContext: _sliverListCtx2,
+            alignment: 1,
+          );
+          await tester.pumpAndSettle();
+          final sliverList2ObservationResult =
+              (resultMap[_sliverListCtx2] as ListViewObserveModel);
+          expect(
+            sliverList2ObservationResult.displayingChildModelList.last.index,
+            5,
+          );
+
+          observerController.jumpTo(
+            index: 10,
+            sliverContext: _sliverListCtx3,
+          );
+          await tester.pumpAndSettle();
+          final sliverList3ObservationResult =
+              (resultMap[_sliverListCtx3] as ListViewObserveModel);
+          expect(sliverList3ObservationResult.firstChild?.index, 10);
+
+          observerController.jumpTo(
+            index: 8,
+            sliverContext: _sliverListCtx4,
+          );
+          await tester.pumpAndSettle();
+          final sliverList4ObservationResult =
+              (resultMap[_sliverListCtx4] as ListViewObserveModel);
+          expect(sliverList4ObservationResult.firstChild?.index, 8);
         },
       );
     },
