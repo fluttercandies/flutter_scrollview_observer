@@ -34,6 +34,37 @@ void main() {
     );
   }
 
+  Widget getFixedHeightListView({
+    ScrollController? scrollController,
+    int itemCount = 100,
+    double? cacheExtent,
+    bool useItemExtentBuilder = false,
+  }) {
+    const double height = 80;
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: ListView.builder(
+        controller: scrollController,
+        itemBuilder: (ctx, index) {
+          return SizedBox(
+            height: height,
+            child: Center(
+              child: Text("index -- $index"),
+            ),
+          );
+        },
+        itemExtent: useItemExtentBuilder ? null : height,
+        itemExtentBuilder: useItemExtentBuilder
+            ? (index, dimensions) {
+                return height;
+              }
+            : null,
+        itemCount: itemCount,
+        cacheExtent: cacheExtent,
+      ),
+    );
+  }
+
   testWidgets('Auto get target sliver context', (tester) async {
     final scrollController = ScrollController();
     final observerController =
@@ -50,39 +81,121 @@ void main() {
     scrollController.dispose();
   });
 
-  testWidgets('Scroll to index', (tester) async {
-    final scrollController = ScrollController();
-    final observerController =
-        ListObserverController(controller: scrollController);
+  group('Scroll to index', () {
+    testWidgets('Dynamic Height', (tester) async {
+      final scrollController = ScrollController();
+      final observerController =
+          ListObserverController(controller: scrollController);
 
-    Widget widget = getListView(
-      scrollController: scrollController,
-    );
-    ListViewObserveModel? observeResult;
-    widget = ListViewObserver(
-      child: widget,
-      controller: observerController,
-      onObserve: (result) {
-        observeResult = result;
-      },
-    );
-    await tester.pumpWidget(widget);
+      Widget widget = getListView(
+        scrollController: scrollController,
+      );
+      ListViewObserveModel? observeResult;
+      widget = ListViewObserver(
+        child: widget,
+        controller: observerController,
+        onObserve: (result) {
+          observeResult = result;
+        },
+      );
+      await tester.pumpWidget(widget);
 
-    int targeItemIndex = 30;
-    observerController.jumpTo(index: targeItemIndex);
-    await tester.pumpAndSettle();
-    expect(observeResult?.firstChild?.index, targeItemIndex);
+      int targeItemIndex = 30;
+      observerController.jumpTo(index: targeItemIndex);
+      await tester.pumpAndSettle();
+      expect(observeResult?.firstChild?.index, targeItemIndex);
 
-    targeItemIndex = 60;
-    observerController.animateTo(
-      index: targeItemIndex,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-    await tester.pumpAndSettle();
-    expect(observeResult?.firstChild?.index, targeItemIndex);
+      targeItemIndex = 60;
+      observerController.animateTo(
+        index: targeItemIndex,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+      await tester.pumpAndSettle();
+      expect(observeResult?.firstChild?.index, targeItemIndex);
 
-    scrollController.dispose();
+      scrollController.dispose();
+    });
+
+    testWidgets('Fixed height with itemExtent', (tester) async {
+      final scrollController = ScrollController();
+      final observerController =
+          ListObserverController(controller: scrollController);
+
+      Widget widget = getFixedHeightListView(
+        scrollController: scrollController,
+        useItemExtentBuilder: false,
+      );
+      ListViewObserveModel? observeResult;
+      widget = ListViewObserver(
+        child: widget,
+        controller: observerController,
+        onObserve: (result) {
+          observeResult = result;
+        },
+      );
+      await tester.pumpWidget(widget);
+
+      int targeItemIndex = 30;
+      observerController.jumpTo(
+        index: targeItemIndex,
+        isFixedHeight: true,
+      );
+      await tester.pumpAndSettle();
+      expect(observeResult?.firstChild?.index, targeItemIndex);
+
+      targeItemIndex = 60;
+      observerController.animateTo(
+        index: targeItemIndex,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        isFixedHeight: true,
+      );
+      await tester.pumpAndSettle();
+      expect(observeResult?.firstChild?.index, targeItemIndex);
+
+      scrollController.dispose();
+    });
+
+    testWidgets('Fixed height with itemExtentBuilder', (tester) async {
+      final scrollController = ScrollController();
+      final observerController =
+          ListObserverController(controller: scrollController);
+
+      Widget widget = getFixedHeightListView(
+        scrollController: scrollController,
+        useItemExtentBuilder: true,
+      );
+      ListViewObserveModel? observeResult;
+      widget = ListViewObserver(
+        child: widget,
+        controller: observerController,
+        onObserve: (result) {
+          observeResult = result;
+        },
+      );
+      await tester.pumpWidget(widget);
+
+      int targeItemIndex = 30;
+      observerController.jumpTo(
+        index: targeItemIndex,
+        isFixedHeight: true,
+      );
+      await tester.pumpAndSettle();
+      expect(observeResult?.firstChild?.index, targeItemIndex);
+
+      targeItemIndex = 60;
+      observerController.animateTo(
+        index: targeItemIndex,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        isFixedHeight: true,
+      );
+      await tester.pumpAndSettle();
+      expect(observeResult?.firstChild?.index, targeItemIndex);
+
+      scrollController.dispose();
+    });
   });
 
   group('Cache index offset', () {
