@@ -23,14 +23,12 @@ jobs:
           flutter pub get
           flutter build web --release
       - name: Deploy
-        working-directory: ./example/build/web
-        run: |
-          git init
-          git config --global user.email LinXunFeng
-          git config --global user.name linxunfeng@yeah.net
-          git status
-          git remote add origin https://${{secrets.commit_secret}}@github.com/fluttercandies/flutter_scrollview_observer.git
-          git checkout -b gh-pages
-          git add --all
-          git commit -m "update"
-          git push origin gh-pages -f
+        working-directory: ./example
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
+          force_orphan: true
+          user_name: 'github-ci[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'Publish to gh-pages'
