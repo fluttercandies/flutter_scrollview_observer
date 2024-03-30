@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-      - develop
+      # - develop
 jobs:
   build:
     name: Build Web
