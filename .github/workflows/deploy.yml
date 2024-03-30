@@ -21,7 +21,7 @@ jobs:
         run: |
           flutter config --enable-web
           flutter pub get
-          flutter build web --release
+          flutter build web --release --base-href /flutter_scrollview_observer/
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
