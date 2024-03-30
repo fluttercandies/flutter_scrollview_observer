@@ -16,11 +16,15 @@ jobs:
         with:
           flutter-version: '3.16.9'
           channel: 'stable'
-      - run: flutter config --enable-web
-      - run: flutter pub get
-      - run: flutter build web --release
-      - run: |
-          cd build/web
+      - name: Flutter build web
+        working-directory: ./example
+        run: |
+          flutter config --enable-web
+          flutter pub get
+          flutter build web --release
+      - name: Deploy
+        working-directory: ./example/build/web
+        run: |
           git init
           git config --global user.email LinXunFeng
           git config --global user.name linxunfeng@yeah.net
