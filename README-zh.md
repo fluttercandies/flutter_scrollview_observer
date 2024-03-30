@@ -44,8 +44,10 @@ Language: 中文 | [English](https://github.com/fluttercandies/flutter_scrollvie
 - [x] `NestedScrollView`
 - [x] 由第三方库构建的 `ScrollView`
 
+## 🕹 预览
 
-🏞 相关[示例](https://github.com/fluttercandies/flutter_scrollview_observer/wiki/Example)
+- 🖥 [在线预览](https://fluttercandies.github.io/flutter_scrollview_observer/)
+- 🏞 [示例图片](https://github.com/fluttercandies/flutter_scrollview_observer/wiki/Example)
 
 ## 📦 安装
 

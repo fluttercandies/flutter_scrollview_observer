@@ -46,7 +46,10 @@ Chat: [Join WeChat group](https://mp.weixin.qq.com/s/JBbMstn0qW6M71hh-BRKzw)
 - [x] `NestedScrollView`
 - [x] `ScrollView` built by third-party package.
 
-🏞 Related [Example](https://github.com/fluttercandies/flutter_scrollview_observer/wiki/Example)
+## 🕹 Preview
+
+- 🖥 [Online Preview](https://fluttercandies.github.io/flutter_scrollview_observer/)
+- 🏞 [Sample images](https://github.com/fluttercandies/flutter_scrollview_observer/wiki/Example)
 
 ## 📦 Installing
 
