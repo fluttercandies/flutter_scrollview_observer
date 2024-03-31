@@ -4,6 +4,8 @@
  * @Date: 2023-12-31 14:00:51
  */
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
@@ -21,7 +23,16 @@ class _InfiniteListViewPageState extends State<InfiniteListViewPage> {
 
   bool isLoadingForFooter = false;
 
-  double itemHeight = 150;
+  final double itemMinHeight = 50;
+
+  final double itemMaxHeight = 150;
+
+  final Random _random = Random();
+
+  double get randomItemHeight =>
+      itemMinHeight + _random.nextInt((itemMaxHeight - itemMinHeight).toInt());
+
+  List<double> itemHeights = [];
 
   int generateCount = 20;
 
@@ -45,6 +56,10 @@ class _InfiniteListViewPageState extends State<InfiniteListViewPage> {
         return initIndex - (generateCount - index);
       }),
     );
+    itemHeights.insertAll(
+      0,
+      List.generate(generateCount, (_) => randomItemHeight),
+    );
     // Keeping position
     chatObserver.standby(changeCount: generateCount);
     // Clearing the offset cache
@@ -66,6 +81,9 @@ class _InfiniteListViewPageState extends State<InfiniteListViewPage> {
       dataSource.addAll(
         List.generate(generateCount, (index) => index + initIndex + 1),
       );
+      itemHeights.addAll(
+        List.generate(generateCount, (_) => randomItemHeight),
+      );
     });
     isLoadingForFooter = false;
   }
@@ -78,12 +96,13 @@ class _InfiniteListViewPageState extends State<InfiniteListViewPage> {
       ..initialIndex = generateCount ~/ 2;
 
     chatObserver = ChatScrollObserver(observerController)
-      ..fixedPositionOffset = -itemHeight
+      ..fixedPositionOffset = -double.maxFinite
       ..toRebuildScrollViewCallback = () {
         setState(() {});
       };
 
     dataSource = List.generate(generateCount, (index) => index);
+    itemHeights = List.generate(generateCount, (_) => randomItemHeight);
   }
 
   @override
@@ -95,6 +114,9 @@ class _InfiniteListViewPageState extends State<InfiniteListViewPage> {
         triggerOnObserveType: ObserverTriggerOnObserveType.directly,
         child: _buildListView(),
         onObserve: (result) {
+          debugPrint(
+              'displaying -- ${result.displayingChildIndexList.map((i) => dataSource[i])}');
+
           if (result.firstChild?.index == 0) {
             final firstChildLeadingMarginToViewport =
                 result.firstChild?.leadingMarginToViewport ?? 0;
@@ -127,14 +149,14 @@ class _InfiniteListViewPageState extends State<InfiniteListViewPage> {
       },
       itemCount: dataSource.length,
       // Ensure that the reference item can be found when keeping position.
-      cacheExtent: itemHeight * (generateCount + 2),
+      cacheExtent: itemMaxHeight * (generateCount + 2),
     );
   }
 
   Widget _buildListItemView(int index) {
     return Container(
-      height: itemHeight,
-      color: Colors.black12,
+      height: itemHeights[index],
+      color: index % 2 == 0 ? Colors.black26 : Colors.black12,
       child: Center(
         child: Text(
           "index -- ${dataSource[index]}",
