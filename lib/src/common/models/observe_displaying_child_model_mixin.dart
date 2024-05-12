@@ -23,6 +23,9 @@ mixin ObserveDisplayingChildModelMixin on ObserveDisplayingChildModel {
   /// The overlap of sliver
   double get overlap => sliver.constraints.overlap;
 
+  /// The amount of currently visible visual space to the [sliver].
+  double get paintExtent => sliver.geometry?.paintExtent ?? 0;
+
   /// The precedingScrollExtent of sliver
   double get precedingScrollExtent => sliver.constraints.precedingScrollExtent;
 
@@ -52,27 +55,39 @@ mixin ObserveDisplayingChildModelMixin on ObserveDisplayingChildModel {
   double get trailingMarginToViewport =>
       viewportMainAxisExtent - leadingMarginToViewport - mainAxisSize;
 
-  /// The display percentage of the current widget
-  double get displayPercentage => calculateDisplayPercentage();
-
-  /// Calculates the display percentage of the current widget
-  double calculateDisplayPercentage() {
-    if (!viewportHasPixels) return 0;
-    final currentChildLayoutOffset = layoutOffset + precedingScrollExtent;
-    double visibleMainAxisSize = mainAxisSize;
-    final rawScrollViewOffSet = viewportPixels + overlap;
-    // Child widget moved out in the main axis.
-    if (rawScrollViewOffSet > currentChildLayoutOffset) {
-      visibleMainAxisSize =
-          mainAxisSize - (rawScrollViewOffSet - currentChildLayoutOffset);
+  /// The visible size of the child widget in the main axis.
+  double get visibleMainAxisSize {
+    if (paintExtent == 0) return 0;
+    double _visibleMainAxisSize = mainAxisSize;
+    final currentChildLayoutOffset = layoutOffset;
+    final scrollOffset = sliver.constraints.scrollOffset;
+    final leadingScrollViewOffset = scrollOffset + overlap;
+    if (leadingScrollViewOffset > currentChildLayoutOffset) {
+      // The child widget is blocked by the leading direction side of viewport.
+      _visibleMainAxisSize =
+          mainAxisSize - (leadingScrollViewOffset - currentChildLayoutOffset);
+    } else if (scrollOffset + paintExtent >
+        currentChildLayoutOffset + mainAxisSize) {
+      // The child widget is being fully displayed.
+      _visibleMainAxisSize = mainAxisSize;
     } else {
-      // The child widget is not blocked by SliverPersistentHeader at the end,
-      // so [overlap] is not considered.
-      visibleMainAxisSize = rawScrollViewOffSet +
-          viewportMainAxisExtent -
-          overlap -
-          currentChildLayoutOffset;
+      // The child widget is blocked by the trailing direction side of viewport.
+      _visibleMainAxisSize =
+          scrollOffset + paintExtent - currentChildLayoutOffset;
     }
+    _visibleMainAxisSize = _visibleMainAxisSize.clamp(0, mainAxisSize);
+    return _visibleMainAxisSize;
+  }
+
+  /// The visible fraction of the child widget on the corresponding sliver.
+  double get visibleFraction {
+    if (paintExtent == 0) return 0;
+    return (visibleMainAxisSize / paintExtent).clamp(0, 1);
+  }
+
+  /// The display percentage of the current widget
+  double get displayPercentage {
+    if (mainAxisSize == 0) return 0;
     return (visibleMainAxisSize / mainAxisSize).clamp(0, 1);
   }
 }
