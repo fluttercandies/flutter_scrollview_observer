@@ -90,10 +90,10 @@ class ChatScrollObserver {
   /// [refItemRelativeIndex] parameter and [refItemRelativeIndexAfterUpdate]
   /// parameter are only used when the mode is
   /// [ChatScrollObserverHandleMode.specified].
-  /// Usage: When you insert a new message, assign [refItemRelativeIndex] to the
-  /// index of the reference message (latest message) before insertion, and
-  /// assign [refItemRelativeIndexAfterUpdate] to the index of the reference
-  /// message after insertion, they refer to the index of the same message.
+  /// Usage: When you insert a new message, assign the index of the reference
+  /// message before insertion to [refItemIndex], and assign the index of the
+  /// reference message after insertion to [refItemIndexAfterUpdate].
+  /// Note that they should refer to the index of the same message.
   standby({
     BuildContext? sliverContext,
     bool isRemove = false,
