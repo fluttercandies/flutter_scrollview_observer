@@ -3,6 +3,7 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -124,6 +125,9 @@ class ObserverWidgetState<
         }
       }).toList();
 
+  /// Whether can handle observe.
+  bool innerCanHandleObserve = true;
+
   @override
   void initState() {
     super.initState();
@@ -151,6 +155,8 @@ class ObserverWidgetState<
         onNotification: (notification) {
           if (innerAutoTriggerObserveScrollNotifications
               .contains(notification.runtimeType)) {
+            final isIgnoreInnerCanHandleObserve =
+                ScrollUpdateNotification != notification.runtimeType;
             if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
               // Getting bad observation result because scrolling in Flutter Web
               // with mouse wheel is not smooth.
@@ -159,10 +165,15 @@ class ObserverWidgetState<
               //
               // issue
               // https://github.com/LinXunFeng/flutter_scrollview_observer/issues/31
-              WidgetsBinding.instance
-                  .addPostFrameCallback((_) => handleContexts());
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                handleContexts(
+                  isIgnoreInnerCanHandleObserve: isIgnoreInnerCanHandleObserve,
+                );
+              });
             } else {
-              handleContexts();
+              handleContexts(
+                isIgnoreInnerCanHandleObserve: isIgnoreInnerCanHandleObserve,
+              );
             }
           }
           return false;
@@ -244,12 +255,33 @@ class ObserverWidgetState<
     return obj is RenderSliverList;
   }
 
+  /// Update [innerCanHandleObserve] according to the
+  /// [ObserverController.observeIntervalForScrolling].
+  updateInnerCanHandleObserve() async {
+    final observeInterval =
+        widget.sliverController?.observeIntervalForScrolling ?? Duration.zero;
+    if (Duration.zero == observeInterval) {
+      innerCanHandleObserve = true;
+      return;
+    }
+    if (!innerCanHandleObserve) return;
+    innerCanHandleObserve = false;
+    await Future.delayed(observeInterval);
+    innerCanHandleObserve = true;
+  }
+
   /// Handle all buildContext
   ObserverHandleContextsResultModel<M>? handleContexts({
     bool isForceObserve = false,
     bool isFromObserveNotification = false,
     bool isDependObserveCallback = true,
+    bool isIgnoreInnerCanHandleObserve = true,
   }) {
+    if (!isIgnoreInnerCanHandleObserve) {
+      if (!innerCanHandleObserve) return null;
+      updateInnerCanHandleObserve();
+    }
+
     final isForbidObserveCallback =
         widget.sliverController?.isForbidObserveCallback ?? false;
     final onObserve = isForbidObserveCallback ? null : widget.onObserve;

@@ -85,7 +85,13 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
     bool isForceObserve = false,
     bool isFromObserveNotification = false,
     bool isDependObserveCallback = true,
+    bool isIgnoreInnerCanHandleObserve = true,
   }) {
+    if (!isIgnoreInnerCanHandleObserve) {
+      if (!innerCanHandleObserve) return null;
+      updateInnerCanHandleObserve();
+    }
+
     // Viewport
     final observeViewportResult = handleObserveViewport(
       isForceObserve: isForceObserve,
@@ -97,6 +103,8 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
       isForceObserve: isForceObserve,
       isFromObserveNotification: isFromObserveNotification,
       isDependObserveCallback: isDependObserveCallback,
+      // It has been processed by the currently rewritten handleContexts method
+      isIgnoreInnerCanHandleObserve: true,
     );
 
     if (observeViewportResult == null && handleContextsResult == null) {

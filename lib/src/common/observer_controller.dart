@@ -28,6 +28,12 @@ class ObserverController {
   /// Target sliver [BuildContext]
   List<BuildContext> sliverContexts = [];
 
+  /// In the case where the observation is triggered during scrolling, the
+  /// minimum amount of time to wait for firing observe callback.
+  ///
+  /// Defaults to Duration.zero.
+  Duration observeIntervalForScrolling = Duration.zero;
+
   /// Whether to forbid the onObserve callback and onObserveAll callback.
   bool isForbidObserveCallback = false;
 
