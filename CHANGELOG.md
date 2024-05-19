@@ -1,3 +1,18 @@
+## 1.20.0
+- ObserverController
+  - Add `observeIntervalForScrolling` to set the minimum amount of time to wait for firing observe callback during scrolling.
+- ObserverUtils
+  - Improve the logic of `isDisplayingSliverInViewport` method.
+- ScrollViewOnceObserveNotificationResult
+  - Add `observeViewportResultModel`.
+- ChatScrollObserver
+  - Add `ChatScrollObserverRefIndexType`.
+  - Add `refIndexType` to specify the role of `refItemIndex` and `refItemIndex`.
+- Slivers
+  - Add `SliverObserveContext`.
+- ObserveDisplayingChildModelMixin
+  - Add `visibleFraction` and `visibleMainAxisSize`.
+
 ## 1.19.1
 - ListViewObserver
   - Support `SliverVariedExtentList` in [74](https://github.com/fluttercandies/flutter_scrollview_observer/issues/74).
