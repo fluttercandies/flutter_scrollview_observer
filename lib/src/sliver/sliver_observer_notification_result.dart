@@ -8,6 +8,7 @@ import 'package:scrollview_observer/src/common/models/observe_model.dart';
 import 'package:scrollview_observer/src/common/observer_notification_result.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
 import 'package:scrollview_observer/src/sliver/models/sliver_observer_observe_result_model.dart';
+import 'package:scrollview_observer/src/sliver/models/sliver_viewport_observe_model.dart';
 
 class ScrollViewOnceObserveNotificationResult
     extends CommonOnceObserveNotificationResult<ObserveModel,
@@ -20,5 +21,12 @@ class ScrollViewOnceObserveNotificationResult
           type: type,
           observeResult: observeResult.changeResultModel,
           observeAllResult: observeResult.changeResultMap,
-        );
+        ) {
+    observeViewportResultModel = observeResult.observeViewportResultModel;
+  }
+
+  /// Getting all slivers those are displayed in viewport.
+  ///
+  /// Corresponding to [onObserveViewport] in [SliverViewObserver].
+  SliverViewportObserveModel? observeViewportResultModel;
 }
