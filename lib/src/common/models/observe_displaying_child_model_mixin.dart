@@ -27,6 +27,9 @@ mixin ObserveDisplayingChildModelMixin on ObserveDisplayingChildModel {
   double get paintExtent => sliver.geometry?.paintExtent ?? 0;
 
   /// The precedingScrollExtent of sliver
+  ///
+  /// Note: Before Flutter 3.22.0, this value may be inaccurate in some scenarios.
+  /// Related PR: https://github.com/flutter/flutter/pull/143661
   double get precedingScrollExtent => sliver.constraints.precedingScrollExtent;
 
   /// The layout offset of child widget.
