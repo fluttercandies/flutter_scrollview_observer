@@ -106,6 +106,7 @@ void main() {
 
       observerController.jumpTo(index: 30);
       await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
       expect(observerController.indexOffsetMap.isEmpty, true);
 
       scrollController.dispose();
@@ -130,6 +131,7 @@ void main() {
 
       observerController.jumpTo(index: 30);
       await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
       expect(observerController.indexOffsetMap[ctx]?.isNotEmpty, true);
 
       observerController.clearScrollIndexCache();
@@ -189,6 +191,54 @@ void main() {
     scrollController.dispose();
   });
 
+  testWidgets('Check observeIntervalForScrolling', (tester) async {
+    final scrollController = ScrollController();
+    final observerController = GridObserverController(
+      controller: scrollController,
+    )..observeIntervalForScrolling = const Duration(milliseconds: 500);
+    int observeCount = 0;
+
+    Widget widget = getGridView(
+      scrollController: scrollController,
+    );
+    widget = GridViewObserver(
+      child: widget,
+      controller: observerController,
+      autoTriggerObserveTypes: const [
+        ObserverAutoTriggerObserveType.scrollStart,
+        ObserverAutoTriggerObserveType.scrollUpdate,
+        ObserverAutoTriggerObserveType.scrollEnd,
+      ],
+      triggerOnObserveType: ObserverTriggerOnObserveType.directly,
+      onObserve: (result) {
+        observeCount++;
+      },
+    );
+    await tester.pumpWidget(widget);
+    final finder = find.byWidget(widget);
+
+    await tester.timedDragFrom(
+      tester.getCenter(finder),
+      const Offset(0, -50),
+      const Duration(milliseconds: 400),
+    );
+    await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
+    expect(observeCount, 3);
+
+    observeCount = 0;
+    await tester.timedDragFrom(
+      tester.getCenter(finder),
+      const Offset(0, -50),
+      const Duration(milliseconds: 600),
+    );
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(observeCount, 4);
+
+    scrollController.dispose();
+  });
+
   testWidgets('Check isForbidObserveCallback', (tester) async {
     final scrollController = ScrollController();
     final observerController =
@@ -211,11 +261,13 @@ void main() {
     observerController.isForbidObserveCallback = true;
     observerController.jumpTo(index: 10);
     await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserve, false);
 
     observerController.isForbidObserveCallback = false;
     observerController.jumpTo(index: 30);
     await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserve, true);
   });
 
@@ -281,6 +333,7 @@ void main() {
           await tester.pumpWidget(widget);
           observerController.jumpTo(index: 10);
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           expect(indexOfStartNoti, 0);
           expect(indexOfInterruptionNoti, -1);
           expect(indexOfDecisionNoti, 1);
@@ -295,6 +348,7 @@ void main() {
           await tester.pumpWidget(widget);
           observerController.jumpTo(index: 101);
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           expect(indexOfStartNoti, 0);
           expect(indexOfInterruptionNoti, 1);
           expect(indexOfDecisionNoti, -1);

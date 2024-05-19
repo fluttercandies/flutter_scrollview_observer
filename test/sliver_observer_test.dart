@@ -118,11 +118,13 @@ void main() {
     observerController.isForbidObserveCallback = true;
     observerController.jumpTo(index: 10, sliverContext: _sliverListCtx);
     await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserve, false);
 
     observerController.isForbidObserveCallback = false;
     observerController.jumpTo(index: 20, sliverContext: _sliverListCtx);
     await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserve, true);
 
     scrollController.dispose();
@@ -158,12 +160,78 @@ void main() {
     observerController.isForbidObserveViewportCallback = true;
     observerController.jumpTo(index: 10, sliverContext: _sliverListCtx);
     await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserveViewport, false);
 
     observerController.isForbidObserveViewportCallback = false;
     observerController.jumpTo(index: 20, sliverContext: _sliverGridCtx);
     await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserveViewport, true);
+
+    scrollController.dispose();
+  });
+
+  testWidgets('Check observeIntervalForScrolling', (tester) async {
+    final scrollController = ScrollController();
+    final observerController =
+        SliverObserverController(controller: scrollController)
+          ..observeIntervalForScrolling = const Duration(milliseconds: 500);
+    int observeCountForOnObserveAll = 0;
+    int observeCountForOnObserveViewport = 0;
+
+    Widget widget = _buildScrollView(
+      scrollController: scrollController,
+    );
+
+    widget = SliverViewObserver(
+      child: widget,
+      controller: observerController,
+      sliverContexts: () {
+        return [
+          if (sliverListKey.currentContext != null)
+            sliverListKey.currentContext!,
+          if (sliverGridKey.currentContext != null)
+            sliverGridKey.currentContext!,
+        ];
+      },
+      autoTriggerObserveTypes: const [
+        ObserverAutoTriggerObserveType.scrollStart,
+        ObserverAutoTriggerObserveType.scrollUpdate,
+        ObserverAutoTriggerObserveType.scrollEnd,
+      ],
+      triggerOnObserveType: ObserverTriggerOnObserveType.directly,
+      onObserveAll: (_) {
+        observeCountForOnObserveAll++;
+      },
+      onObserveViewport: (_) {
+        observeCountForOnObserveViewport++;
+      },
+    );
+    await tester.pumpWidget(widget);
+    final finder = find.byWidget(widget);
+
+    await tester.timedDragFrom(
+      tester.getCenter(finder),
+      const Offset(0, -50),
+      const Duration(milliseconds: 400),
+    );
+    await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
+    expect(observeCountForOnObserveAll, 3);
+    expect(observeCountForOnObserveViewport, 3);
+
+    observeCountForOnObserveAll = 0;
+    observeCountForOnObserveViewport = 0;
+    await tester.timedDragFrom(
+      tester.getCenter(finder),
+      const Offset(0, -50),
+      const Duration(milliseconds: 600),
+    );
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(observeCountForOnObserveAll, 4);
+    expect(observeCountForOnObserveViewport, 4);
 
     scrollController.dispose();
   });
@@ -229,6 +297,7 @@ void main() {
           await tester.pumpWidget(widget);
           observerController.jumpTo(index: 10);
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           expect(indexOfStartNoti, 0);
           expect(indexOfInterruptionNoti, -1);
           expect(indexOfDecisionNoti, 1);
@@ -243,6 +312,7 @@ void main() {
           await tester.pumpWidget(widget);
           observerController.jumpTo(index: 101);
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           expect(indexOfStartNoti, 0);
           expect(indexOfInterruptionNoti, 1);
           expect(indexOfDecisionNoti, -1);
@@ -375,6 +445,7 @@ void main() {
           sliverContext: _sliverGridCtx,
         );
         await tester.pumpAndSettle();
+        await tester.pump(observerController.observeIntervalForScrolling);
         result = await observerController.dispatchOnceObserve(
           sliverContext: _sliverGridCtx!,
           isDependObserveCallback: false,
@@ -559,6 +630,7 @@ void main() {
             },
           );
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           final headerListObservationResult =
               (resultMap[_sliverHeaderListCtx] as ListViewObserveModel);
           expect(headerListObservationResult.firstChild?.index, 1);
@@ -576,6 +648,7 @@ void main() {
             },
           );
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           final bodyListObservationResult =
               (resultMap[_sliverBodyListCtx] as ListViewObserveModel);
           expect(bodyListObservationResult.firstChild?.index, 5);
@@ -591,6 +664,7 @@ void main() {
             },
           );
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           final bodyGridObservationResult =
               (resultMap[_sliverBodyGridCtx] as GridViewObserveModel);
           final bodyGridFirstGroupChildIndexList = bodyGridObservationResult
@@ -826,6 +900,7 @@ void main() {
             sliverContext: _sliverListCtx1,
           );
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           final sliverList1ObservationResult =
               (resultMap[_sliverListCtx1] as ListViewObserveModel);
           expect(sliverList1ObservationResult.firstChild?.index, 1);
@@ -835,6 +910,7 @@ void main() {
             sliverContext: _sliverListCtx2,
           );
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           final sliverList2ObservationResult =
               (resultMap[_sliverListCtx2] as ListViewObserveModel);
           expect(sliverList2ObservationResult.firstChild?.index, 5);
@@ -845,6 +921,7 @@ void main() {
             alignment: 1,
           );
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           final sliverList3ObservationResult =
               (resultMap[_sliverListCtx3] as ListViewObserveModel);
           expect(
@@ -858,6 +935,7 @@ void main() {
             alignment: 1,
           );
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           final sliverList4ObservationResult =
               (resultMap[_sliverListCtx4] as ListViewObserveModel);
           expect(
@@ -879,6 +957,7 @@ void main() {
             alignment: 1,
           );
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           final sliverList1ObservationResult =
               (resultMap[_sliverListCtx1] as ListViewObserveModel);
           expect(
@@ -892,6 +971,7 @@ void main() {
             alignment: 1,
           );
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           final sliverList2ObservationResult =
               (resultMap[_sliverListCtx2] as ListViewObserveModel);
           expect(
@@ -904,6 +984,7 @@ void main() {
             sliverContext: _sliverListCtx3,
           );
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           final sliverList3ObservationResult =
               (resultMap[_sliverListCtx3] as ListViewObserveModel);
           expect(sliverList3ObservationResult.firstChild?.index, 10);
@@ -913,6 +994,7 @@ void main() {
             sliverContext: _sliverListCtx4,
           );
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           final sliverList4ObservationResult =
               (resultMap[_sliverListCtx4] as ListViewObserveModel);
           expect(sliverList4ObservationResult.firstChild?.index, 8);

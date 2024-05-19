@@ -105,6 +105,7 @@ void main() {
       int targeItemIndex = 30;
       observerController.jumpTo(index: targeItemIndex);
       await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
       expect(observeResult?.firstChild?.index, targeItemIndex);
 
       targeItemIndex = 60;
@@ -114,6 +115,7 @@ void main() {
         curve: Curves.easeInOut,
       );
       await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
       expect(observeResult?.firstChild?.index, targeItemIndex);
 
       scrollController.dispose();
@@ -145,6 +147,7 @@ void main() {
         isFixedHeight: true,
       );
       await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
       expect(observeResult?.firstChild?.index, targeItemIndex);
 
       targeItemIndex = 60;
@@ -155,6 +158,7 @@ void main() {
         isFixedHeight: true,
       );
       await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
       expect(observeResult?.firstChild?.index, targeItemIndex);
 
       scrollController.dispose();
@@ -185,6 +189,7 @@ void main() {
         isFixedHeight: true,
       );
       await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
       expect(observeResult?.firstChild?.index, targeItemIndex);
 
       targeItemIndex = 60;
@@ -195,6 +200,7 @@ void main() {
         isFixedHeight: true,
       );
       await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
       expect(observeResult?.firstChild?.index, targeItemIndex);
 
       scrollController.dispose();
@@ -219,6 +225,7 @@ void main() {
 
       observerController.jumpTo(index: 30);
       await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
       expect(observerController.indexOffsetMap.isEmpty, true);
 
       scrollController.dispose();
@@ -243,6 +250,7 @@ void main() {
 
       observerController.jumpTo(index: 30);
       await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
       expect(observerController.indexOffsetMap[ctx]?.isNotEmpty, true);
 
       observerController.clearScrollIndexCache();
@@ -277,6 +285,7 @@ void main() {
       alignment: 0,
     );
     await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     var firstChild = observeResult?.firstChild;
     expect(firstChild, isNotNull);
     expect(firstChild?.index, targetItemIndex);
@@ -287,6 +296,7 @@ void main() {
       alignment: 0.5,
     );
     await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     firstChild = observeResult?.firstChild;
     expect(firstChild?.index, targetItemIndex);
     expect(firstChild?.displayPercentage, 0.5);
@@ -296,8 +306,57 @@ void main() {
       alignment: 1,
     );
     await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     firstChild = observeResult?.firstChild;
     expect(firstChild?.index, targetItemIndex + 1);
+
+    scrollController.dispose();
+  });
+
+  testWidgets('Check observeIntervalForScrolling', (tester) async {
+    final scrollController = ScrollController();
+    final observerController = ListObserverController(
+      controller: scrollController,
+    )..observeIntervalForScrolling = const Duration(milliseconds: 500);
+    int observeCount = 0;
+
+    Widget widget = getListView(
+      scrollController: scrollController,
+    );
+    widget = ListViewObserver(
+      child: widget,
+      controller: observerController,
+      autoTriggerObserveTypes: const [
+        ObserverAutoTriggerObserveType.scrollStart,
+        ObserverAutoTriggerObserveType.scrollUpdate,
+        ObserverAutoTriggerObserveType.scrollEnd,
+      ],
+      triggerOnObserveType: ObserverTriggerOnObserveType.directly,
+      onObserve: (result) {
+        observeCount++;
+      },
+    );
+    await tester.pumpWidget(widget);
+    final finder = find.byWidget(widget);
+
+    await tester.timedDragFrom(
+      tester.getCenter(finder),
+      const Offset(0, -50),
+      const Duration(milliseconds: 400),
+    );
+    await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
+    expect(observeCount, 3);
+
+    observeCount = 0;
+    await tester.timedDragFrom(
+      tester.getCenter(finder),
+      const Offset(0, -50),
+      const Duration(milliseconds: 600),
+    );
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(observeCount, 4);
 
     scrollController.dispose();
   });
@@ -324,11 +383,13 @@ void main() {
     observerController.isForbidObserveCallback = true;
     observerController.jumpTo(index: 10);
     await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserve, false);
 
     observerController.isForbidObserveCallback = false;
     observerController.jumpTo(index: 30);
     await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserve, true);
   });
 
@@ -396,6 +457,7 @@ void main() {
           await tester.pumpWidget(widget);
           observerController.jumpTo(index: 10);
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           expect(indexOfStartNoti, 0);
           expect(indexOfInterruptionNoti, -1);
           expect(indexOfDecisionNoti, 1);
@@ -410,6 +472,7 @@ void main() {
           await tester.pumpWidget(widget);
           observerController.jumpTo(index: 10);
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           expect(indexOfStartNoti, 0);
           expect(indexOfInterruptionNoti, -1);
           expect(indexOfDecisionNoti, 1);
@@ -424,6 +487,7 @@ void main() {
           await tester.pumpWidget(widget);
           observerController.jumpTo(index: 101);
           await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
           expect(indexOfStartNoti, 0);
           expect(indexOfInterruptionNoti, 1);
           expect(indexOfDecisionNoti, -1);
