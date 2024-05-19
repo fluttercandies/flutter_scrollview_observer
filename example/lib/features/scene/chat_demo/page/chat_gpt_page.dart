@@ -203,10 +203,24 @@ class _ChatGPTPageState extends State<ChatGPTPage> {
         // changeCount: 1,
       );
       // chatObserver.standby(
-      //   changeCount: 1,
       //   mode: ChatScrollObserverHandleMode.specified,
-      //   refItemRelativeIndex: 2,
-      //   refItemRelativeIndexAfterUpdate: 2,
+      //   refIndexType:
+      //       ChatScrollObserverRefIndexType.relativeIndexStartFromCacheExtent,
+      //   refItemIndex: 1,
+      //   refItemIndexAfterUpdate: 1,
+      // );
+      // chatObserver.standby(
+      //   mode: ChatScrollObserverHandleMode.specified,
+      //   refIndexType:
+      //       ChatScrollObserverRefIndexType.relativeIndexStartFromDisplaying,
+      //   refItemIndex: 1,
+      //   refItemIndexAfterUpdate: 1,
+      // );
+      // chatObserver.standby(
+      //   mode: ChatScrollObserverHandleMode.specified,
+      //   refIndexType: ChatScrollObserverRefIndexType.itemIndex,
+      //   refItemIndex: 1,
+      //   refItemIndexAfterUpdate: 1,
       // );
       setState(() {});
     });
