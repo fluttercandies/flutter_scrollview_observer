@@ -39,6 +39,131 @@ void main() {
 
     scrollController.dispose();
   });
+
+  testWidgets('Keeping position with ChatScrollObserverHandleMode.specified',
+      (tester) async {
+    GlobalKey<ChatListViewState> key = GlobalKey();
+    final scrollController = ScrollController();
+    final observerController =
+        ListObserverController(controller: scrollController);
+    final chatScrollObserver = ChatScrollObserver(observerController)
+      ..fixedPositionOffset = -1;
+    const firstDisplayingChildIndex = 2;
+
+    Widget widget = ChatListView(
+      key: key,
+      scrollController: scrollController,
+      observerController: observerController,
+      chatScrollObserver: chatScrollObserver,
+    );
+    await tester.pumpWidget(widget);
+
+    updateData({
+      int index = 0,
+    }) {
+      final appendStr = 'updateData' * 10;
+      key.currentState?.dataList[index] += appendStr;
+    }
+
+    observerController.jumpTo(index: firstDisplayingChildIndex);
+    await tester.pumpAndSettle();
+    var result = await observerController.dispatchOnceObserve(
+      isDependObserveCallback: false,
+      isForce: true,
+    );
+    expectSync(
+      result.observeResult?.firstChild?.index,
+      firstDisplayingChildIndex,
+    );
+    expectSync(result.observeResult?.firstChild?.leadingMarginToViewport, 0);
+
+    // relativeIndexStartFromCacheExtent
+    var firstItemModel = observerController.observeFirstItem();
+    var firstItemIndex = firstItemModel?.index ?? 0;
+    await chatScrollObserver.standby(
+      mode: ChatScrollObserverHandleMode.specified,
+      refIndexType:
+          ChatScrollObserverRefIndexType.relativeIndexStartFromCacheExtent,
+      refItemIndex: 1,
+      refItemIndexAfterUpdate: 1,
+    );
+    expect(chatScrollObserver.refItemIndex, firstItemIndex + 1);
+    expect(
+      chatScrollObserver.refItemIndexAfterUpdate,
+      firstItemIndex + 1,
+    );
+    updateData();
+    await tester.pumpAndSettle();
+    result = await observerController.dispatchOnceObserve(
+      isDependObserveCallback: false,
+      isForce: true,
+    );
+    expectSync(
+      result.observeResult?.firstChild?.index,
+      firstDisplayingChildIndex,
+    );
+    expectSync(result.observeResult?.firstChild?.leadingMarginToViewport, 0);
+
+    // relativeIndexStartFromDisplaying
+    result = await observerController.dispatchOnceObserve(
+      isDependObserveCallback: false,
+      isForce: true,
+    );
+    var currentFirstDisplayingChildIndex =
+        result.observeResult?.firstChild?.index ?? 0;
+    await chatScrollObserver.standby(
+      mode: ChatScrollObserverHandleMode.specified,
+      refIndexType:
+          ChatScrollObserverRefIndexType.relativeIndexStartFromDisplaying,
+      refItemIndex: 1,
+      refItemIndexAfterUpdate: 1,
+    );
+    expect(
+      chatScrollObserver.refItemIndex,
+      currentFirstDisplayingChildIndex + 1,
+    );
+    expect(
+      chatScrollObserver.refItemIndexAfterUpdate,
+      currentFirstDisplayingChildIndex + 1,
+    );
+    updateData();
+    await tester.pumpAndSettle();
+    result = await observerController.dispatchOnceObserve(
+      isDependObserveCallback: false,
+      isForce: true,
+    );
+    expectSync(
+      result.observeResult?.firstChild?.index,
+      firstDisplayingChildIndex,
+    );
+    expectSync(result.observeResult?.firstChild?.leadingMarginToViewport, 0);
+
+    // itemIndex
+    await chatScrollObserver.standby(
+      mode: ChatScrollObserverHandleMode.specified,
+      refIndexType: ChatScrollObserverRefIndexType.itemIndex,
+      refItemIndex: firstDisplayingChildIndex,
+      refItemIndexAfterUpdate: firstDisplayingChildIndex,
+    );
+    updateData();
+    await tester.pumpAndSettle();
+    expect(chatScrollObserver.refItemIndex, firstDisplayingChildIndex);
+    expect(
+      chatScrollObserver.refItemIndexAfterUpdate,
+      firstDisplayingChildIndex,
+    );
+    result = await observerController.dispatchOnceObserve(
+      isDependObserveCallback: false,
+      isForce: true,
+    );
+    expectSync(
+      result.observeResult?.firstChild?.index,
+      firstDisplayingChildIndex,
+    );
+    expectSync(result.observeResult?.firstChild?.leadingMarginToViewport, 0);
+
+    scrollController.dispose();
+  });
 }
 
 class ChatListView extends StatefulWidget {
@@ -47,7 +172,7 @@ class ChatListView extends StatefulWidget {
     required this.scrollController,
     required this.observerController,
     required this.chatScrollObserver,
-    required this.onReceiveScrollNotification,
+    this.onReceiveScrollNotification,
   }) : super(key: key);
 
   final ScrollController scrollController;
@@ -56,10 +181,10 @@ class ChatListView extends StatefulWidget {
   final Function()? onReceiveScrollNotification;
 
   @override
-  State<ChatListView> createState() => _ChatListViewState();
+  State<ChatListView> createState() => ChatListViewState();
 }
 
-class _ChatListViewState extends State<ChatListView> {
+class ChatListViewState extends State<ChatListView> {
   List<String> dataList =
       List.generate(100, (index) => index.toString()).toList();
 
