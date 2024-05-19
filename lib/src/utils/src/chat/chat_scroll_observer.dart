@@ -99,9 +99,17 @@ class ChatScrollObserver {
     bool isRemove = false,
     int changeCount = 1,
     ChatScrollObserverHandleMode mode = ChatScrollObserverHandleMode.normal,
+    ChatScrollObserverRefIndexType refIndexType =
+        ChatScrollObserverRefIndexType.relativeIndexStartFromCacheExtent,
+    @Deprecated(
+        'It will be removed in version 2, please use [refItemIndex] instead')
     int refItemRelativeIndex = 0,
+    @Deprecated(
+        'It will be removed in version 2, please use [refItemIndexAfterUpdate] instead')
     int refItemRelativeIndexAfterUpdate = 0,
-  }) {
+    int refItemIndex = 0,
+    int refItemIndexAfterUpdate = 0,
+  }) async {
     innerMode = mode;
     this.isRemove = isRemove;
     this.changeCount = changeCount;
@@ -132,17 +140,56 @@ class ChatScrollObserver {
         _innerRefItemLayoutOffset = model.layoutOffset;
         break;
       case ChatScrollObserverHandleMode.specified:
-        int index = firstItemModel.index + refItemRelativeIndex;
-        final model = observerController.observeItem(
-          sliverContext: sliverContext,
-          index: index,
-        );
-        if (model == null) return;
-        _innerRefItemIndex = index;
-        _innerRefItemIndexAfterUpdate =
-            firstItemModel.index + refItemRelativeIndexAfterUpdate;
-        _innerRefItemLayoutOffset = model.layoutOffset;
-        break;
+        // Prioritize the values ​​of [refItemIndex] and [refItemIndexAfterUpdate]
+        int _refItemIndex =
+            refItemIndex != 0 ? refItemIndex : refItemRelativeIndex;
+        int _refItemIndexAfterUpdate = refItemIndexAfterUpdate != 0
+            ? refItemIndexAfterUpdate
+            : refItemRelativeIndexAfterUpdate;
+
+        switch (refIndexType) {
+          case ChatScrollObserverRefIndexType.relativeIndexStartFromCacheExtent:
+            int index = firstItemModel.index + _refItemIndex;
+            final model = observerController.observeItem(
+              sliverContext: sliverContext,
+              index: index,
+            );
+            if (model == null) return;
+            _innerRefItemIndex = index;
+            _innerRefItemIndexAfterUpdate =
+                firstItemModel.index + _refItemIndexAfterUpdate;
+            _innerRefItemLayoutOffset = model.layoutOffset;
+            break;
+          case ChatScrollObserverRefIndexType.relativeIndexStartFromDisplaying:
+            final observeResult = await observerController.dispatchOnceObserve(
+              isForce: true,
+              isDependObserveCallback: false,
+            );
+            if (!observeResult.isSuccess) return;
+            final currentFirstDisplayingChildIndex =
+                observeResult.observeResult?.firstChild?.index ?? 0;
+            int index = currentFirstDisplayingChildIndex + _refItemIndex;
+            final model = observerController.observeItem(
+              sliverContext: sliverContext,
+              index: index,
+            );
+            if (model == null) return;
+            _innerRefItemIndex = index;
+            _innerRefItemIndexAfterUpdate =
+                currentFirstDisplayingChildIndex + _refItemIndexAfterUpdate;
+            _innerRefItemLayoutOffset = model.layoutOffset;
+            break;
+          case ChatScrollObserverRefIndexType.itemIndex:
+            final model = observerController.observeItem(
+              sliverContext: sliverContext,
+              index: _refItemIndex,
+            );
+            if (model == null) return;
+            _innerRefItemIndex = _refItemIndex;
+            _innerRefItemIndexAfterUpdate = _refItemIndexAfterUpdate;
+            _innerRefItemLayoutOffset = model.layoutOffset;
+            break;
+        }
     }
     // Record value.
     innerIsNeedFixedPosition = true;
