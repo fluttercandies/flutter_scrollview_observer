@@ -234,6 +234,9 @@ class ObserverUtils {
     if (sliver == null) {
       return false;
     }
+    if (!(sliver.geometry?.visible ?? false)) {
+      return false;
+    }
     if (!isBelowOffsetSliverInViewport(
       viewportPixels: viewportPixels,
       sliver: sliver,
