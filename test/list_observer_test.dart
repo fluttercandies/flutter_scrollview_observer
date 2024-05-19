@@ -67,8 +67,9 @@ void main() {
 
   testWidgets('Auto get target sliver context', (tester) async {
     final scrollController = ScrollController();
-    final observerController =
-        ListObserverController(controller: scrollController);
+    final observerController = ListObserverController(
+      controller: scrollController,
+    );
     Widget widget = getListView(
       scrollController: scrollController,
     );
@@ -84,8 +85,9 @@ void main() {
   group('Scroll to index', () {
     testWidgets('Dynamic Height', (tester) async {
       final scrollController = ScrollController();
-      final observerController =
-          ListObserverController(controller: scrollController);
+      final observerController = ListObserverController(
+        controller: scrollController,
+      );
 
       Widget widget = getListView(
         scrollController: scrollController,
@@ -119,8 +121,9 @@ void main() {
 
     testWidgets('Fixed height with itemExtent', (tester) async {
       final scrollController = ScrollController();
-      final observerController =
-          ListObserverController(controller: scrollController);
+      final observerController = ListObserverController(
+        controller: scrollController,
+      );
 
       Widget widget = getFixedHeightListView(
         scrollController: scrollController,
@@ -249,6 +252,56 @@ void main() {
     });
   });
 
+  testWidgets('Check displayPercentage', (tester) async {
+    final scrollController = ScrollController();
+    final observerController = ListObserverController(
+      controller: scrollController,
+    );
+
+    Widget widget = getListView(
+      scrollController: scrollController,
+    );
+    ListViewObserveModel? observeResult;
+    widget = ListViewObserver(
+      child: widget,
+      controller: observerController,
+      onObserve: (result) {
+        observeResult = result;
+      },
+    );
+    await tester.pumpWidget(widget);
+
+    int targetItemIndex = 30;
+    observerController.jumpTo(
+      index: targetItemIndex,
+      alignment: 0,
+    );
+    await tester.pumpAndSettle();
+    var firstChild = observeResult?.firstChild;
+    expect(firstChild, isNotNull);
+    expect(firstChild?.index, targetItemIndex);
+    expect(firstChild?.displayPercentage, 1);
+
+    observerController.jumpTo(
+      index: targetItemIndex,
+      alignment: 0.5,
+    );
+    await tester.pumpAndSettle();
+    firstChild = observeResult?.firstChild;
+    expect(firstChild?.index, targetItemIndex);
+    expect(firstChild?.displayPercentage, 0.5);
+
+    observerController.jumpTo(
+      index: targetItemIndex,
+      alignment: 1,
+    );
+    await tester.pumpAndSettle();
+    firstChild = observeResult?.firstChild;
+    expect(firstChild?.index, targetItemIndex + 1);
+
+    scrollController.dispose();
+  });
+
   testWidgets('Check isForbidObserveCallback', (tester) async {
     final scrollController = ScrollController();
     final observerController =
@@ -299,8 +352,9 @@ void main() {
         indexOfDecisionNoti = -1;
         indexOfEndNoti = -1;
         scrollController = ScrollController();
-        observerController =
-            ListObserverController(controller: scrollController);
+        observerController = ListObserverController(
+          controller: scrollController,
+        );
 
         widget = getListView(
           scrollController: scrollController,
@@ -392,4 +446,101 @@ void main() {
       );
     },
   );
+
+  group('dispatchOnceObserve', () {
+    late ScrollController scrollController;
+    late ListObserverController observerController;
+    late Widget widget;
+
+    tearDown(() {
+      scrollController.dispose();
+    });
+
+    resetAll() {
+      scrollController = ScrollController();
+      observerController = ListObserverController(
+        controller: scrollController,
+      );
+      widget = getListView(
+        scrollController: scrollController,
+        itemCount: 100,
+      );
+      widget = ListViewObserver(
+        child: widget,
+        controller: observerController,
+      );
+    }
+
+    testWidgets(
+      'Check observeResult',
+      (tester) async {
+        resetAll();
+        await tester.pumpWidget(widget);
+        var result = await observerController.dispatchOnceObserve();
+        expect(result.isSuccess, isFalse);
+
+        result = await observerController.dispatchOnceObserve(
+          isDependObserveCallback: false,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(result.observeResult, isNotNull);
+        expect(
+          result.observeResult?.displayingChildIndexList ?? [],
+          isNotEmpty,
+        );
+
+        result = await observerController.dispatchOnceObserve(
+          isDependObserveCallback: false,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(
+          result.observeResult?.displayingChildIndexList ?? [],
+          isEmpty,
+        );
+
+        result = await observerController.dispatchOnceObserve(
+          isDependObserveCallback: false,
+          isForce: true,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(
+          result.observeResult?.displayingChildIndexList ?? [],
+          isNotEmpty,
+        );
+      },
+    );
+
+    testWidgets(
+      'Check observeAllResult',
+      (tester) async {
+        resetAll();
+        await tester.pumpWidget(widget);
+        var result = await observerController.dispatchOnceObserve();
+        expect(result.isSuccess, isFalse);
+
+        result = await observerController.dispatchOnceObserve(
+          isDependObserveCallback: false,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(result.observeAllResult.values.length, 1);
+        expect(
+          result.observeAllResult.values.first,
+          result.observeResult,
+        );
+
+        result = await observerController.dispatchOnceObserve(
+          isDependObserveCallback: false,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(result.observeAllResult, isEmpty);
+
+        result = await observerController.dispatchOnceObserve(
+          isDependObserveCallback: false,
+          isForce: true,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(result.observeAllResult, isNotEmpty);
+      },
+    );
+  });
 }

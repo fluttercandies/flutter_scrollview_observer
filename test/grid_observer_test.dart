@@ -139,6 +139,56 @@ void main() {
     });
   });
 
+  testWidgets('Check displayPercentage', (tester) async {
+    final scrollController = ScrollController();
+    final observerController = GridObserverController(
+      controller: scrollController,
+    );
+
+    Widget widget = getGridView(
+      scrollController: scrollController,
+    );
+    GridViewObserveModel? observeResult;
+    widget = GridViewObserver(
+      child: widget,
+      controller: observerController,
+      onObserve: (result) {
+        observeResult = result;
+      },
+    );
+    await tester.pumpWidget(widget);
+
+    int targetItemIndex = 30;
+    observerController.jumpTo(
+      index: targetItemIndex,
+      alignment: 0,
+    );
+    await tester.pumpAndSettle();
+    var firstGroupChildList = observeResult?.firstGroupChildList ?? [];
+    expect(firstGroupChildList, isNotEmpty);
+    expect(firstGroupChildList.first.index, targetItemIndex);
+    expect(firstGroupChildList.first.displayPercentage, 1);
+
+    observerController.jumpTo(
+      index: targetItemIndex,
+      alignment: 0.5,
+    );
+    await tester.pumpAndSettle();
+    firstGroupChildList = observeResult?.firstGroupChildList ?? [];
+    expect(firstGroupChildList.first.index, targetItemIndex);
+    expect(firstGroupChildList.first.displayPercentage, 0.5);
+
+    observerController.jumpTo(
+      index: targetItemIndex,
+      alignment: 1,
+    );
+    await tester.pumpAndSettle();
+    firstGroupChildList = observeResult?.firstGroupChildList ?? [];
+    expect(firstGroupChildList.first.index, targetItemIndex + 2);
+
+    scrollController.dispose();
+  });
+
   testWidgets('Check isForbidObserveCallback', (tester) async {
     final scrollController = ScrollController();
     final observerController =
@@ -253,4 +303,101 @@ void main() {
       );
     },
   );
+
+  group('dispatchOnceObserve', () {
+    late ScrollController scrollController;
+    late GridObserverController observerController;
+    late Widget widget;
+
+    tearDown(() {
+      scrollController.dispose();
+    });
+
+    resetAll() {
+      scrollController = ScrollController();
+      observerController = GridObserverController(
+        controller: scrollController,
+      );
+      widget = getGridView(
+        scrollController: scrollController,
+        itemCount: 100,
+      );
+      widget = GridViewObserver(
+        child: widget,
+        controller: observerController,
+      );
+    }
+
+    testWidgets(
+      'Check observeResult',
+      (tester) async {
+        resetAll();
+        await tester.pumpWidget(widget);
+        var result = await observerController.dispatchOnceObserve();
+        expect(result.isSuccess, isFalse);
+
+        result = await observerController.dispatchOnceObserve(
+          isDependObserveCallback: false,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(result.observeResult, isNotNull);
+        expect(
+          result.observeResult?.displayingChildIndexList ?? [],
+          isNotEmpty,
+        );
+
+        result = await observerController.dispatchOnceObserve(
+          isDependObserveCallback: false,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(
+          result.observeResult?.displayingChildIndexList ?? [],
+          isEmpty,
+        );
+
+        result = await observerController.dispatchOnceObserve(
+          isDependObserveCallback: false,
+          isForce: true,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(
+          result.observeResult?.displayingChildIndexList ?? [],
+          isNotEmpty,
+        );
+      },
+    );
+
+    testWidgets(
+      'Check observeAllResult',
+      (tester) async {
+        resetAll();
+        await tester.pumpWidget(widget);
+        var result = await observerController.dispatchOnceObserve();
+        expect(result.isSuccess, isFalse);
+
+        result = await observerController.dispatchOnceObserve(
+          isDependObserveCallback: false,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(result.observeAllResult.values.length, 1);
+        expect(
+          result.observeAllResult.values.first,
+          result.observeResult,
+        );
+
+        result = await observerController.dispatchOnceObserve(
+          isDependObserveCallback: false,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(result.observeAllResult, isEmpty);
+
+        result = await observerController.dispatchOnceObserve(
+          isDependObserveCallback: false,
+          isForce: true,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(result.observeAllResult, isNotEmpty);
+      },
+    );
+  });
 }

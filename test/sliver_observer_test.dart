@@ -252,6 +252,142 @@ void main() {
     },
   );
 
+  group('dispatchOnceObserve', () {
+    late ScrollController scrollController;
+    late SliverObserverController observerController;
+    late Widget widget;
+
+    tearDown(() {
+      scrollController.dispose();
+    });
+
+    resetAll() {
+      scrollController = ScrollController();
+      observerController = SliverObserverController(
+        controller: scrollController,
+      );
+      widget = _buildScrollView(
+        scrollController: scrollController,
+      );
+      widget = SliverViewObserver(
+        sliverContexts: () => [
+          if (_sliverListCtx != null) _sliverListCtx!,
+          if (_sliverGridCtx != null) _sliverGridCtx!
+        ],
+        child: widget,
+        controller: observerController,
+      );
+    }
+
+    testWidgets(
+      'Check observeAllResult',
+      (tester) async {
+        resetAll();
+        await tester.pumpWidget(widget);
+        var result = await observerController.dispatchOnceObserve(
+          sliverContext: _sliverListCtx!,
+        );
+        expect(result.isSuccess, isFalse);
+
+        result = await observerController.dispatchOnceObserve(
+          sliverContext: _sliverListCtx!,
+          isDependObserveCallback: false,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(result.observeAllResult[_sliverListCtx], isNotNull);
+        expect(
+          result.observeAllResult[_sliverListCtx]?.displayingChildIndexList ??
+              [],
+          isNotEmpty,
+        );
+        expect(result.observeAllResult[_sliverGridCtx], isNotNull);
+
+        result = await observerController.dispatchOnceObserve(
+          sliverContext: _sliverListCtx!,
+          isDependObserveCallback: false,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(
+          result.observeAllResult[_sliverListCtx]?.displayingChildIndexList ??
+              [],
+          isEmpty,
+        );
+
+        result = await observerController.dispatchOnceObserve(
+          sliverContext: _sliverListCtx!,
+          isDependObserveCallback: false,
+          isForce: true,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(
+          result.observeAllResult[_sliverListCtx]?.displayingChildIndexList ??
+              [],
+          isNotEmpty,
+        );
+      },
+    );
+
+    testWidgets(
+      'Check observeViewportResultModel',
+      (tester) async {
+        resetAll();
+        await tester.pumpWidget(widget);
+        var result = await observerController.dispatchOnceObserve(
+          sliverContext: _sliverListCtx!,
+        );
+        expect(result.isSuccess, isFalse);
+        result = await observerController.dispatchOnceObserve(
+          sliverContext: _sliverListCtx!,
+          isDependObserveCallback: false,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(
+          result.observeViewportResultModel?.firstChild.sliverContext,
+          _sliverListCtx,
+        );
+        expect(
+          result.observeViewportResultModel?.displayingChildModelList ?? [],
+          isNotEmpty,
+        );
+        result = await observerController.dispatchOnceObserve(
+          sliverContext: _sliverListCtx!,
+          isDependObserveCallback: false,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(
+          result.observeViewportResultModel?.displayingChildModelList ?? [],
+          isEmpty,
+        );
+        result = await observerController.dispatchOnceObserve(
+          sliverContext: _sliverListCtx!,
+          isDependObserveCallback: false,
+          isForce: true,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(
+          result.observeViewportResultModel?.displayingChildModelList ?? [],
+          isNotEmpty,
+        );
+
+        expect(_sliverGridCtx, isNotNull);
+        observerController.jumpTo(
+          index: 0,
+          sliverContext: _sliverGridCtx,
+        );
+        await tester.pumpAndSettle();
+        result = await observerController.dispatchOnceObserve(
+          sliverContext: _sliverGridCtx!,
+          isDependObserveCallback: false,
+        );
+        expect(result.isSuccess, isTrue);
+        expect(
+          result.observeViewportResultModel?.firstChild.sliverContext,
+          _sliverGridCtx,
+        );
+      },
+    );
+  });
+
   group(
     'NestedScrollView',
     () {
