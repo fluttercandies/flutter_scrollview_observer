@@ -1,5 +1,5 @@
 ## 1.21.0
-- ObserverController: 
+- ObserverController
   - Add `onPrepareScrollToIndex` for `jumpTo` and `animateTo`.
 - NestedScrollUtil
   - Add `jumpTo` and `animateTo` methods.
