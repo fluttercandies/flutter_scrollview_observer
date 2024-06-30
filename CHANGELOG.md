@@ -1,3 +1,9 @@
+## 1.21.0
+- ObserverController: 
+  - Add `onPrepareScrollToIndex` for `jumpTo` and `animateTo`.
+- NestedScrollUtil
+  - Add `jumpTo` and `animateTo` methods.
+
 ## 1.20.0
 - ObserverController
   - Add `observeIntervalForScrolling` to set the minimum amount of time to wait for firing observe callback during scrolling.
