@@ -557,6 +557,8 @@ void main() {
             final innerScrollController = PrimaryScrollController.of(context);
             if (bodyScrollController != innerScrollController) {
               bodyScrollController = innerScrollController;
+              nestedScrollUtil?.bodyScrollController = innerScrollController;
+              nestedScrollUtil?.outerScrollController = outerScrollController;
             }
             return CustomScrollView(
               slivers: [
@@ -619,9 +621,12 @@ void main() {
           await tester.pumpWidget(widget);
 
           observerController.controller = outerScrollController;
-          observerController.jumpTo(
-            index: 1,
+          nestedScrollUtil?.jumpTo(
+            nestedScrollViewKey: nestedScrollViewKey,
+            observerController: observerController,
             sliverContext: _sliverHeaderListCtx,
+            position: NestedScrollUtilPosition.header,
+            index: 1,
             offset: (targetOffset) {
               return calcPersistentHeaderExtent(
                 offset: targetOffset,
@@ -631,15 +636,19 @@ void main() {
           );
           await tester.pumpAndSettle();
           await tester.pump(observerController.observeIntervalForScrolling);
-          final headerListObservationResult =
+          var headerListObservationResult =
               (resultMap[_sliverHeaderListCtx] as ListViewObserveModel);
           expect(headerListObservationResult.firstChild?.index, 1);
 
-          expect(bodyScrollController != null, true);
-          observerController.controller = bodyScrollController;
-          observerController.jumpTo(
-            index: 5,
-            sliverContext: _sliverBodyListCtx,
+          observerController.controller = outerScrollController;
+          nestedScrollUtil?.animateTo(
+            nestedScrollViewKey: nestedScrollViewKey,
+            observerController: observerController,
+            sliverContext: _sliverHeaderListCtx,
+            position: NestedScrollUtilPosition.header,
+            index: 2,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
             offset: (targetOffset) {
               return calcPersistentHeaderExtent(
                 offset: targetOffset,
@@ -649,13 +658,38 @@ void main() {
           );
           await tester.pumpAndSettle();
           await tester.pump(observerController.observeIntervalForScrolling);
-          final bodyListObservationResult =
+          headerListObservationResult =
+              (resultMap[_sliverHeaderListCtx] as ListViewObserveModel);
+          expect(headerListObservationResult.firstChild?.index, 2);
+
+          expect(bodyScrollController != null, true);
+          nestedScrollUtil?.jumpTo(
+            nestedScrollViewKey: nestedScrollViewKey,
+            observerController: observerController,
+            sliverContext: _sliverBodyListCtx,
+            position: NestedScrollUtilPosition.body,
+            index: 5,
+            offset: (targetOffset) {
+              return calcPersistentHeaderExtent(
+                offset: targetOffset,
+                widgetKey: appBarKey,
+              );
+            },
+          );
+          await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
+          var bodyListObservationResult =
               (resultMap[_sliverBodyListCtx] as ListViewObserveModel);
           expect(bodyListObservationResult.firstChild?.index, 5);
 
-          observerController.jumpTo(
-            index: 10,
-            sliverContext: _sliverBodyGridCtx,
+          nestedScrollUtil?.animateTo(
+            nestedScrollViewKey: nestedScrollViewKey,
+            observerController: observerController,
+            sliverContext: _sliverBodyListCtx,
+            position: NestedScrollUtilPosition.body,
+            index: 20,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
             offset: (targetOffset) {
               return calcPersistentHeaderExtent(
                 offset: targetOffset,
@@ -665,13 +699,57 @@ void main() {
           );
           await tester.pumpAndSettle();
           await tester.pump(observerController.observeIntervalForScrolling);
-          final bodyGridObservationResult =
+          bodyListObservationResult =
+              (resultMap[_sliverBodyListCtx] as ListViewObserveModel);
+          expect(bodyListObservationResult.firstChild?.index, 20);
+
+          nestedScrollUtil?.jumpTo(
+            nestedScrollViewKey: nestedScrollViewKey,
+            observerController: observerController,
+            sliverContext: _sliverBodyGridCtx,
+            position: NestedScrollUtilPosition.body,
+            index: 10,
+            offset: (targetOffset) {
+              return calcPersistentHeaderExtent(
+                offset: targetOffset,
+                widgetKey: appBarKey,
+              );
+            },
+          );
+          await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
+          var bodyGridObservationResult =
               (resultMap[_sliverBodyGridCtx] as GridViewObserveModel);
-          final bodyGridFirstGroupChildIndexList = bodyGridObservationResult
+          var bodyGridFirstGroupChildIndexList = bodyGridObservationResult
               .firstGroupChildList
               .map((e) => e.index)
               .toList();
           expect(bodyGridFirstGroupChildIndexList.contains(10), true);
+
+          nestedScrollUtil?.animateTo(
+            nestedScrollViewKey: nestedScrollViewKey,
+            observerController: observerController,
+            sliverContext: _sliverBodyGridCtx,
+            position: NestedScrollUtilPosition.body,
+            index: 20,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            offset: (targetOffset) {
+              return calcPersistentHeaderExtent(
+                offset: targetOffset,
+                widgetKey: appBarKey,
+              );
+            },
+          );
+          await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
+          bodyGridObservationResult =
+              (resultMap[_sliverBodyGridCtx] as GridViewObserveModel);
+          bodyGridFirstGroupChildIndexList = bodyGridObservationResult
+              .firstGroupChildList
+              .map((e) => e.index)
+              .toList();
+          expect(bodyGridFirstGroupChildIndexList.contains(20), true);
         },
       );
 
