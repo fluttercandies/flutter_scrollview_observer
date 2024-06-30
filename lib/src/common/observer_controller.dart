@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/models/observe_find_child_model.dart';
-import 'package:scrollview_observer/src/common/models/observe_scroll_to_index_fixed_height_result_model.dart';
+import 'package:scrollview_observer/src/common/models/observe_scroll_to_index_result_model.dart';
 import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
 import 'package:scrollview_observer/src/utils/src/log.dart';
@@ -325,6 +325,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     EdgeInsets padding = EdgeInsets.zero,
     ObserverLocateIndexOffsetCallback? offset,
     ObserverRenderSliverType? renderSliverType,
+    ObserverOnPrepareScrollToIndex? onPrepareScrollToIndex,
   }) {
     Completer completer = Completer();
     _scrollToIndex(
@@ -336,6 +337,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       sliverContext: sliverContext,
       offset: offset,
       renderSliverType: renderSliverType,
+      onPrepareScrollToIndex: onPrepareScrollToIndex,
     );
     return completer.future;
   }
@@ -363,6 +365,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     double alignment = 0,
     ObserverLocateIndexOffsetCallback? offset,
     ObserverRenderSliverType? renderSliverType,
+    ObserverOnPrepareScrollToIndex? onPrepareScrollToIndex,
   }) {
     Completer completer = Completer();
     _scrollToIndex(
@@ -376,6 +379,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       curve: curve,
       offset: offset,
       renderSliverType: renderSliverType,
+      onPrepareScrollToIndex: onPrepareScrollToIndex,
     );
     return completer.future;
   }
@@ -386,11 +390,12 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     required bool isFixedHeight,
     required double alignment,
     required EdgeInsets padding,
-    BuildContext? sliverContext,
+    required BuildContext? sliverContext,
     Duration? duration,
     Curve? curve,
-    ObserverLocateIndexOffsetCallback? offset,
-    ObserverRenderSliverType? renderSliverType,
+    required ObserverLocateIndexOffsetCallback? offset,
+    required ObserverRenderSliverType? renderSliverType,
+    required ObserverOnPrepareScrollToIndex? onPrepareScrollToIndex,
   }) async {
     assert(alignment.clamp(0, 1) == alignment,
         'The [alignment] is expected to be a value in the range [0.0, 1.0]');
@@ -481,7 +486,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     // There is a cache offset, scroll to the offset directly.
     if (targetScrollChildModel != null) {
       _handleScrollDecision(context: ctx);
-      var targetOffset = _calculateTargetLayoutOffset(
+      var calcResult = _calculateTargetLayoutOffset(
         obj: obj,
         childLayoutOffset: targetScrollChildModel.layoutOffset,
         childSize: targetScrollChildModel.size,
@@ -489,15 +494,15 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         padding: padding,
         offset: offset,
       );
-      if (isAnimateTo) {
-        await _controller.animateTo(
-          targetOffset,
-          duration: duration,
-          curve: curve,
-        );
-      } else {
-        _controller.jumpTo(targetOffset);
-      }
+      await _scrollTo(
+        isAnimateTo: isAnimateTo,
+        duration: duration,
+        curve: curve,
+        controller: _controller,
+        calcResult: calcResult,
+        onPrepareScrollToIndex: onPrepareScrollToIndex,
+      );
+
       _handleScrollEnd(context: ctx, completer: completer);
       return;
     }
@@ -516,6 +521,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         curve: curve,
         offset: offset,
         renderSliverType: renderSliverType,
+        onPrepareScrollToIndex: onPrepareScrollToIndex,
       );
       return;
     }
@@ -544,6 +550,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       duration: duration,
       curve: curve,
       offset: offset,
+      onPrepareScrollToIndex: onPrepareScrollToIndex,
     );
   }
 
@@ -558,8 +565,9 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     required EdgeInsets padding,
     Duration? duration,
     Curve? curve,
-    ObserverLocateIndexOffsetCallback? offset,
-    ObserverRenderSliverType? renderSliverType,
+    required ObserverLocateIndexOffsetCallback? offset,
+    required ObserverRenderSliverType? renderSliverType,
+    required ObserverOnPrepareScrollToIndex? onPrepareScrollToIndex,
   }) async {
     assert(controller != null);
     var _controller = controller;
@@ -609,7 +617,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     );
 
     // Getting safety layout offset.
-    childLayoutOffset = _calculateTargetLayoutOffset(
+    final calcResult = _calculateTargetLayoutOffset(
       obj: obj,
       childLayoutOffset: childLayoutOffset,
       childSize: childMainAxisSize,
@@ -617,18 +625,15 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       padding: padding,
       offset: offset,
     );
-    if (isAnimateTo) {
-      Duration _duration =
-          isAnimateTo ? duration : const Duration(milliseconds: 1);
-      Curve _curve = isAnimateTo ? curve : Curves.linear;
-      await _controller.animateTo(
-        childLayoutOffset,
-        duration: _duration,
-        curve: _curve,
-      );
-    } else {
-      _controller.jumpTo(childLayoutOffset);
-    }
+    childLayoutOffset = calcResult.calculateTargetLayoutOffset;
+    await _scrollTo(
+      isAnimateTo: isAnimateTo,
+      duration: isAnimateTo ? duration : null,
+      curve: isAnimateTo ? curve : null,
+      controller: _controller,
+      calcResult: calcResult,
+      onPrepareScrollToIndex: onPrepareScrollToIndex,
+    );
     _handleScrollEnd(context: ctx, completer: completer);
   }
 
@@ -647,6 +652,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     Curve? curve,
     ObserverLocateIndexOffsetCallback? offset,
     double? lastPageTurningOffset,
+    ObserverOnPrepareScrollToIndex? onPrepareScrollToIndex,
   }) async {
     var _controller = controller;
     if (_controller == null || !_controller.hasClients) {
@@ -726,6 +732,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           curve: curve,
           offset: offset,
           lastPageTurningOffset: lastPageTurningOffset,
+          onPrepareScrollToIndex: onPrepareScrollToIndex,
         );
       });
     } else if (index > lastChildIndex) {
@@ -785,6 +792,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
           curve: curve,
           offset: offset,
           lastPageTurningOffset: lastPageTurningOffset,
+          onPrepareScrollToIndex: onPrepareScrollToIndex,
         );
       });
     } else {
@@ -817,7 +825,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         } else {
           _handleScrollDecision(context: ctx);
 
-          var targetOffset = _calculateTargetLayoutOffset(
+          final calcResult = _calculateTargetLayoutOffset(
             obj: obj,
             childLayoutOffset: childLayoutOffset,
             childSize: childSize,
@@ -825,18 +833,14 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
             padding: padding,
             offset: offset,
           );
-          if (isAnimateTo) {
-            Duration _duration =
-                isAnimateTo ? duration : const Duration(milliseconds: 1);
-            Curve _curve = isAnimateTo ? curve : Curves.linear;
-            await _controller.animateTo(
-              targetOffset,
-              duration: _duration,
-              curve: _curve,
-            );
-          } else {
-            _controller.jumpTo(targetOffset);
-          }
+          await _scrollTo(
+            isAnimateTo: isAnimateTo,
+            duration: isAnimateTo ? duration : null,
+            curve: isAnimateTo ? curve : null,
+            controller: _controller,
+            calcResult: calcResult,
+            onPrepareScrollToIndex: onPrepareScrollToIndex,
+          );
 
           _handleScrollEnd(context: ctx, completer: completer);
         }
@@ -845,9 +849,37 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     }
   }
 
+  Future<void> _scrollTo({
+    required bool isAnimateTo,
+    required Duration? duration,
+    required Curve? curve,
+    required ScrollController controller,
+    required ObservePrepareScrollToIndexModel calcResult,
+    required ObserverOnPrepareScrollToIndex? onPrepareScrollToIndex,
+  }) async {
+    assert(controller.hasClients);
+
+    // The developer has handled it externally.
+    final haveHandle = await onPrepareScrollToIndex?.call(calcResult) ?? false;
+    if (haveHandle) return;
+
+    final targetOffset = calcResult.calculateTargetLayoutOffset;
+    if (isAnimateTo) {
+      assert(duration != null);
+      assert(curve != null);
+      await controller.animateTo(
+        targetOffset,
+        duration: duration ?? const Duration(milliseconds: 1),
+        curve: curve ?? Curves.linear,
+      );
+    } else {
+      controller.jumpTo(targetOffset);
+    }
+  }
+
   /// Getting target safety layout offset for scrolling to index.
   /// This can avoid jitter.
-  double _calculateTargetLayoutOffset({
+  ObservePrepareScrollToIndexModel _calculateTargetLayoutOffset({
     required RenderSliverMultiBoxAdaptor obj,
     required double childLayoutOffset,
     required double childSize,
@@ -910,7 +942,12 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     // The remainingBottomExtent may be negative when the scrollView has too
     // few items.
     targetOffset = targetOffset.clamp(0, double.maxFinite);
-    return targetOffset.rectify(obj);
+    final calculateTargetLayoutOffset = targetOffset.rectify(obj);
+    return ObservePrepareScrollToIndexModel(
+      calculateTargetLayoutOffset: calculateTargetLayoutOffset,
+      precedingScrollExtent: precedingScrollExtent,
+      targetChildLayoutOffset: childLayoutOffset,
+    );
   }
 
   /// Calculate the information about scrolling to the specified index location

@@ -4,6 +4,13 @@
  * @Date: 2022-12-04 15:57:38
  */
 
+import 'package:scrollview_observer/src/common/models/observe_scroll_to_index_result_model.dart';
+
+/// Called when the ObserverController prepare to scroll to index with
+/// [ObservePrepareScrollToIndexModel].
+typedef ObserverOnPrepareScrollToIndex = Future<bool> Function(
+    ObservePrepareScrollToIndexModel);
+
 /// Define type that auto trigger observe.
 enum ObserverAutoTriggerObserveType {
   scrollStart,

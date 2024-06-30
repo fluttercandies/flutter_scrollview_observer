@@ -70,6 +70,7 @@ class SliverObserverController extends ObserverController
     double alignment = 0,
     ObserverLocateIndexOffsetCallback? offset,
     ObserverRenderSliverType? renderSliverType,
+    ObserverOnPrepareScrollToIndex? onPrepareScrollToIndex,
   }) {
     return innerAnimateTo(
       index: index,
@@ -81,6 +82,7 @@ class SliverObserverController extends ObserverController
       alignment: alignment,
       offset: offset,
       renderSliverType: renderSliverType,
+      onPrepareScrollToIndex: onPrepareScrollToIndex,
     );
   }
 
@@ -109,6 +111,7 @@ class SliverObserverController extends ObserverController
     EdgeInsets padding = EdgeInsets.zero,
     ObserverLocateIndexOffsetCallback? offset,
     ObserverRenderSliverType? renderSliverType,
+    ObserverOnPrepareScrollToIndex? onPrepareScrollToIndex,
   }) {
     return innerJumpTo(
       index: index,
@@ -118,6 +121,7 @@ class SliverObserverController extends ObserverController
       padding: padding,
       offset: offset,
       renderSliverType: renderSliverType,
+      onPrepareScrollToIndex: onPrepareScrollToIndex,
     );
   }
 }
