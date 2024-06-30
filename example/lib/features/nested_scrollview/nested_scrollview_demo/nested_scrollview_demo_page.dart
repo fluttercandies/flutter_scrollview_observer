@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/utils/snackbar.dart';
+import 'package:scrollview_observer_example/widgets/sliver.dart';
 
 class NestedScrollViewDemoPage extends StatefulWidget {
   const NestedScrollViewDemoPage({Key? key}) : super(key: key);
@@ -16,13 +17,15 @@ class NestedScrollViewDemoPage extends StatefulWidget {
       _NestedScrollViewDemoPageState();
 }
 
-class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage> {
+class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage>
+    with TickerProviderStateMixin {
   BuildContext? _sliverHeaderListCtx;
   BuildContext? _sliverBodyListCtx;
   BuildContext? _sliverBodyGridCtx;
 
   GlobalKey nestedScrollViewKey = GlobalKey();
   GlobalKey appBarKey = GlobalKey();
+  GlobalKey tabBarKey = GlobalKey();
 
   final nestedScrollUtil = NestedScrollUtil();
 
@@ -36,6 +39,20 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage> {
   late SliverObserverController observerController = SliverObserverController(
     controller: outerScrollController,
   );
+
+  late TabController tabBarController = TabController(
+    length: 3,
+    vsync: this,
+  );
+
+  bool scrollToWithAnimation = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    nestedScrollUtil.outerScrollController = outerScrollController;
+  }
 
   @override
   void dispose() {
@@ -93,45 +110,42 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage> {
           IconButton(
             icon: const Icon(Icons.list_alt_rounded),
             onPressed: () {
-              observerController.controller = outerScrollController;
-              observerController.jumpTo(
+              scrollTo(
+                position: NestedScrollUtilPosition.header,
                 index: 1,
                 sliverContext: _sliverHeaderListCtx,
-                offset: calcPersistentHeaderExtent,
               );
               SnackBarUtil.showSnackBar(
                 context: context,
-                text: 'Header - SliverList - Jumping to item 1',
+                text: 'Header - SliverList - Scrolling to item 1',
               );
             },
           ),
           IconButton(
             icon: const Icon(Icons.list_rounded),
             onPressed: () {
-              observerController.controller = bodyScrollController;
-              observerController.jumpTo(
-                index: 5,
+              scrollTo(
+                position: NestedScrollUtilPosition.body,
+                index: 1,
                 sliverContext: _sliverBodyListCtx,
-                offset: calcPersistentHeaderExtent,
               );
               SnackBarUtil.showSnackBar(
                 context: context,
-                text: 'Body - SliverList - Jumping to item 5',
+                text: 'Body - SliverList - Scrolling to item 1',
               );
             },
           ),
           IconButton(
             icon: const Icon(Icons.grid_view),
             onPressed: () {
-              observerController.controller = bodyScrollController;
-              observerController.jumpTo(
+              scrollTo(
+                position: NestedScrollUtilPosition.body,
                 index: 5,
                 sliverContext: _sliverBodyGridCtx,
-                offset: calcPersistentHeaderExtent,
               );
               SnackBarUtil.showSnackBar(
                 context: context,
-                text: 'Body - SliverGrid - Jumping to item 5',
+                text: 'Body - SliverGrid - Scrolling to item 5',
               );
             },
           ),
@@ -155,6 +169,19 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage> {
             title: const Text("NestedScrollView"),
             pinned: true,
             forceElevated: innerBoxIsScrolled,
+            actions: [
+              Switch(
+                value: scrollToWithAnimation,
+                onChanged: ((value) {
+                  scrollToWithAnimation = value;
+                  setState(() {});
+                  SnackBarUtil.showSnackBar(
+                    context: context,
+                    text: "Scroll to with animation: $scrollToWithAnimation",
+                  );
+                }),
+              ),
+            ],
           ),
           SliverFixedExtentList(
             delegate: SliverChildBuilderDelegate(
@@ -171,12 +198,31 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage> {
             ),
             itemExtent: 50,
           ),
+          SliverPersistentHeader(
+            key: tabBarKey,
+            pinned: true,
+            delegate: SliverHeaderDelegate.fixedHeight(
+              height: 40,
+              child: Container(
+                color: Colors.blue,
+                child: TabBar(
+                  controller: tabBarController,
+                  tabs: const [
+                    Tab(text: "Tab 1"),
+                    Tab(text: "Tab 2"),
+                    Tab(text: "Tab 3"),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ];
       },
       body: Builder(builder: (context) {
+        // Get the inner scroll controller.
         final innerScrollController = PrimaryScrollController.of(context);
-        if (bodyScrollController != innerScrollController) {
-          bodyScrollController = innerScrollController;
+        if (nestedScrollUtil.bodyScrollController != innerScrollController) {
+          nestedScrollUtil.bodyScrollController = innerScrollController;
         }
         return CustomScrollView(
           slivers: [
@@ -244,20 +290,73 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage> {
     );
   }
 
-  double calcPersistentHeaderExtent(double offset) {
-    return ObserverUtils.calcPersistentHeaderExtent(
+  double calcPersistentHeaderExtent(
+    double offset, {
+    required bool isBody,
+  }) {
+    double value = ObserverUtils.calcPersistentHeaderExtent(
       key: appBarKey,
       offset: offset,
     );
+    if (isBody) {
+      value += ObserverUtils.calcPersistentHeaderExtent(
+        key: tabBarKey,
+        offset: offset,
+      );
+    }
+    return value;
   }
 
   resetAllSliverObservationData() {
     nestedScrollUtil.reset();
     nestedScrollViewKey = GlobalKey();
+    nestedScrollUtil.outerScrollController = outerScrollController;
     setState(() {});
     SnackBarUtil.showSnackBar(
       context: context,
       text: "Reset all sliver's observation data\n",
     );
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      observerController.reattach();
+    });
+  }
+
+  scrollTo({
+    required NestedScrollUtilPosition position,
+    required int index,
+    required BuildContext? sliverContext,
+  }) {
+    bool isBody = NestedScrollUtilPosition.body == position;
+    if (scrollToWithAnimation) {
+      nestedScrollUtil.animateTo(
+        nestedScrollViewKey: nestedScrollViewKey,
+        observerController: observerController,
+        position: position,
+        index: index,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        sliverContext: sliverContext,
+        offset: (targetOffset) {
+          return calcPersistentHeaderExtent(
+            targetOffset,
+            isBody: isBody,
+          );
+        },
+      );
+    } else {
+      nestedScrollUtil.jumpTo(
+        nestedScrollViewKey: nestedScrollViewKey,
+        observerController: observerController,
+        position: position,
+        index: index,
+        sliverContext: sliverContext,
+        offset: (targetOffset) {
+          return calcPersistentHeaderExtent(
+            targetOffset,
+            isBody: isBody,
+          );
+        },
+      );
+    }
   }
 }
