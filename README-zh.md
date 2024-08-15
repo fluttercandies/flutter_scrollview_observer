@@ -25,6 +25,7 @@ Language: 中文 | [English](https://github.com/fluttercandies/flutter_scrollvie
 - [Flutter - 滚动视图中的表单防遮挡 🗒](https://mp.weixin.qq.com/s/iaHyYMjZSPBggLw2yZv8dQ) | [备用链接](https://juejin.cn/spost/7266455050632921107)
 - [Flutter - 秒杀1/2曝光统计 📊](https://mp.weixin.qq.com/s/gNFX4Au4esftgTPXHvB4LQ) | [备用链接](https://juejin.cn/post/7271248528998121512)
 - [Flutter - 如何快速搓一个微信通讯录列表(azlist) 📓](https://mp.weixin.qq.com/s/1bmYSvtOYX83DLncvnBjqA) | [备用链接](https://juejin.cn/post/7294884963631497254)
+- [Flutter - 支持观察NestedScrollView，兼容性更强 😈](https://mp.weixin.qq.com/s/1dsmRg8q2VJ6HzasLgoVpA) | [备用链接](https://juejin.cn/post/7388444606456840211)
 
 ## 🔨 功能点
 
@@ -36,6 +37,8 @@ Language: 中文 | [English](https://github.com/fluttercandies/flutter_scrollvie
 - [x] 支持在插入或更新消息时保持IM消息位置，避免抖动
 
 ## 🎀 支持
+
+- [x] `PageView`
 - [x] `ListView`
 - [x] `SliverList`
 - [x] `GridView`

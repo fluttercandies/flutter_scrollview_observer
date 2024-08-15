@@ -26,6 +26,7 @@ Chat: [Join WeChat group](https://mp.weixin.qq.com/s/JBbMstn0qW6M71hh-BRKzw)
 - [Flutter - Anti-occlusion of form in ScrollView 🗒](https://medium.com/@linxunfeng/flutter-anti-occlusion-of-form-in-scrollview-ad8bde15e18d) | [WeChat](https://mp.weixin.qq.com/s/iaHyYMjZSPBggLw2yZv8dQ) | [JueJin](https://juejin.cn/spost/7266455050632921107)
 - [Flutter - Quickly achieve half-view exposure statistic 📊](https://medium.com/@linxunfeng/flutter-quickly-achieve-half-view-exposure-statistic-097fd4b237ef) | [WeChat](https://mp.weixin.qq.com/s/gNFX4Au4esftgTPXHvB4LQ) | [JueJin](https://juejin.cn/post/7271248528998121512)
 - [Flutter - How to quickly implement an contact list page (azlist) 📓](https://medium.com/@linxunfeng/flutter-how-to-quickly-implement-an-contact-list-page-azlist-829bbef12d8f) | [WeChat](https://mp.weixin.qq.com/s/1bmYSvtOYX83DLncvnBjqA) | [JueJin](https://juejin.cn/post/7294884963631497254)
+- [Flutter - Supports observing NestedScrollView, with greater compatibility 😈](https://medium.com/@linxunfeng/flutter-supports-observing-nestedscrollview-with-greater-compatibility-86f49dce7955) | [WeChat](https://mp.weixin.qq.com/s/1dsmRg8q2VJ6HzasLgoVpA) | [JueJin](https://juejin.cn/post/7388444606456840211)
 
 ## 🔨 Feature
 
@@ -38,6 +39,7 @@ Chat: [Join WeChat group](https://mp.weixin.qq.com/s/JBbMstn0qW6M71hh-BRKzw)
 
 ## 🎀 Support
 
+- [x] `PageView`
 - [x] `ListView`
 - [x] `SliverList`
 - [x] `GridView`
