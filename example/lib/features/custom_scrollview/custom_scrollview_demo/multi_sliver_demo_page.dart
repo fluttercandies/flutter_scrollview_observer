@@ -5,6 +5,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/utils/random.dart';
@@ -32,15 +33,23 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
   final appBarKey = GlobalKey();
 
   final scrollController = ScrollController();
-  late final SliverObserverController sliverObserverController;
-  Map<int, BuildContext> contextList = {};
+  late final SliverObserverController sliverItemObserverController;
+  // late final SliverObserverController sliverObserverController;
+  Map<int, BuildContext> itemSliverIndexCtxMap = {};
+  Map<int, BuildContext> sliverIndexCtxMap = {};
+
+  ValueNotifier<int> tabCurrentSelectedIndex = ValueNotifier(0);
+  bool isIgnoreCalcTabBarIndex = false;
 
   @override
   void initState() {
     super.initState();
-    sliverObserverController = SliverObserverController(
+    sliverItemObserverController = SliverObserverController(
       controller: scrollController,
     );
+    // sliverObserverController = SliverObserverController(
+    //   controller: scrollController,
+    // );
 
     for (var i = 0; i < 4; i++) {
       final tag = 'Section ${i + 1}';
@@ -54,26 +63,80 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
 
   @override
   Widget build(BuildContext context) {
+    Widget resultWidget = _buildScrollView();
+    resultWidget = _buildSliverItemObserver(child: resultWidget);
+    resultWidget = _buildSliverObserver(child: resultWidget);
     return Scaffold(
-      body: SliverViewObserver(
-        controller: sliverObserverController,
-        sliverContexts: () => contextList.values.toList(),
-        child: CustomScrollView(
-          controller: scrollController,
-          physics: const ClampingScrollPhysics(),
-          slivers: [
-            SliverAppBar(
-              key: appBarKey,
-              pinned: true,
-              title: const Text('Multi Sliver'),
-            ),
-            ...List.generate(modelList.length, (mainIndex) {
-              return _buildSectionListView(mainIndex);
-            }),
-          ],
-        ),
-      ),
+      body: resultWidget,
       bottomNavigationBar: buildBottomNavigationBar(context),
+    );
+  }
+
+  /// To observe sliver items and handle scrollTo.
+  Widget _buildSliverItemObserver({
+    required Widget child,
+  }) {
+    return SliverViewObserver(
+      controller: sliverItemObserverController,
+      sliverContexts: () => itemSliverIndexCtxMap.values.toList(),
+      child: child,
+    );
+  }
+
+  /// To observe which sliver is currently the first.
+  Widget _buildSliverObserver({
+    required Widget child,
+  }) {
+    return SliverViewObserver(
+      // controller: sliverObserverController,
+      child: child,
+      sliverContexts: () => sliverIndexCtxMap.values.toList(),
+      triggerOnObserveType: ObserverTriggerOnObserveType.directly,
+      dynamicLeadingOffset: () {
+        // Accumulate the height of all PersistentHeader.
+        return ObserverUtils.calcPersistentHeaderExtent(
+              key: appBarKey,
+              offset: scrollController.offset,
+            ) +
+            1; // To avoid tabBar index rebound.
+      },
+      onObserveViewport: (result) {
+        if (isIgnoreCalcTabBarIndex) return;
+        int? currentTabIndex;
+        final currentFirstSliverCtx = result.firstChild.sliverContext;
+        for (var sectionIndex in sliverIndexCtxMap.keys) {
+          final ctx = sliverIndexCtxMap[sectionIndex];
+          if (ctx == null) continue;
+          // If they are not the same sliver, continue.
+          if (currentFirstSliverCtx != ctx) continue;
+          // If the sliver is not visible, continue.
+          final visible =
+              (ctx.findRenderObject() as RenderSliver).geometry?.visible ??
+                  false;
+          if (!visible) continue;
+          currentTabIndex = sectionIndex;
+          break;
+        }
+        if (currentTabIndex == null) return;
+        updateTabBarIndex(currentTabIndex);
+      },
+    );
+  }
+
+  Widget _buildScrollView() {
+    return CustomScrollView(
+      controller: scrollController,
+      physics: const ClampingScrollPhysics(),
+      slivers: [
+        SliverAppBar(
+          key: appBarKey,
+          pinned: true,
+          title: const Text('Multi Sliver'),
+        ),
+        ...List.generate(modelList.length, (mainIndex) {
+          return _buildSectionListView(mainIndex);
+        }),
+      ],
     );
   }
 
@@ -85,9 +148,11 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
           children: List.generate(modelList.length, (index) {
             return Expanded(
               child: InkWell(
-                onTap: () {
-                  // sliverObserverController.jumpTo(
-                  //   sliverContext: contextList[index],
+                onTap: () async {
+                  updateTabBarIndex(index);
+                  isIgnoreCalcTabBarIndex = true;
+                  // await sliverItemObserverController.jumpTo(
+                  //   sliverContext: itemSliverIndexCtxMap[index],
                   //   index: 0,
                   //   isFixedHeight: true,
                   //   offset: (offset) {
@@ -97,11 +162,11 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
                   //     );
                   //   },
                   // );
-                  sliverObserverController.animateTo(
-                    sliverContext: contextList[index],
+                  await sliverItemObserverController.animateTo(
+                    sliverContext: itemSliverIndexCtxMap[index],
                     index: 0,
                     isFixedHeight: true,
-                    duration: const Duration(seconds: 1),
+                    duration: const Duration(milliseconds: 200),
                     curve: Curves.easeInOut,
                     offset: (offset) {
                       return ObserverUtils.calcPersistentHeaderExtent(
@@ -110,28 +175,35 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
                       );
                     },
                   );
+                  isIgnoreCalcTabBarIndex = false;
                 },
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    border: Border.all(width: 0.5),
-                  ),
-                  child: Text(
-                    modelList[index].tag,
-                  ),
+                child: ValueListenableBuilder(
+                  valueListenable: tabCurrentSelectedIndex,
+                  builder: (BuildContext context, int value, Widget? child) {
+                    return Container(
+                      alignment: Alignment.center,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        border: Border.all(width: 0.5),
+                        color: value == index ? Colors.amber : Colors.white,
+                      ),
+                      child: Text(
+                        modelList[index].tag,
+                      ),
+                    );
+                  },
                 ),
               ),
             );
           }),
         ),
-        SizedBox(height: MediaQuery.of(context).padding.bottom),
+        SizedBox(height: MediaQuery.paddingOf(context).bottom),
       ],
     );
   }
 
   Widget _buildSectionListView(int mainIndex) {
-    return SliverStickyHeader(
+    Widget resultWidget = SliverStickyHeader(
       header: Container(
         height: 40,
         color: Colors.white,
@@ -145,7 +217,8 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
         itemExtent: 120,
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            contextList[mainIndex] = context;
+            // Save the context of SliverList.
+            itemSliverIndexCtxMap[mainIndex] = context;
             return Container(
               padding: const EdgeInsets.only(left: 12),
               color: RandomTool.color(),
@@ -159,5 +232,18 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
         ),
       ),
     );
+    resultWidget = SliverObserveContext(
+      child: resultWidget,
+      onObserve: (context) {
+        // Save the context of the outermost sliver.
+        sliverIndexCtxMap[mainIndex] = context;
+      },
+    );
+    return resultWidget;
+  }
+
+  updateTabBarIndex(int index) {
+    if (index == tabCurrentSelectedIndex.value) return;
+    tabCurrentSelectedIndex.value = index;
   }
 }
