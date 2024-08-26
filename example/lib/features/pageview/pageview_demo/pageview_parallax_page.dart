@@ -1,23 +1,21 @@
 /*
  * @Author: LinXunFeng linxunfeng@yeah.net
  * @Repo: https://github.com/fluttercandies/flutter_scrollview_observer
- * @Date: 2024-08-03 14:09:53
+ * @Date: 2024-08-26 21:30:59
  */
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
-class PageViewDemoPage extends StatefulWidget {
-  const PageViewDemoPage({Key? key}) : super(key: key);
+class PageViewParallaxPage extends StatefulWidget {
+  const PageViewParallaxPage({Key? key}) : super(key: key);
 
   @override
-  State<PageViewDemoPage> createState() => _PageViewDemoPageState();
+  State<PageViewParallaxPage> createState() => _PageViewParallaxPageState();
 }
 
-class _PageViewDemoPageState extends State<PageViewDemoPage> {
-  double offsetYDelta = 50;
-
+class _PageViewParallaxPageState extends State<PageViewParallaxPage> {
   late PageController pageController;
 
   List<String> pageItemBgPicList = [
@@ -38,7 +36,7 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
 
   int get pageItemCount => pageItemBgPicList.length;
 
-  List<ValueNotifier<double>> pageItemOffsetYList = [];
+  List<ValueNotifier<double>> pageItemBgPicAlignmentXList = [];
 
   final observerController = ListObserverController();
 
@@ -47,9 +45,9 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
     super.initState();
     pageController = PageController(
       initialPage: 4,
-      viewportFraction: 0.8,
+      viewportFraction: 0.9,
     );
-    pageItemOffsetYList = List.generate(
+    pageItemBgPicAlignmentXList = List.generate(
       pageItemCount,
       (index) {
         return ValueNotifier<double>(0);
@@ -70,9 +68,10 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.amber[50],
       appBar: AppBar(
         title: const Text(
-          "PageView",
+          "PageView - Parallax",
           style: TextStyle(
             color: Colors.white,
           ),
@@ -88,44 +87,10 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
           },
         ),
       ),
-      body: Stack(
-        children: [
-          _buildMap(),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: _buildPageView(),
-          ),
-        ],
+      body: Center(
+        child: _buildPageView(),
       ),
     );
-  }
-
-  Widget _buildMap() {
-    Widget resultWidget = SizedBox(
-      width: 500,
-      height: 900,
-      child: Image.network(
-        'https://images.pexels.com/photos/41949/earth-earth-at-night-night-lights-41949.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-        fit: BoxFit.fitHeight,
-      ),
-    );
-    resultWidget = Stack(
-      children: [
-        resultWidget,
-        Positioned(
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0,
-          child: Container(
-            color: Colors.black38,
-          ),
-        ),
-      ],
-    );
-    return resultWidget;
   }
 
   Widget _buildPageView() {
@@ -146,31 +111,44 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
           final itemIndex = itemModel.index;
           final itemDisplayPercentage = itemModel.displayPercentage;
 
-          // Calculates pageItemOffsetY
-          final offsetY = (1 - itemDisplayPercentage) * offsetYDelta;
-          pageItemOffsetYList[itemIndex].value = offsetY;
+          // Calculates itemAlignmentX
+          double itemAlignmentX = 1 - itemDisplayPercentage;
+          if (itemModel.leadingMarginToViewport > 0) {
+            itemAlignmentX = -itemAlignmentX;
+          }
+          if (itemAlignmentX > 1) {
+            itemAlignmentX = 1;
+          } else if (itemAlignmentX < -1) {
+            itemAlignmentX = -1;
+          }
+          pageItemBgPicAlignmentXList[itemIndex].value = itemAlignmentX;
         }
       },
       customTargetRenderSliverType: (renderObj) {
         return renderObj is RenderSliverFillViewport;
       },
     );
+
     resultWidget = SizedBox(
-      height: 300,
+      height: (MediaQuery.sizeOf(context).height -
+              MediaQuery.paddingOf(context).top -
+              kToolbarHeight) *
+          0.8,
       child: resultWidget,
     );
     return resultWidget;
   }
 
   Widget _buildPageItem(int index) {
-    Widget itemWidget = Container(
+    Widget resultWidget = Container(
       decoration: BoxDecoration(
-        color: Colors.blue[100],
-        borderRadius: BorderRadius.circular(4),
+        color: Colors.blue[50],
+        borderRadius: BorderRadius.circular(10),
       ),
       clipBehavior: Clip.antiAlias,
       alignment: Alignment.center,
       child: Stack(
+        alignment: AlignmentDirectional.center,
         children: [
           Positioned(
             left: 0,
@@ -180,26 +158,9 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
             child: _buildPageItemBgPicView(index),
           ),
           const SizedBox.expand(),
-          Container(
-            width: double.infinity,
-            alignment: Alignment.center,
-            height: 44,
-            decoration: const BoxDecoration(
-              color: Colors.white54,
-            ),
-            child: Text("Page $index"),
-          ),
+          _buildNum(index),
         ],
       ),
-    );
-    Widget resultWidget = ValueListenableBuilder(
-      valueListenable: pageItemOffsetYList[index],
-      builder: (BuildContext context, double offsetY, Widget? child) {
-        return Transform.translate(
-          offset: Offset(0, offsetY),
-          child: itemWidget,
-        );
-      },
     );
     resultWidget = Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -208,10 +169,29 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
     return resultWidget;
   }
 
+  Widget _buildNum(int index) {
+    return Container(
+      alignment: Alignment.center,
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text("Page $index"),
+    );
+  }
+
   Widget _buildPageItemBgPicView(int index) {
-    return Image.network(
-      pageItemBgPicList[index],
-      fit: BoxFit.cover,
+    return ValueListenableBuilder(
+      valueListenable: pageItemBgPicAlignmentXList[index],
+      builder: (BuildContext context, double alignmentX, Widget? child) {
+        return Image.network(
+          pageItemBgPicList[index],
+          fit: BoxFit.cover,
+          alignment: Alignment(alignmentX, 0),
+        );
+      },
     );
   }
 }

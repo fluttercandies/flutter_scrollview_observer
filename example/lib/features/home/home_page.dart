@@ -24,6 +24,7 @@ import 'package:scrollview_observer_example/features/listview/listview_fixed_hei
 import 'package:scrollview_observer_example/features/listview/sliver_list_demo/sliver_list_demo_page.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_demo/nested_scrollview_demo_page.dart';
 import 'package:scrollview_observer_example/features/pageview/pageview_demo/pageview_demo_page.dart';
+import 'package:scrollview_observer_example/features/pageview/pageview_demo/pageview_parallax_page.dart';
 import 'package:scrollview_observer_example/features/scene/anchor_demo/anchor_page.dart';
 import 'package:scrollview_observer_example/features/scene/anchor_demo/anchor_waterfall_page.dart';
 import 'package:scrollview_observer_example/features/scene/azlist_demo/azlist_page.dart';
@@ -194,6 +195,12 @@ class HomePage extends StatelessWidget {
         "PageView",
         () {
           return const PageViewDemoPage();
+        },
+      ),
+      Tuple2<String, PageBuilder>(
+        "PageView - Parallax",
+        () {
+          return const PageViewParallaxPage();
         },
       ),
       Tuple2<String, PageBuilder>(
