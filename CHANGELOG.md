@@ -1,3 +1,7 @@
+## 1.21.1
+- ObserverCore
+  - improve the logic of `handleListObserve` and `handleGridObserve`.
+
 ## 1.21.0
 - ObserverController
   - Add `onPrepareScrollToIndex` for `jumpTo` and `animateTo`.
