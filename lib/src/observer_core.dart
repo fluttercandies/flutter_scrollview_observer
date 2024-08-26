@@ -52,6 +52,8 @@ class ObserverCore {
     var parentData = firstChild.parentData as SliverMultiBoxAdaptorParentData;
     var index = parentData.index ?? 0;
 
+    // Whether the first child being displayed is not found.
+    bool isNotFound = false;
     // Find out the first child which is displaying
     var targetFirstChild = firstChild;
 
@@ -63,15 +65,34 @@ class ObserverCore {
     )) {
       index = index + 1;
       var nextChild = _obj.childAfter(targetFirstChild);
-      if (nextChild == null) break;
+      if (nextChild == null) {
+        isNotFound = true;
+        break;
+      }
 
       if (nextChild is! RenderIndexedSemantics) {
         // It is separator
         nextChild = _obj.childAfter(nextChild);
       }
-      if (nextChild == null) break;
+      if (nextChild == null) {
+        isNotFound = true;
+        break;
+      }
       targetFirstChild = nextChild;
     }
+
+    // The first child being displayed is not found, indicating that the
+    // ScrollView is not visible.
+    if (isNotFound) {
+      return ListViewObserveModel(
+        sliverList: _obj,
+        viewport: viewport,
+        visible: false,
+        firstChild: null,
+        displayingChildModelList: [],
+      );
+    }
+
     if (targetFirstChild is! RenderIndexedSemantics) return null;
 
     List<ListViewObserveDisplayingChildModel> displayingChildModelList = [
@@ -159,6 +180,8 @@ class ObserverCore {
     final rawScrollViewOffset = _obj.constraints.scrollOffset + overlap;
     var scrollViewOffset = rawScrollViewOffset + offset;
 
+    // Whether the first child being displayed is not found.
+    bool isNotFound = false;
     // Find out the first child which is displaying
     var targetFirstChild = firstChild;
     var lastFirstGroupChildWidget = targetFirstChild;
@@ -171,9 +194,25 @@ class ObserverCore {
     )) {
       /// Entering here means it is not the target object
       RenderBox? nextChild = _obj.childAfter(targetFirstChild);
-      if (nextChild == null) break;
+      if (nextChild == null) {
+        isNotFound = true;
+        break;
+      }
       targetFirstChild = nextChild;
     }
+
+    // The first child being displayed is not found, indicating that the
+    // ScrollView is not visible.
+    if (isNotFound) {
+      return GridViewObserveModel(
+        sliverGrid: _obj,
+        viewport: viewport,
+        visible: false,
+        firstGroupChildList: [],
+        displayingChildModelList: [],
+      );
+    }
+
     if (targetFirstChild is! RenderIndexedSemantics) return null;
     lastFirstGroupChildWidget = targetFirstChild;
 

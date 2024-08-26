@@ -467,6 +467,7 @@ void main() {
       late SliverObserverController observerController;
       late Widget widget;
       BuildContext? _sliverHeaderListCtx;
+      BuildContext? _sliverHeaderGridCtx;
       BuildContext? _sliverBodyListCtx;
       BuildContext? _sliverBodyGridCtx;
       GlobalKey appBarKey = GlobalKey();
@@ -551,6 +552,22 @@ void main() {
                 ),
                 itemExtent: 50,
               ),
+              SliverGrid.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 10.0,
+                  crossAxisSpacing: 10.0,
+                  childAspectRatio: 2.0,
+                ),
+                itemBuilder: (context, index) {
+                  if (_sliverHeaderGridCtx != context) {
+                    _sliverHeaderGridCtx = context;
+                    nestedScrollUtil?.headerSliverContexts.add(context);
+                  }
+                  return Text("Item $index");
+                },
+                itemCount: 10,
+              ),
             ];
           },
           body: Builder(builder: (context) {
@@ -587,6 +604,7 @@ void main() {
           sliverContexts: () {
             return [
               if (_sliverHeaderListCtx != null) _sliverHeaderListCtx!,
+              if (_sliverHeaderGridCtx != null) _sliverHeaderGridCtx!,
               if (_sliverBodyListCtx != null) _sliverBodyListCtx!,
               if (_sliverBodyGridCtx != null) _sliverBodyGridCtx!,
             ];
@@ -610,6 +628,7 @@ void main() {
       tearDown(() {
         outerScrollController.dispose();
         _sliverHeaderListCtx = null;
+        _sliverHeaderGridCtx = null;
         _sliverBodyListCtx = null;
         _sliverBodyGridCtx = null;
       });
@@ -758,7 +777,7 @@ void main() {
         (tester) async {
           resetAll();
           await tester.pumpWidget(widget);
-          expect(nestedScrollUtil?.headerSliverContexts.length, 1);
+          expect(nestedScrollUtil?.headerSliverContexts.length, 2);
           expect(nestedScrollUtil?.bodySliverContexts.length, 2);
           expect(nestedScrollUtil?.remainingSliverContext == null, true);
           expect(nestedScrollUtil?.remainingSliverRenderObj == null, true);
@@ -772,6 +791,83 @@ void main() {
           expect(nestedScrollUtil?.bodySliverContexts.length, 0);
           expect(nestedScrollUtil?.remainingSliverContext, null);
           expect(nestedScrollUtil?.remainingSliverRenderObj, null);
+        },
+      );
+
+      testWidgets(
+        'Check the observed data when the sliver in the header is not visible',
+        (tester) async {
+          resetAll();
+          await tester.pumpWidget(widget);
+          await observerController.dispatchOnceObserve(
+            sliverContext: _sliverHeaderListCtx!,
+          );
+          var headerListObservationResult =
+              (resultMap[_sliverHeaderListCtx] as ListViewObserveModel);
+          expect(
+            headerListObservationResult.displayingChildIndexList,
+            isNotEmpty,
+          );
+
+          nestedScrollUtil?.jumpTo(
+            nestedScrollViewKey: nestedScrollViewKey,
+            observerController: observerController,
+            sliverContext: _sliverHeaderGridCtx,
+            position: NestedScrollUtilPosition.header,
+            index: 0,
+            offset: (targetOffset) {
+              return calcPersistentHeaderExtent(
+                offset: targetOffset,
+                widgetKey: appBarKey,
+              );
+            },
+          );
+          await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
+
+          headerListObservationResult =
+              (resultMap[_sliverHeaderListCtx] as ListViewObserveModel);
+          expect(
+            headerListObservationResult.displayingChildIndexList,
+            isEmpty,
+          );
+
+          var headerGridObservationResult =
+              (resultMap[_sliverHeaderGridCtx] as GridViewObserveModel);
+          expect(
+            headerGridObservationResult.firstGroupChildList.first.index,
+            0,
+          );
+
+          nestedScrollUtil?.jumpTo(
+            nestedScrollViewKey: nestedScrollViewKey,
+            observerController: observerController,
+            sliverContext: _sliverBodyListCtx,
+            position: NestedScrollUtilPosition.body,
+            index: 0,
+            offset: (targetOffset) {
+              return calcPersistentHeaderExtent(
+                offset: targetOffset,
+                widgetKey: appBarKey,
+              );
+            },
+          );
+          await tester.pumpAndSettle();
+          await tester.pump(observerController.observeIntervalForScrolling);
+
+          var bodyListObservationResult =
+              (resultMap[_sliverBodyListCtx] as ListViewObserveModel);
+          expect(
+            bodyListObservationResult.firstChild?.index,
+            0,
+          );
+
+          headerGridObservationResult =
+              (resultMap[_sliverHeaderGridCtx] as GridViewObserveModel);
+          expect(
+            headerGridObservationResult.displayingChildIndexList,
+            isEmpty,
+          );
         },
       );
     },
