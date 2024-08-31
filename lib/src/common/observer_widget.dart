@@ -4,7 +4,6 @@
  * @Date: 2022-08-08 00:20:03
  */
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -157,7 +156,8 @@ class ObserverWidgetState<
               .contains(notification.runtimeType)) {
             final isIgnoreInnerCanHandleObserve =
                 ScrollUpdateNotification != notification.runtimeType;
-            if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
+            final platform = Theme.of(context).platform;
+            if (kIsWeb || platform == TargetPlatform.windows || platform == TargetPlatform.macOS) {
               // Getting bad observation result because scrolling in Flutter Web
               // with mouse wheel is not smooth.
               // https://github.com/flutter/flutter/issues/78708
