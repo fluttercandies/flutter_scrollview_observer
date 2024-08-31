@@ -1,6 +1,6 @@
 ## 1.21.2
-- Observer Widget
-  - Fix web support by @Ahmadre in [#91](https://github.com/LinXunFeng/flutter_scrollview_observer/pull/91)
+- ObserverWidget
+  - Fix web support by @Ahmadre in [#91](https://github.com/LinXunFeng/flutter_scrollview_observer/pull/91).
 
 ## 1.21.1
 - ObserverCore
