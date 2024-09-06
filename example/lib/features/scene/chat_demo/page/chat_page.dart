@@ -320,7 +320,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   }
 
   addUnreadTipView() {
-    Overlay.of(pageOverlayContext!)?.insert(OverlayEntry(
+    Overlay.of(pageOverlayContext!).insert(OverlayEntry(
       builder: (BuildContext context) => UnconstrainedBox(
         child: CompositedTransformFollower(
           link: layerLink,
