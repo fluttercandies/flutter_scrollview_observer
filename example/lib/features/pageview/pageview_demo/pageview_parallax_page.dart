@@ -62,6 +62,9 @@ class _PageViewParallaxPageState extends State<PageViewParallaxPage> {
   @override
   void dispose() {
     pageController.dispose();
+    for (var e in pageItemBgPicAlignmentXList) {
+      e.dispose();
+    }
     super.dispose();
   }
 
@@ -140,30 +143,27 @@ class _PageViewParallaxPageState extends State<PageViewParallaxPage> {
   }
 
   Widget _buildPageItem(int index) {
-    Widget resultWidget = Container(
+    Widget resultWidget = Stack(
+      alignment: AlignmentDirectional.center,
+      children: [
+        Positioned(
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          child: _buildPageItemBgPicView(index),
+        ),
+        const SizedBox.expand(),
+        _buildNum(index),
+      ],
+    );
+    resultWidget = Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.blue[50],
         borderRadius: BorderRadius.circular(10),
       ),
-      clipBehavior: Clip.antiAlias,
-      alignment: Alignment.center,
-      child: Stack(
-        alignment: AlignmentDirectional.center,
-        children: [
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            child: _buildPageItemBgPicView(index),
-          ),
-          const SizedBox.expand(),
-          _buildNum(index),
-        ],
-      ),
-    );
-    resultWidget = Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
       child: resultWidget,
     );
     return resultWidget;

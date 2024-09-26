@@ -64,6 +64,9 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
   @override
   void dispose() {
     pageController.dispose();
+    for (var e in pageItemOffsetYList) {
+      e.dispose();
+    }
     super.dispose();
   }
 
