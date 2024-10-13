@@ -1,3 +1,7 @@
+## 1.22.0
+- ObserverWidget
+  - Add `scrollNotificationPredicate`.
+
 ## 1.21.2
 - ObserverWidget
   - Fix web support by @Ahmadre in [#91](https://github.com/LinXunFeng/flutter_scrollview_observer/pull/91).
