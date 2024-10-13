@@ -8,12 +8,16 @@ void main() {
     int itemCount = 100,
     bool isFixedHeight = false,
     double? cacheExtent,
+    NullableIndexedWidgetBuilder? itemBuilder,
   }) {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: ListView.separated(
         controller: scrollController,
         itemBuilder: (ctx, index) {
+          if (itemBuilder != null) {
+            return itemBuilder(ctx, index);
+          }
           double height = 80;
           if (!isFixedHeight) {
             height = (index % 2 == 0) ? 80 : 50;
@@ -80,6 +84,63 @@ void main() {
     await tester.pumpWidget(widget);
     expect(observerController.sliverContexts.length, 1);
     scrollController.dispose();
+  });
+
+  testWidgets('scrollNotificationPredicate', (tester) async {
+    final scrollController = ScrollController();
+    final observerController = ListObserverController(
+      controller: scrollController,
+    );
+    final pageController = PageController();
+    bool isCalledOnObserve = false;
+
+    Widget widget = getListView(
+      scrollController: scrollController,
+      itemBuilder: (ctx, index) {
+        if (index == 0) {
+          return SizedBox(
+            height: 200,
+            child: PageView.builder(
+              scrollDirection: Axis.horizontal,
+              controller: pageController,
+              itemBuilder: (ctx, index) {
+                return const SizedBox.expand();
+              },
+              itemCount: 10,
+            ),
+          );
+        }
+        return const SizedBox(height: 80);
+      },
+    );
+    widget = ListViewObserver(
+      child: widget,
+      controller: observerController,
+      scrollNotificationPredicate: defaultScrollNotificationPredicate,
+      onObserve: (result) {
+        isCalledOnObserve = true;
+      },
+    );
+    await tester.pumpWidget(widget);
+
+    pageController.animateToPage(
+      3,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeInOut,
+    );
+    await tester.pumpAndSettle();
+    expect(pageController.page, 3);
+    expect(isCalledOnObserve, isFalse);
+
+    scrollController.animateTo(
+      10,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeInOut,
+    );
+    expect(isCalledOnObserve, isTrue);
+
+    scrollController.dispose();
+    pageController.dispose();
   });
 
   group('Scroll to index', () {

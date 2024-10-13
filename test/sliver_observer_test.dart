@@ -28,12 +28,17 @@ void main() {
     );
   }
 
-  Widget _buildSliverListView() {
+  Widget _buildSliverListView({
+    NullableIndexedWidgetBuilder? builder,
+  }) {
     return SliverList(
       key: sliverListKey,
       delegate: SliverChildBuilderDelegate(
         (ctx, index) {
           _sliverListCtx ??= ctx;
+          if (builder != null) {
+            return builder(ctx, index);
+          }
           return Container(
             height: (index % 2 == 0) ? 80 : 50,
             color: Colors.red,
@@ -47,7 +52,9 @@ void main() {
     );
   }
 
-  Widget _buildSliverGridView() {
+  Widget _buildSliverGridView({
+    NullableIndexedWidgetBuilder? builder,
+  }) {
     return SliverGrid(
       key: sliverGridKey,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -59,6 +66,9 @@ void main() {
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
           _sliverGridCtx ??= context;
+          if (builder != null) {
+            return builder(context, index);
+          }
           return Container(
             color: Colors.green,
             child: Center(
@@ -73,13 +83,19 @@ void main() {
 
   Widget _buildScrollView({
     ScrollController? scrollController,
+    NullableIndexedWidgetBuilder? listItemBuilder,
+    NullableIndexedWidgetBuilder? gridItemBuilder,
   }) {
     return _buildDirectionality(
       child: CustomScrollView(
         controller: scrollController,
         slivers: [
-          _buildSliverListView(),
-          _buildSliverGridView(),
+          _buildSliverListView(
+            builder: listItemBuilder,
+          ),
+          _buildSliverGridView(
+            builder: gridItemBuilder,
+          ),
         ],
       ),
     );
@@ -92,8 +108,9 @@ void main() {
 
   testWidgets('Check isForbidObserveCallback', (tester) async {
     final scrollController = ScrollController();
-    final observerController =
-        SliverObserverController(controller: scrollController);
+    final observerController = SliverObserverController(
+      controller: scrollController,
+    );
 
     Widget widget = _buildScrollView(
       scrollController: scrollController,
@@ -132,8 +149,9 @@ void main() {
 
   testWidgets('Check isForbidObserveViewportCallback', (tester) async {
     final scrollController = ScrollController();
-    final observerController =
-        SliverObserverController(controller: scrollController);
+    final observerController = SliverObserverController(
+      controller: scrollController,
+    );
 
     Widget widget = _buildScrollView(
       scrollController: scrollController,
@@ -174,9 +192,9 @@ void main() {
 
   testWidgets('Check observeIntervalForScrolling', (tester) async {
     final scrollController = ScrollController();
-    final observerController =
-        SliverObserverController(controller: scrollController)
-          ..observeIntervalForScrolling = const Duration(milliseconds: 500);
+    final observerController = SliverObserverController(
+      controller: scrollController,
+    )..observeIntervalForScrolling = const Duration(milliseconds: 500);
     int observeCountForOnObserveAll = 0;
     int observeCountForOnObserveViewport = 0;
 
@@ -236,6 +254,69 @@ void main() {
     scrollController.dispose();
   });
 
+  testWidgets('scrollNotificationPredicate', (tester) async {
+    final scrollController = ScrollController();
+    final observerController = SliverObserverController(
+      controller: scrollController,
+    );
+    final pageController = PageController();
+    bool isCalledOnObserve = false;
+
+    Widget widget = _buildScrollView(
+      scrollController: scrollController,
+      listItemBuilder: (context, index) {
+        if (index == 0) {
+          return SizedBox(
+            height: 200,
+            child: PageView.builder(
+              scrollDirection: Axis.horizontal,
+              controller: pageController,
+              itemBuilder: (ctx, index) {
+                return const SizedBox.expand();
+              },
+              itemCount: 10,
+            ),
+          );
+        }
+        return const SizedBox(height: 80);
+      },
+    );
+    widget = SliverViewObserver(
+      child: widget,
+      controller: observerController,
+      scrollNotificationPredicate: defaultScrollNotificationPredicate,
+      sliverContexts: () {
+        return [
+          if (_sliverListCtx != null) _sliverListCtx!,
+          if (_sliverGridCtx != null) _sliverGridCtx!,
+        ];
+      },
+      onObserveAll: (result) {
+        isCalledOnObserve = true;
+      },
+    );
+    await tester.pumpWidget(widget);
+
+    pageController.animateToPage(
+      3,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeInOut,
+    );
+    await tester.pumpAndSettle();
+    expect(pageController.page, 3);
+    expect(isCalledOnObserve, isFalse);
+
+    scrollController.animateTo(
+      10,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeInOut,
+    );
+    expect(isCalledOnObserve, isTrue);
+
+    scrollController.dispose();
+    pageController.dispose();
+  });
+
   group(
     'ObserverScrollNotification',
     () {
@@ -256,8 +337,9 @@ void main() {
         indexOfDecisionNoti = -1;
         indexOfEndNoti = -1;
         scrollController = ScrollController();
-        observerController =
-            SliverObserverController(controller: scrollController);
+        observerController = SliverObserverController(
+          controller: scrollController,
+        );
 
         widget = _buildScrollView(
           scrollController: scrollController,

@@ -6,6 +6,7 @@ void main() {
   Widget getGridView({
     ScrollController? scrollController,
     int itemCount = 200,
+    NullableIndexedWidgetBuilder? itemBuilder,
   }) {
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -17,6 +18,9 @@ void main() {
           mainAxisSpacing: 5,
         ),
         itemBuilder: (context, index) {
+          if (itemBuilder != null) {
+            return itemBuilder(context, index);
+          }
           return Container(
             color: Colors.blue[100],
             child: Center(
@@ -31,8 +35,9 @@ void main() {
 
   testWidgets('Auto get target sliver context', (tester) async {
     final scrollController = ScrollController();
-    final gridObserverController =
-        GridObserverController(controller: scrollController);
+    final gridObserverController = GridObserverController(
+      controller: scrollController,
+    );
     Widget widget = getGridView(
       scrollController: scrollController,
     );
@@ -45,10 +50,65 @@ void main() {
     scrollController.dispose();
   });
 
+  testWidgets('scrollNotificationPredicate', (tester) async {
+    final scrollController = ScrollController();
+    final observerController = GridObserverController(
+      controller: scrollController,
+    );
+    final pageController = PageController();
+    bool isCalledOnObserve = false;
+
+    Widget widget = getGridView(
+      scrollController: scrollController,
+      itemBuilder: (ctx, index) {
+        if (index == 0) {
+          return PageView.builder(
+            scrollDirection: Axis.horizontal,
+            controller: pageController,
+            itemBuilder: (ctx, index) {
+              return const SizedBox.expand();
+            },
+            itemCount: 10,
+          );
+        }
+        return const SizedBox.expand();
+      },
+    );
+    widget = GridViewObserver(
+      child: widget,
+      controller: observerController,
+      scrollNotificationPredicate: defaultScrollNotificationPredicate,
+      onObserve: (result) {
+        isCalledOnObserve = true;
+      },
+    );
+    await tester.pumpWidget(widget);
+
+    pageController.animateToPage(
+      3,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeInOut,
+    );
+    await tester.pumpAndSettle();
+    expect(pageController.page, 3);
+    expect(isCalledOnObserve, isFalse);
+
+    scrollController.animateTo(
+      10,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeInOut,
+    );
+    expect(isCalledOnObserve, isTrue);
+
+    scrollController.dispose();
+    pageController.dispose();
+  });
+
   testWidgets('Scroll to index', (tester) async {
     final scrollController = ScrollController();
-    final gridObserverController =
-        GridObserverController(controller: scrollController);
+    final gridObserverController = GridObserverController(
+      controller: scrollController,
+    );
 
     Widget widget = getGridView(
       scrollController: scrollController,
@@ -91,9 +151,9 @@ void main() {
   group('Cache index offset', () {
     testWidgets('Property cacheJumpIndexOffset', (tester) async {
       final scrollController = ScrollController();
-      final observerController =
-          GridObserverController(controller: scrollController)
-            ..cacheJumpIndexOffset = false;
+      final observerController = GridObserverController(
+        controller: scrollController,
+      )..cacheJumpIndexOffset = false;
 
       Widget widget = getGridView(
         scrollController: scrollController,
@@ -114,8 +174,9 @@ void main() {
 
     testWidgets('Method clearScrollIndexCache', (tester) async {
       final scrollController = ScrollController();
-      final observerController =
-          GridObserverController(controller: scrollController);
+      final observerController = GridObserverController(
+        controller: scrollController,
+      );
 
       Widget widget = getGridView(
         scrollController: scrollController,
