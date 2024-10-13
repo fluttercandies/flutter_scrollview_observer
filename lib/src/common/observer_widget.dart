@@ -48,6 +48,16 @@ class ObserverWidget<C extends ObserverController, M extends ObserveModel,
   /// child widget.
   final double toNextOverPercent;
 
+  /// A predicate for [ScrollNotification], used to determine whether
+  /// observation can be triggered.
+  ///
+  /// Generally combined with [defaultScrollNotificationPredicate] to check
+  /// whether `notification.depth == 0`, which means that the notification did
+  /// not bubble through any intervening scrolling widgets.
+  /// This can avoid the unnecessary observation calculations caused by
+  /// intervening scrolling widgets, which in turn improves performance.
+  final ScrollNotificationPredicate? scrollNotificationPredicate;
+
   /// Used to set types those can trigger observe automatically.
   ///
   /// Defaults to [.scrollStart, .scrollUpdate, .scrollEnd]
@@ -78,6 +88,7 @@ class ObserverWidget<C extends ObserverController, M extends ObserveModel,
     this.leadingOffset = 0,
     this.dynamicLeadingOffset,
     this.toNextOverPercent = 1,
+    this.scrollNotificationPredicate,
     this.autoTriggerObserveTypes,
     this.triggerOnObserveType =
         ObserverTriggerOnObserveType.displayingItemsChange,
@@ -152,6 +163,15 @@ class ObserverWidgetState<
       },
       child: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
+          // If the scrollNotificationPredicate returns false, the notification
+          // will be ignored.
+          if (!(widget.scrollNotificationPredicate?.call(notification) ??
+              true)) {
+            return false;
+          }
+          // If the notification.runtimeType is not in the list of
+          // innerAutoTriggerObserveScrollNotifications that can trigger
+          // observation, the notification will be ignored.
           if (innerAutoTriggerObserveScrollNotifications
               .contains(notification.runtimeType)) {
             final isIgnoreInnerCanHandleObserve =
