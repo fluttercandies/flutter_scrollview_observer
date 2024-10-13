@@ -26,6 +26,8 @@ Language: 中文 | [English](https://github.com/fluttercandies/flutter_scrollvie
 - [Flutter - 秒杀1/2曝光统计 📊](https://mp.weixin.qq.com/s/gNFX4Au4esftgTPXHvB4LQ) | [备用链接](https://juejin.cn/post/7271248528998121512)
 - [Flutter - 如何快速搓一个微信通讯录列表(azlist) 📓](https://mp.weixin.qq.com/s/1bmYSvtOYX83DLncvnBjqA) | [备用链接](https://juejin.cn/post/7294884963631497254)
 - [Flutter - 支持观察NestedScrollView，兼容性更强 😈](https://mp.weixin.qq.com/s/1dsmRg8q2VJ6HzasLgoVpA) | [备用链接](https://juejin.cn/post/7388444606456840211)
+- [Flutter - 轻松实现PageView卡片偏移效果](https://mp.weixin.qq.com/s/Q8zk89bgr_8bgWQ4F86VUQ) | [备用链接](https://juejin.cn/post/7411516362916216859)
+- [Flutter - 轻松搞定炫酷视差(Parallax)效果](https://mp.weixin.qq.com/s/Fi-X2eJRWj17sqCcVqbPRQ) | [备用链接](https://juejin.cn/post/7416655730214699017)
 
 ## 🔨 功能点
 
