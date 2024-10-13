@@ -37,6 +37,7 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
       body: SliverViewObserver(
         child: _buildBody(),
         leadingOffset: observeOffset,
+        scrollNotificationPredicate: defaultScrollNotificationPredicate,
         autoTriggerObserveTypes: const [
           ObserverAutoTriggerObserveType.scrollEnd,
         ],
