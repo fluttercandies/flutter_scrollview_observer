@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
+import 'package:scrollview_observer/src/common/observer_widget_tag_manager.dart';
 
 void main() {
   GlobalKey sliverListKey = GlobalKey();
@@ -1258,4 +1259,354 @@ void main() {
       );
     },
   );
+
+  group('ObserverListener', () {
+    late String tag1;
+    late String tag2;
+    late GlobalKey key1;
+    late GlobalKey key2;
+    late ScrollController scrollController;
+    late SliverObserverController observerController1;
+    late SliverObserverController observerController2;
+    late Widget widget;
+
+    tearDown(() {
+      scrollController.dispose();
+    });
+
+    resetAll({
+      bool isResetTag = false,
+    }) {
+      if (isResetTag) {
+        tag1 = tag1 * 2;
+        tag2 = tag2 * 2;
+      } else {
+        tag1 = 'tag1';
+        tag2 = 'tag2';
+        key1 = GlobalKey();
+        key2 = GlobalKey();
+        scrollController = ScrollController();
+        observerController1 = SliverObserverController(
+          controller: scrollController,
+        );
+        observerController2 = SliverObserverController(
+          controller: scrollController,
+        );
+      }
+      widget = _buildScrollView(
+        scrollController: scrollController,
+        listItemBuilder: (context, index) {
+          if (index == 3) {
+            return const SizedBox(
+              height: 50,
+              child: Center(
+                child: Icon(Icons.list),
+              ),
+            );
+          }
+          return Container(height: 50);
+        },
+        gridItemBuilder: (context, index) {
+          if (index == 3) {
+            return const Center(
+              child: Icon(Icons.grid_view),
+            );
+          }
+          return Container();
+        },
+      );
+      widget = SliverViewObserver(
+        key: key2,
+        tag: tag2,
+        sliverContexts: () => [
+          if (_sliverListCtx != null) _sliverListCtx!,
+          if (_sliverGridCtx != null) _sliverGridCtx!
+        ],
+        child: widget,
+        controller: observerController2,
+      );
+      widget = SliverViewObserver(
+        key: key1,
+        tag: tag1,
+        sliverContexts: () => [
+          if (_sliverListCtx != null) _sliverListCtx!,
+          if (_sliverGridCtx != null) _sliverGridCtx!
+        ],
+        child: widget,
+        controller: observerController1,
+      );
+    }
+
+    testWidgets('Change tag', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+
+      final listItemFinder = find.byIcon(Icons.list);
+
+      ObserverWidgetTagManager? tagManager = ObserverWidgetTagManager.maybeOf(
+        tester.element(listItemFinder),
+      );
+      expect(tagManager, isNotNull);
+
+      Map<String, BuildContext> tagMap = Map.from(tagManager?.tagMap ?? {});
+      Set<String> tags = {tag1, tag2};
+      expect(tagMap.keys.toSet(), tags);
+
+      resetAll(isResetTag: true);
+      await tester.pumpWidget(widget);
+
+      tagManager = ObserverWidgetTagManager.maybeOf(
+        tester.element(listItemFinder),
+      );
+      tagMap = Map.from(tagManager?.tagMap ?? {});
+      Set<String> newTags = {tag1, tag2};
+      expect(tags != newTags, isTrue);
+      expect(tagMap.keys.toSet(), newTags);
+    });
+
+    testWidgets('of', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+
+      final listItemFinder = find.byIcon(Icons.list);
+      final gridItemFinder = find.byIcon(Icons.grid_view);
+
+      ObserveModel? cbResult;
+      Map<BuildContext, ObserveModel>? cbAllResult;
+      SliverViewportObserveModel? cbObserveViewportResult;
+      onObserveCallback(ObserveModel result) {
+        cbResult = result;
+      }
+
+      onObserveAllCallback(
+        Map<BuildContext, ObserveModel> resultMap,
+      ) {
+        cbAllResult = resultMap;
+      }
+
+      onObserveViewportCallback(SliverViewportObserveModel result) {
+        cbObserveViewportResult = result;
+      }
+
+      final listObserverState = SliverViewObserver.of(
+        tester.element(listItemFinder),
+      );
+      expect(listObserverState, isNotNull);
+
+      final listObserverStateByTag2 = SliverViewObserver.of(
+        tester.element(listItemFinder),
+        tag: tag2,
+      );
+      expect(listObserverStateByTag2 == key2.currentState, isTrue);
+      expect(listObserverStateByTag2 == listObserverState, isTrue);
+
+      final listObserverStateByTag1 = SliverViewObserver.of(
+        tester.element(listItemFinder),
+        tag: tag1,
+      );
+      expect(listObserverStateByTag1 == key1.currentState, isTrue);
+      expect(listObserverStateByTag1 == listObserverState, isFalse);
+
+      listObserverState.addListener(
+        onObserve: onObserveCallback,
+        onObserveAll: onObserveAllCallback,
+        onObserveViewport: onObserveViewportCallback,
+      );
+      expect(listObserverState.innerListeners?.length, 1);
+
+      ScrollViewOnceObserveNotificationResult? result =
+          await observerController2.dispatchOnceObserve(
+        sliverContext: _sliverListCtx!,
+        isDependObserveCallback: false,
+      );
+      expect(result.observeResult, cbResult);
+      expect(result.observeAllResult, cbAllResult);
+      expect(result.observeViewportResultModel, cbObserveViewportResult);
+
+      listObserverState.removeListener(
+        onObserve: onObserveCallback,
+        onObserveAll: onObserveAllCallback,
+        onObserveViewport: onObserveViewportCallback,
+      );
+      expect(listObserverState.innerListeners?.length, 0);
+
+      observerController2.jumpTo(
+        index: 0,
+        sliverContext: _sliverGridCtx,
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController2.observeIntervalForScrolling);
+      cbResult = null;
+      cbAllResult = null;
+      cbObserveViewportResult = null;
+
+      final gridObserverState = SliverViewObserver.of(
+        tester.element(gridItemFinder),
+      );
+      expect(gridObserverState, isNotNull);
+      expect(gridObserverState == listObserverState, isTrue);
+
+      final gridObserverStateByTag2 = SliverViewObserver.of(
+        tester.element(gridItemFinder),
+        tag: tag2,
+      );
+      expect(gridObserverStateByTag2 == key2.currentState, isTrue);
+      expect(gridObserverStateByTag2 == listObserverState, isTrue);
+
+      final gridObserverStateByTag1 = SliverViewObserver.of(
+        tester.element(gridItemFinder),
+        tag: tag1,
+      );
+      expect(gridObserverStateByTag1 == key1.currentState, isTrue);
+      expect(gridObserverStateByTag1 == listObserverState, isFalse);
+
+      gridObserverState.addListener(
+        onObserve: onObserveCallback,
+        onObserveAll: onObserveAllCallback,
+        onObserveViewport: onObserveViewportCallback,
+      );
+      expect(gridObserverState.innerListeners?.length, 1);
+
+      result = await observerController2.dispatchOnceObserve(
+        sliverContext: _sliverListCtx!,
+      );
+      expect(result.observeResult, cbResult);
+      expect(result.observeAllResult, cbAllResult);
+      expect(result.observeViewportResultModel, cbObserveViewportResult);
+
+      gridObserverState.removeListener(
+        onObserve: onObserveCallback,
+        onObserveAll: onObserveAllCallback,
+        onObserveViewport: onObserveViewportCallback,
+      );
+      expect(gridObserverState.innerListeners?.length, 0);
+    });
+
+    testWidgets('maybeOf', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+
+      final listItemFinder = find.byIcon(Icons.list);
+      final gridItemFinder = find.byIcon(Icons.grid_view);
+
+      MixViewObserverState? observerState = SliverViewObserver.maybeOf(
+        tester.element(find.byKey(key1)),
+      );
+      expect(observerState, isNull);
+
+      ObserveModel? cbResult;
+      Map<BuildContext, ObserveModel>? cbAllResult;
+      SliverViewportObserveModel? cbObserveViewportResult;
+      onObserveCallback(ObserveModel result) {
+        cbResult = result;
+      }
+
+      onObserveAllCallback(
+        Map<BuildContext, ObserveModel> resultMap,
+      ) {
+        cbAllResult = resultMap;
+      }
+
+      onObserveViewportCallback(SliverViewportObserveModel result) {
+        cbObserveViewportResult = result;
+      }
+
+      MixViewObserverState? listObserverState = SliverViewObserver.maybeOf(
+        tester.element(listItemFinder),
+      );
+      expect(listObserverState, isNotNull);
+
+      final listObserverStateByTag2 = SliverViewObserver.maybeOf(
+        tester.element(listItemFinder),
+        tag: tag2,
+      );
+      expect(listObserverStateByTag2 == key2.currentState, isTrue);
+      expect(listObserverStateByTag2 == listObserverState, isTrue);
+
+      final listObserverStateByTag1 = SliverViewObserver.maybeOf(
+        tester.element(listItemFinder),
+        tag: tag1,
+      );
+      expect(listObserverStateByTag1 == key1.currentState, isTrue);
+      expect(listObserverStateByTag1 == listObserverState, isFalse);
+
+      listObserverState?.addListener(
+        onObserve: onObserveCallback,
+        onObserveAll: onObserveAllCallback,
+        onObserveViewport: onObserveViewportCallback,
+      );
+      expect(listObserverState?.innerSliverListeners?.length, 1);
+      expect(listObserverState?.innerListeners?.length, 1);
+
+      ScrollViewOnceObserveNotificationResult? result =
+          await observerController2.dispatchOnceObserve(
+        sliverContext: _sliverListCtx!,
+        isDependObserveCallback: false,
+      );
+      expect(result.observeResult, cbResult);
+      expect(result.observeAllResult, cbAllResult);
+      expect(result.observeViewportResultModel, cbObserveViewportResult);
+
+      listObserverState?.removeListener(
+        onObserve: onObserveCallback,
+        onObserveAll: onObserveAllCallback,
+        onObserveViewport: onObserveViewportCallback,
+      );
+      expect(listObserverState?.innerSliverListeners?.length, 0);
+      expect(listObserverState?.innerListeners?.length, 0);
+
+      observerController2.jumpTo(
+        index: 0,
+        sliverContext: _sliverGridCtx,
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController2.observeIntervalForScrolling);
+      cbResult = null;
+      cbAllResult = null;
+      cbObserveViewportResult = null;
+
+      MixViewObserverState? gridObserverState = SliverViewObserver.maybeOf(
+        tester.element(find.byIcon(Icons.grid_view)),
+      );
+      expect(gridObserverState, isNotNull);
+      final gridObserverStateByTag2 = SliverViewObserver.maybeOf(
+        tester.element(gridItemFinder),
+        tag: tag2,
+      );
+
+      expect(gridObserverStateByTag2 == key2.currentState, isTrue);
+      expect(gridObserverStateByTag2 == gridObserverState, isTrue);
+
+      final gridObserverStateByTag1 = SliverViewObserver.maybeOf(
+        tester.element(gridItemFinder),
+        tag: tag1,
+      );
+      expect(gridObserverStateByTag1 == key1.currentState, isTrue);
+      expect(gridObserverStateByTag1 == gridObserverState, isFalse);
+
+      gridObserverState?.addListener(
+        onObserve: onObserveCallback,
+        onObserveAll: onObserveAllCallback,
+        onObserveViewport: onObserveViewportCallback,
+      );
+      expect(gridObserverState?.innerSliverListeners?.length, 1);
+      expect(gridObserverState?.innerListeners?.length, 1);
+
+      result = await observerController2.dispatchOnceObserve(
+        sliverContext: _sliverListCtx!,
+        isDependObserveCallback: false,
+      );
+      expect(result.observeResult, cbResult);
+      expect(result.observeAllResult, cbAllResult);
+      expect(result.observeViewportResultModel, cbObserveViewportResult);
+
+      gridObserverState?.removeListener(
+        onObserve: onObserveCallback,
+        onObserveAll: onObserveAllCallback,
+        onObserveViewport: onObserveViewportCallback,
+      );
+      expect(gridObserverState?.innerSliverListeners?.length, 0);
+      expect(gridObserverState?.innerListeners?.length, 0);
+    });
+  });
 }

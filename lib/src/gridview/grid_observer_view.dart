@@ -24,10 +24,11 @@ class GridViewObserver extends ObserverWidget<GridObserverController,
   const GridViewObserver({
     Key? key,
     required Widget child,
+    String? tag,
     this.sliverGridContexts,
     this.controller,
-    Function(Map<BuildContext, GridViewObserveModel>)? onObserveAll,
-    Function(GridViewObserveModel)? onObserve,
+    OnObserveAllCallback<GridViewObserveModel>? onObserveAll,
+    OnObserveCallback<GridViewObserveModel>? onObserve,
     double leadingOffset = 0,
     double Function()? dynamicLeadingOffset,
     double toNextOverPercent = 1,
@@ -40,6 +41,7 @@ class GridViewObserver extends ObserverWidget<GridObserverController,
   }) : super(
           key: key,
           child: child,
+          tag: tag,
           sliverContexts: sliverGridContexts,
           sliverController: controller,
           onObserveAll: onObserveAll,
@@ -56,6 +58,37 @@ class GridViewObserver extends ObserverWidget<GridObserverController,
 
   @override
   State<GridViewObserver> createState() => GridViewObserverState();
+
+  static GridViewObserverState? maybeOf(
+    BuildContext context, {
+    String? tag,
+  }) {
+    final _state = ObserverWidget.maybeOf<
+        GridObserverController,
+        GridViewObserveModel,
+        GridViewOnceObserveNotification,
+        GridViewObserver>(
+      context,
+      tag: tag,
+    );
+    if (_state is! GridViewObserverState) return null;
+    return _state;
+  }
+
+  static GridViewObserverState of(
+    BuildContext context, {
+    String? tag,
+  }) {
+    final _state = ObserverWidget.of<
+        GridObserverController,
+        GridViewObserveModel,
+        GridViewOnceObserveNotification,
+        GridViewObserver>(
+      context,
+      tag: tag,
+    );
+    return _state as GridViewObserverState;
+  }
 }
 
 class GridViewObserverState extends ObserverWidgetState<GridObserverController,

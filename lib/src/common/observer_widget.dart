@@ -3,15 +3,21 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
+
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
 import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
 import 'package:scrollview_observer/src/common/observer_controller.dart';
-import 'package:scrollview_observer/src/common/typedefs.dart';
+import 'package:scrollview_observer/src/common/observer_listener.dart';
 import 'package:scrollview_observer/src/common/observer_typedef.dart';
+import 'package:scrollview_observer/src/common/observer_widget_scope.dart';
+import 'package:scrollview_observer/src/common/observer_widget_tag_manager.dart';
+import 'package:scrollview_observer/src/common/typedefs.dart';
 import 'package:scrollview_observer/src/notification.dart';
 import 'package:scrollview_observer/src/utils/src/log.dart';
 
@@ -19,7 +25,14 @@ import 'models/observe_model.dart';
 
 class ObserverWidget<C extends ObserverController, M extends ObserveModel,
     N extends ScrollViewOnceObserveNotification> extends StatefulWidget {
+  /// The subtree below this widget.
   final Widget child;
+
+  /// This is for when you have multiple nested [ObserverWidget] widgets and
+  /// you want to get the corresponding [ObserverWidgetState].
+  ///
+  /// It must be a unique string in the tree.
+  final String? tag;
 
   /// An object that can be used to dispatch a [ListViewOnceObserveNotification]
   /// or [GridViewOnceObserveNotification].
@@ -29,10 +42,10 @@ class ObserverWidget<C extends ObserverController, M extends ObserveModel,
   final List<BuildContext> Function()? sliverContexts;
 
   /// The callback of getting observed result map.
-  final Function(Map<BuildContext, M>)? onObserveAll;
+  final OnObserveAllCallback<M>? onObserveAll;
 
   /// The callback of getting observed result for first sliver.
-  final Function(M)? onObserve;
+  final OnObserveCallback<M>? onObserve;
 
   /// Calculate offset.
   final double leadingOffset;
@@ -81,6 +94,7 @@ class ObserverWidget<C extends ObserverController, M extends ObserveModel,
   const ObserverWidget({
     Key? key,
     required this.child,
+    this.tag,
     this.sliverController,
     this.sliverContexts,
     this.onObserveAll,
@@ -100,6 +114,85 @@ class ObserverWidget<C extends ObserverController, M extends ObserveModel,
   @override
   State<ObserverWidget> createState() =>
       ObserverWidgetState<C, M, N, ObserverWidget<C, M, N>>();
+
+  /// Returning the closest instance of this class that encloses the given
+  /// context.
+  ///
+  /// If you give a tag, it will give priority find the corresponding instance
+  /// of this class with the given tag and return it.
+  ///
+  /// If there is no [ObserverWidget] widget, then null is returned.
+  ///
+  /// Calling this method will create a dependency on the closest
+  /// [ObserverWidget] in the [context], if there is one.
+  ///
+  /// See also:
+  ///
+  /// * [ObserverWidget.of], which is similar to this method, but asserts if no
+  ///   [ObserverWidget] instance is found.
+  static ObserverWidgetState<C, M, N, T>? maybeOf<
+      C extends ObserverController,
+      M extends ObserveModel,
+      N extends ScrollViewOnceObserveNotification,
+      T extends ObserverWidget<C, M, N>>(
+    BuildContext context, {
+    String? tag,
+  }) {
+    BuildContext? _ctx;
+    if (tag != null) {
+      final tagManager = ObserverWidgetTagManager.maybeOf(context);
+      _ctx = tagManager?.context(tag);
+    }
+    return (_ctx ?? context)
+        .dependOnInheritedWidgetOfExactType<ObserverWidgetScope<C, M, N, T>>()
+        ?.observerWidgetState;
+  }
+
+  /// Returning the closest instance of this class that encloses the given
+  /// context.
+  ///
+  /// If you give a tag, it will give priority find the corresponding instance
+  /// of this class with the given tag and return it.
+  ///
+  /// If no instance is found, this method will assert in debug mode, and throw
+  /// an exception in release mode.
+  ///
+  /// Calling this method will create a dependency on the closest
+  /// [ObserverWidget] in the [context].
+  ///
+  /// See also:
+  ///
+  /// * [ObserverWidget.maybeOf], which is similar to this method, but returns
+  ///   null if no [ObserverWidget] instance is found.
+  static ObserverWidgetState<C, M, N, T> of<
+      C extends ObserverController,
+      M extends ObserveModel,
+      N extends ScrollViewOnceObserveNotification,
+      T extends ObserverWidget<C, M, N>>(
+    BuildContext context, {
+    String? tag,
+  }) {
+    final observerState = maybeOf<C, M, N, T>(
+      context,
+      tag: tag,
+    );
+    assert(() {
+      if (observerState == null) {
+        throw FlutterError(
+          '$T.of() was called with a context that does not contain a '
+          '$T widget.\n'
+          'No $T widget ancestor could be found starting from the '
+          'context that was passed to $T.of(). This can happen '
+          'because you are using a widget that looks for a $T '
+          'ancestor, but no such ancestor exists.\n'
+          'The context used was:\n'
+          '  $context',
+        );
+      }
+      return true;
+    }());
+    return observerState!;
+  }
 }
 
 class ObserverWidgetState<
@@ -138,6 +231,32 @@ class ObserverWidgetState<
   /// Whether can handle observe.
   bool innerCanHandleObserve = true;
 
+  /// The [BuildContext] of the [ObserverWidgetScope].
+  BuildContext? scopeContext;
+
+  /// The listener list state for a [ObserverWidget] returned by
+  /// [ObserverWidget.of].
+  ///
+  /// It supports a listener list instead of just a single observation
+  /// callback (such as onObserve and onObserveAll).
+  @protected
+  @visibleForTesting
+  LinkedList<ObserverListenerEntry<M>>? innerListeners =
+      LinkedList<ObserverListenerEntry<M>>();
+
+  bool _debugAssertNotDisposed() {
+    assert(() {
+      if (innerListeners == null) {
+        throw FlutterError(
+          'A $runtimeType was used after being disposed.\n'
+          'Once you have called dispose() on a $runtimeType, it can no longer be used.',
+        );
+      }
+      return true;
+    }());
+    return true;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -145,8 +264,30 @@ class ObserverWidgetState<
   }
 
   @override
+  void didUpdateWidget(covariant T oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    _checkTagChange(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    assert(_debugAssertNotDisposed());
+    innerListeners?.clear();
+    innerListeners = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return NotificationListener<N>(
+    // Placed at the deepest level for convenient subsequent operations using
+    // its context.
+    Widget resultWidget = ObserverWidgetScope<C, M, N, T>(
+      child: widget.child,
+      observerWidgetState: this,
+      onCreateElement: _handleScopeContext,
+    );
+    resultWidget = NotificationListener<N>(
       onNotification: (notification) {
         final result = handleContexts(
           isForceObserve: notification.isForce,
@@ -200,9 +341,17 @@ class ObserverWidgetState<
           }
           return false;
         },
-        child: widget.child,
+        child: resultWidget,
       ),
     );
+    // When nesting multiple ObserverWidgets, ensure that only one
+    // ObserverWidgetTagManager is at the top.
+    if (ObserverWidgetTagManager.maybeOf(context) == null) {
+      resultWidget = ObserverWidgetTagManager(
+        child: resultWidget,
+      );
+    }
+    return resultWidget;
   }
 
   /// Setup sliver controller
@@ -309,7 +458,9 @@ class ObserverWidgetState<
     final onObserve = isForbidObserveCallback ? null : widget.onObserve;
     final onObserveAll = isForbidObserveCallback ? null : widget.onObserveAll;
     if (isDependObserveCallback) {
-      if (onObserve == null && onObserveAll == null) return null;
+      if (onObserve == null &&
+          onObserveAll == null &&
+          (innerListeners?.isEmpty ?? true)) return null;
     }
 
     final isHandlingScroll =
@@ -360,6 +511,8 @@ class ObserverWidgetState<
       onObserveAll(changeResultMap);
     }
 
+    _notifyListeners(changeResultMap);
+
     return ObserverHandleContextsResultModel(
       changeResultModel: changeResultModel,
       changeResultMap: changeResultMap,
@@ -371,5 +524,120 @@ class ObserverWidgetState<
       return widget.customHandleObserve?.call(ctx);
     }
     return null;
+  }
+
+  void _handleScopeContext(BuildContext ctx) async {
+    scopeContext = ctx;
+    final tag = widget.tag ?? '';
+    if (tag.isEmpty) return;
+    await WidgetsBinding.instance.endOfFrame;
+    assert(ctx.mounted);
+    final tagManager = ObserverWidgetTagManager.maybeOf(ctx);
+    tagManager?.set(tag, ctx);
+  }
+
+  void _checkTagChange(T oldWidget) async {
+    final oldTag = oldWidget.tag ?? '';
+    final tag = widget.tag ?? '';
+    if (tag == oldWidget) return;
+    // Execute after the current frame ends to avoid getting an outdated
+    // ObserverWidgetTagManager.
+    await WidgetsBinding.instance.endOfFrame;
+    final _scopeContext = scopeContext;
+    if (_scopeContext == null) return;
+    assert(_scopeContext.mounted);
+    final tagManager = ObserverWidgetTagManager.maybeOf(_scopeContext);
+    tagManager?.remove(oldTag);
+    if (tag.isNotEmpty) {
+      tagManager?.set(tag, _scopeContext);
+    }
+  }
+
+  /// Add [OnObserveCallback] and [OnObserveAllCallback] that will be called
+  /// each time a result is observed.
+  void addListener({
+    BuildContext? context,
+    OnObserveCallback<M>? onObserve,
+    OnObserveAllCallback<M>? onObserveAll,
+  }) {
+    assert(_debugAssertNotDisposed());
+    assert(
+      onObserve != null || onObserveAll != null,
+      'At least one callback must be provided.',
+    );
+    innerListeners?.add(ObserverListenerEntry<M>(
+      context: context,
+      onObserve: onObserve,
+      onObserveAll: onObserveAll,
+    ));
+  }
+
+  /// Remove the specified [OnObserveCallback] and [OnObserveAllCallback].
+  void removeListener({
+    BuildContext? context,
+    OnObserveCallback<M>? onObserve,
+    OnObserveAllCallback<M>? onObserveAll,
+  }) {
+    assert(_debugAssertNotDisposed());
+    assert(
+      onObserve != null || onObserveAll != null,
+      'At least one callback must be provided.',
+    );
+    final _listeners = innerListeners;
+    if (_listeners == null) return;
+    for (final ObserverListenerEntry<M> entry in _listeners) {
+      if (entry.context == context &&
+          entry.onObserve == onObserve &&
+          entry.onObserveAll == onObserveAll) {
+        entry.unlink();
+        return;
+      }
+    }
+  }
+
+  void _notifyListeners(
+    Map<BuildContext, M> changeResultMap,
+  ) {
+    assert(_debugAssertNotDisposed());
+    if (changeResultMap.isEmpty) return;
+    final _listeners = innerListeners;
+    if (_listeners == null || _listeners.isEmpty) return;
+
+    final List<ObserverListenerEntry<M>> localListeners =
+        List<ObserverListenerEntry<M>>.of(_listeners);
+    for (final ObserverListenerEntry<M> entry in localListeners) {
+      try {
+        if (entry.list != null) {
+          entry.onObserveAll?.call(changeResultMap);
+
+          if (entry.onObserve != null) {
+            // If sliverContext is not specified, the first one in
+            // targetSliverContexts is taken.
+            BuildContext? _sliverContext = entry.context;
+            if (_sliverContext == null && targetSliverContexts.isNotEmpty) {
+              _sliverContext = targetSliverContexts.first;
+            }
+            final result = changeResultMap[_sliverContext];
+            if (result == null) continue;
+            entry.onObserve?.call(result);
+          }
+        }
+      } catch (exception, stack) {
+        FlutterError.reportError(FlutterErrorDetails(
+          exception: exception,
+          stack: stack,
+          library: 'scrollview_observer',
+          context:
+              ErrorDescription('while dispatching result for $runtimeType'),
+          informationCollector: () => <DiagnosticsNode>[
+            DiagnosticsProperty<ObserverWidgetState>(
+              'The $runtimeType sending result was',
+              this,
+              style: DiagnosticsTreeStyle.errorProperty,
+            ),
+          ],
+        ));
+      }
+    }
   }
 }

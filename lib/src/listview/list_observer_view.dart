@@ -6,13 +6,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import 'package:scrollview_observer/src/common/observer_widget.dart';
 import 'package:scrollview_observer/src/common/observer_typedef.dart';
+import 'package:scrollview_observer/src/common/observer_widget.dart';
+import 'package:scrollview_observer/src/listview/models/listview_observe_model.dart';
 import 'package:scrollview_observer/src/notification.dart';
 import 'package:scrollview_observer/src/observer_core.dart';
 
 import 'list_observer_controller.dart';
-import 'models/listview_observe_model.dart';
 
 class ListViewObserver extends ObserverWidget<ListObserverController,
     ListViewObserveModel, ListViewOnceObserveNotification> {
@@ -24,10 +24,11 @@ class ListViewObserver extends ObserverWidget<ListObserverController,
   const ListViewObserver({
     Key? key,
     required Widget child,
+    String? tag,
     this.controller,
     this.sliverListContexts,
-    Function(Map<BuildContext, ListViewObserveModel>)? onObserveAll,
-    Function(ListViewObserveModel)? onObserve,
+    OnObserveAllCallback<ListViewObserveModel>? onObserveAll,
+    OnObserveCallback<ListViewObserveModel>? onObserve,
     double leadingOffset = 0,
     double Function()? dynamicLeadingOffset,
     double toNextOverPercent = 1,
@@ -40,6 +41,7 @@ class ListViewObserver extends ObserverWidget<ListObserverController,
   }) : super(
           key: key,
           child: child,
+          tag: tag,
           sliverController: controller,
           sliverContexts: sliverListContexts,
           onObserveAll: onObserveAll,
@@ -56,6 +58,68 @@ class ListViewObserver extends ObserverWidget<ListObserverController,
 
   @override
   State<ListViewObserver> createState() => ListViewObserverState();
+
+  /// Returning the closest instance of this class that encloses the given
+  /// context.
+  ///
+  /// If you give a tag, it will give priority find the corresponding instance
+  /// of this class with the given tag and return it.
+  ///
+  /// If there is no [ListViewObserver] widget, then null is returned.
+  ///
+  /// Calling this method will create a dependency on the closest
+  /// [ListViewObserver] in the [context], if there is one.
+  ///
+  /// See also:
+  ///
+  /// * [ListViewObserver.of], which is similar to this method, but asserts if no
+  ///   [ListViewObserver] instance is found.
+  static ListViewObserverState? maybeOf(
+    BuildContext context, {
+    String? tag,
+  }) {
+    final _state = ObserverWidget.maybeOf<
+        ListObserverController,
+        ListViewObserveModel,
+        ListViewOnceObserveNotification,
+        ListViewObserver>(
+      context,
+      tag: tag,
+    );
+    if (_state is! ListViewObserverState) return null;
+    return _state;
+  }
+
+  /// Returning the closest instance of this class that encloses the given
+  /// context.
+  ///
+  /// If you give a tag, it will give priority find the corresponding instance
+  /// of this class with the given tag and return it.
+  ///
+  /// If no instance is found, this method will assert in debug mode, and throw
+  /// an exception in release mode.
+  ///
+  /// Calling this method will create a dependency on the closest
+  /// [ObserverWidget] in the [context].
+  ///
+  /// See also:
+  ///
+  /// * [ObserverWidget.maybeOf], which is similar to this method, but returns
+  ///   null if no [ObserverWidget] instance is found.
+  static ListViewObserverState of(
+    BuildContext context, {
+    String? tag,
+  }) {
+    final _state = ObserverWidget.of<
+        ListObserverController,
+        ListViewObserveModel,
+        ListViewOnceObserveNotification,
+        ListViewObserver>(
+      context,
+      tag: tag,
+    );
+    return _state as ListViewObserverState;
+  }
 
   /// Determine whether the [obj] is a supported RenderSliver type.
   static bool isSupportRenderSliverType(RenderObject? obj) {
