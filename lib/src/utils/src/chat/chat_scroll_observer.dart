@@ -60,7 +60,7 @@ class ChatScrollObserver {
   /// This callback will be called when handling in [ClampingScrollPhysics]'s
   /// [adjustPositionForNewDimensions].
   @Deprecated(
-      'It will be removed in version 2, please use [onHandlePositionCallback] instead')
+      'It will be removed in version 2, please use [onHandlePositionResultCallback] instead')
   void Function(ChatScrollObserverHandlePositionType)? onHandlePositionCallback;
 
   /// The result callback for processing chat location.
