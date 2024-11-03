@@ -1,3 +1,7 @@
+## 1.23.0
+- ObserverWidget
+  - Make `ObserverWidget` listenable.
+
 ## 1.22.0
 - ObserverWidget
   - Add `scrollNotificationPredicate`.
