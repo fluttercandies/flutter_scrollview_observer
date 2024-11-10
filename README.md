@@ -27,6 +27,8 @@ Chat: [Join WeChat group](https://mp.weixin.qq.com/s/JBbMstn0qW6M71hh-BRKzw)
 - [Flutter - Quickly achieve half-view exposure statistic 📊](https://medium.com/@linxunfeng/flutter-quickly-achieve-half-view-exposure-statistic-097fd4b237ef) | [WeChat](https://mp.weixin.qq.com/s/gNFX4Au4esftgTPXHvB4LQ) | [JueJin](https://juejin.cn/post/7271248528998121512)
 - [Flutter - How to quickly implement an contact list page (azlist) 📓](https://medium.com/@linxunfeng/flutter-how-to-quickly-implement-an-contact-list-page-azlist-829bbef12d8f) | [WeChat](https://mp.weixin.qq.com/s/1bmYSvtOYX83DLncvnBjqA) | [JueJin](https://juejin.cn/post/7294884963631497254)
 - [Flutter - Supports observing NestedScrollView, with greater compatibility 😈](https://medium.com/@linxunfeng/flutter-supports-observing-nestedscrollview-with-greater-compatibility-86f49dce7955) | [WeChat](https://mp.weixin.qq.com/s/1dsmRg8q2VJ6HzasLgoVpA) | [JueJin](https://juejin.cn/post/7388444606456840211)
+- [Flutter - Offset effect in PageView](https://medium.com/@linxunfeng/flutter-offset-effect-in-pageview-cec39572d56a) | [WeChat](https://mp.weixin.qq.com/s/Q8zk89bgr_8bgWQ4F86VUQ) | [JueJin](https://juejin.cn/post/7411516362916216859)
+- [Flutter - Parallax effect in PageView](https://medium.com/@linxunfeng/flutter-parallax-effect-in-pageview-ccff6b0b34aa) | [WeChat](https://mp.weixin.qq.com/s/Fi-X2eJRWj17sqCcVqbPRQ) | [JueJin](https://juejin.cn/post/7416655730214699017)
 
 ## 🔨 Feature
 
