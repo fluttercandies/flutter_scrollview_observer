@@ -52,7 +52,27 @@ mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
       mode: observer.innerMode,
       changeCount: observer.changeCount,
     ));
-    final delta = model.layoutOffset - observer.innerRefItemLayoutOffset;
+
+    // Customize the delta of the adjustPosition.
+    double? customDelta = observer.customAdjustPositionDelta?.call(
+      ChatScrollObserverCustomAdjustPositionDeltaModel(
+        oldPosition: oldPosition,
+        newPosition: newPosition,
+        isScrolling: isScrolling,
+        velocity: velocity,
+        observer: observer,
+        currentItemModel: model,
+      ),
+    );
+
+    // Calculate the final delta.
+    //
+    // If the customDelta is not null, use the customDelta.
+    // Otherwise, use the layoutOffset minus innerRefItemLayoutOffset to get
+    // the difference in the leading offset of the item.
+    final delta =
+        customDelta ?? (model.layoutOffset - observer.innerRefItemLayoutOffset);
+
     return adjustPosition + delta;
   }
 

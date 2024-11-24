@@ -4,6 +4,13 @@
  * @Date: 2022-10-31 14:57:45
  */
 
+import 'package:scrollview_observer/src/utils/src/chat/chat_scroll_observer_model.dart';
+
+/// Customize the delta of the adjustPosition.
+typedef ChatScrollObserverCustomAdjustPositionDelta = double Function(
+  ChatScrollObserverCustomAdjustPositionDeltaModel,
+);
+
 enum ChatScrollObserverHandlePositionType {
   /// Nothing will be done.
   none,
