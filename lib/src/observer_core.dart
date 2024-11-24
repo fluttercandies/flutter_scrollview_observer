@@ -39,6 +39,7 @@ class ObserverCore {
         visible: false,
         firstChild: null,
         displayingChildModelList: [],
+        displayingChildModelMap: {},
       );
     }
     final scrollDirection = _obj.constraints.axis;
@@ -90,18 +91,24 @@ class ObserverCore {
         visible: false,
         firstChild: null,
         displayingChildModelList: [],
+        displayingChildModelMap: {},
       );
     }
 
     if (targetFirstChild is! RenderIndexedSemantics) return null;
 
+    final firstDisplayingChildIndex = targetFirstChild.index;
+    final firstDisplayingChildModel = ListViewObserveDisplayingChildModel(
+      sliverList: _obj,
+      viewport: viewport,
+      index: firstDisplayingChildIndex,
+      renderObject: targetFirstChild,
+    );
+    Map<int, ListViewObserveDisplayingChildModel> displayingChildModelMap = {
+      firstDisplayingChildIndex: firstDisplayingChildModel,
+    };
     List<ListViewObserveDisplayingChildModel> displayingChildModelList = [
-      ListViewObserveDisplayingChildModel(
-        sliverList: _obj,
-        viewport: viewport,
-        index: targetFirstChild.index,
-        renderObject: targetFirstChild,
-      ),
+      firstDisplayingChildModel,
     ];
 
     // Find the remaining children that are being displayed
@@ -123,12 +130,16 @@ class ObserverCore {
         displayingChild = _obj.childAfter(displayingChild);
         continue;
       }
-      displayingChildModelList.add(ListViewObserveDisplayingChildModel(
+
+      final displayingChildIndex = displayingChild.index;
+      final displayingChildModel = ListViewObserveDisplayingChildModel(
         sliverList: _obj,
         viewport: viewport,
-        index: displayingChild.index,
+        index: displayingChildIndex,
         renderObject: displayingChild,
-      ));
+      );
+      displayingChildModelList.add(displayingChildModel);
+      displayingChildModelMap[displayingChildIndex] = displayingChildModel;
       displayingChild = _obj.childAfter(displayingChild);
     }
 
@@ -136,13 +147,9 @@ class ObserverCore {
       sliverList: _obj,
       viewport: viewport,
       visible: true,
-      firstChild: ListViewObserveDisplayingChildModel(
-        sliverList: _obj,
-        viewport: viewport,
-        index: targetFirstChild.index,
-        renderObject: targetFirstChild,
-      ),
+      firstChild: firstDisplayingChildModel,
       displayingChildModelList: displayingChildModelList,
+      displayingChildModelMap: displayingChildModelMap,
     );
   }
 
@@ -169,6 +176,7 @@ class ObserverCore {
         visible: false,
         firstGroupChildList: [],
         displayingChildModelList: [],
+        displayingChildModelMap: {},
       );
     }
     final scrollDirection = _obj.constraints.axis;
@@ -210,20 +218,26 @@ class ObserverCore {
         visible: false,
         firstGroupChildList: [],
         displayingChildModelList: [],
+        displayingChildModelMap: {},
       );
     }
 
     if (targetFirstChild is! RenderIndexedSemantics) return null;
     lastFirstGroupChildWidget = targetFirstChild;
 
+    final firstDisplayingChildIndex = targetFirstChild.index;
     final firstModel = GridViewObserveDisplayingChildModel(
       sliverGrid: _obj,
       viewport: viewport,
-      index: targetFirstChild.index,
+      index: firstDisplayingChildIndex,
       renderObject: targetFirstChild,
     );
-    List<GridViewObserveDisplayingChildModel> firstGroupChildModelList = [];
-    firstGroupChildModelList.add(firstModel);
+    Map<int, GridViewObserveDisplayingChildModel> displayingChildModelMap = {
+      firstDisplayingChildIndex: firstModel,
+    };
+    List<GridViewObserveDisplayingChildModel> firstGroupChildModelList = [
+      firstModel,
+    ];
 
     final showingChildrenMaxOffset =
         rawScrollViewOffset + _obj.constraints.remainingPaintExtent - overlap;
@@ -238,12 +252,15 @@ class ObserverCore {
         toNextOverPercent: toNextOverPercent,
       )) {
         if (targetChild is! RenderIndexedSemantics) break;
-        firstGroupChildModelList.add(GridViewObserveDisplayingChildModel(
+        final targetChildIndex = targetChild.index;
+        final displayingChildModel = GridViewObserveDisplayingChildModel(
           sliverGrid: _obj,
           viewport: viewport,
-          index: targetChild.index,
+          index: targetChildIndex,
           renderObject: targetChild,
-        ));
+        );
+        firstGroupChildModelList.add(displayingChildModel);
+        displayingChildModelMap[targetChildIndex] = displayingChildModel;
         lastFirstGroupChildWidget = targetChild;
       }
 
@@ -268,12 +285,15 @@ class ObserverCore {
         if (displayingChild is! RenderIndexedSemantics) {
           continue;
         }
-        showingChildModelList.add(GridViewObserveDisplayingChildModel(
+        final displayingChildIndex = displayingChild.index;
+        final displayingChildModel = GridViewObserveDisplayingChildModel(
           sliverGrid: _obj,
           viewport: viewport,
-          index: displayingChild.index,
+          index: displayingChildIndex,
           renderObject: displayingChild,
-        ));
+        );
+        showingChildModelList.add(displayingChildModel);
+        displayingChildModelMap[displayingChildIndex] = displayingChildModel;
       }
       displayingChild = _obj.childAfter(displayingChild);
     }
@@ -284,6 +304,7 @@ class ObserverCore {
       visible: true,
       firstGroupChildList: firstGroupChildModelList,
       displayingChildModelList: showingChildModelList,
+      displayingChildModelMap: displayingChildModelMap,
     );
   }
 }

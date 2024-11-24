@@ -20,6 +20,9 @@ abstract class ObserveModel {
   /// Stores model list for children widgets those are displaying.
   List<ObserveDisplayingChildModel> innerDisplayingChildModelList;
 
+  /// Stores model map for children widgets those are displaying.
+  Map<int, ObserveDisplayingChildModel> innerDisplayingChildModelMap;
+
   /// Stores index list for children widgets those are displaying.
   List<int> get displayingChildIndexList =>
       innerDisplayingChildModelList.map((e) => e.index).toList();
@@ -35,5 +38,6 @@ abstract class ObserveModel {
     required this.sliver,
     required this.viewport,
     required this.innerDisplayingChildModelList,
+    required this.innerDisplayingChildModelMap,
   });
 }
