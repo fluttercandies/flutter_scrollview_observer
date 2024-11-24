@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
@@ -453,6 +454,58 @@ void main() {
     await tester.pumpAndSettle();
     await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserve, true);
+
+    scrollController.dispose();
+  });
+
+  testWidgets('Check displayingChildModelMap', (tester) async {
+    final scrollController = ScrollController();
+    final observerController = ListObserverController(
+      controller: scrollController,
+    );
+
+    Widget widget = getListView(
+      scrollController: scrollController,
+    );
+    ListViewObserveModel? observeResult;
+    widget = ListViewObserver(
+      child: widget,
+      controller: observerController,
+      onObserve: (result) {
+        observeResult = result;
+      },
+    );
+    await tester.pumpWidget(widget);
+    await observerController.dispatchOnceObserve(
+      isForce: true,
+    );
+    expect(observeResult, isNotNull);
+    expect(observeResult?.firstChild?.index, 0);
+    expect(
+      listEquals(
+        observeResult?.displayingChildModelMap.values.toList(),
+        observeResult?.displayingChildModelList,
+      ),
+      true,
+    );
+
+    int targetItemIndex = 30;
+    observerController.jumpTo(
+      index: targetItemIndex,
+      alignment: 0,
+    );
+    await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
+    expect(observeResult?.firstChild?.index, targetItemIndex);
+    expect(
+      listEquals(
+        observeResult?.displayingChildModelMap.values.toList(),
+        observeResult?.displayingChildModelList,
+      ),
+      true,
+    );
+
+    scrollController.dispose();
   });
 
   group(
