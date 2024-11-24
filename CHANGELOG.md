@@ -1,3 +1,9 @@
+## 1.24.0
+- ObserveModel
+  - Add `displayingChildModelMap`.
+- ChatScrollObserver
+  - Add `customAdjustPositionDelta`.
+
 ## 1.23.0
 - ObserverWidget
   - Make `ObserverWidget` listenable.
@@ -38,7 +44,7 @@
 ## 1.19.1
 - ListViewObserver
   - Support `SliverVariedExtentList` in [74](https://github.com/fluttercandies/flutter_scrollview_observer/issues/74).
-- Chat Observer
+- ChatScrollObserver
   - Safely obtain the `constraints` of RenderSliver.
 - ObserverController
   - Adapt to scenes where `CustomScrollView` specifies `center`.
@@ -54,7 +60,7 @@
   - Adjust the controller to be modifiable.
 
 ## 1.18.2
-- Chat Observer
+- ChatScrollObserver
   - Fix keeping position not working by @LinXunFeng in [#64](https://github.com/fluttercandies/flutter_scrollview_observer/issues/64)
 
 ## 1.18.1
@@ -74,7 +80,7 @@
 ## 1.16.5
 - ObserverWidget
   - Improve the processing logic of scroll notification when scrolling with the mouse wheel is not smooth by @qiangjindong in [#48](https://github.com/LinXunFeng/flutter_scrollview_observer/pull/48).
-- Chat Observer
+- ChatScrollObserver
   - Update `isShrinkWrap` once during initialization by @LinXunFeng. [#47](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/47)
 - ObserverController
   - Fix unable to jump when sliver is too far away and has no any child by @LinXunFeng. [#45](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/45)
@@ -111,11 +117,11 @@
   - Safe to use context. [#35](https://github.com/LinXunFeng/flutter_scrollview_observer/issues/35).
 
 ## 1.14.1
-- Chat Observer
+- ChatScrollObserver
   - Improve the logic of the conversion type.
 
 ## 1.14.0
-- Chat Observer
+- ChatScrollObserver
   - Support for keeping position of generative messages (eg: ChatGPT)
 
 ## 1.13.2
@@ -140,7 +146,7 @@
   - Refine the logic for finding the first sliver in viewport.
 
 ## 1.11.0
-- Chat Observer
+- ChatScrollObserver
   - Support inserting multiple messages at once.
 - ObserverWidget
   - `GridViewObserver` is compatible with waterfall flow.
@@ -177,7 +183,7 @@
   - Deprecated `[clearIndexOffsetCache]`, please use `[clearScrollIndexCache]` instead.
 
 ## 1.7.0
-- Chat Observer
+- ChatScrollObserver
   - Add the property `[fixedPositionOffset]`.
   - Deprecated `[ChatObserverClampinScrollPhysics]`, please use `[ChatObserverClampingScrollPhysics]` instead.
 
@@ -188,14 +194,14 @@
 - Fix lib not working when `shrinkWrap` is `true` in scrollView.
 
 ## 1.6.0
-- Chat Observer
+- ChatScrollObserver
   - Add `onHandlePositionCallback`.
 
 ## 1.5.1
 - Fix scrollView being stuck when child widget get `[size]`.
 
 ## 1.5.0
-- Chat Observer
+- ChatScrollObserver
   - Quickly implement the chat session page effect.
 - Scrolling to the specified index location
   - Add the property `[cacheJumpIndexOffset]`.
