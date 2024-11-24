@@ -27,7 +27,7 @@ void main() {
       },
     );
     await tester.pumpWidget(widget);
-    await tester.tap(find.byType(FloatingActionButton));
+    await tester.tap(find.byIcon(Icons.add));
     await tester.pumpAndSettle();
 
     final result = await observerController.dispatchOnceObserve(
@@ -164,6 +164,118 @@ void main() {
 
     scrollController.dispose();
   });
+
+  testWidgets('Keeping position with customAdjustPositionDelta',
+      (tester) async {
+    final scrollController = ScrollController();
+    final observerController = ListObserverController(
+      controller: scrollController,
+    );
+    final chatScrollObserver = ChatScrollObserver(observerController)
+      ..fixedPositionOffset = -1;
+    Map<int, double> itemHeightMap = {};
+    const double expandedItemHeight = 200;
+    const double normalItemHeight = 100;
+
+    Widget widget = ChatListView(
+      scrollController: scrollController,
+      observerController: observerController,
+      chatScrollObserver: chatScrollObserver,
+      itemBuilder: (context, index) {
+        if (itemHeightMap[index] == null) {
+          itemHeightMap[index] = normalItemHeight;
+        }
+        double itemHeight = itemHeightMap[index] ?? normalItemHeight;
+        return SizedBox(
+          height: itemHeight,
+          child: Center(child: Text(index.toString())),
+        );
+      },
+    );
+    await tester.pumpWidget(widget);
+
+    Future<void> setState() async {
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pumpAndSettle();
+    }
+
+    var result = await observerController.dispatchOnceObserve(
+      isForce: true,
+      isDependObserveCallback: false,
+    );
+    var observeResult = result.observeResult;
+    final displayingChildModelList =
+        observeResult?.displayingChildModelList ?? [];
+    expect(displayingChildModelList, isNotEmpty);
+
+    final targetIndex = displayingChildModelList.last.index + 1;
+    // Jump to targetIndex and align its bottom with the viewport bottom.
+    observerController.jumpTo(
+      index: targetIndex,
+      offset: (targetOffset) {
+        final viewportMainAxisExtent =
+            observeResult?.firstChild?.viewportMainAxisExtent ?? 0;
+        return viewportMainAxisExtent - normalItemHeight;
+      },
+    );
+    await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
+
+    // Check if the last item is aligned with the viewport bottom.
+    result = await observerController.dispatchOnceObserve(
+      isForce: true,
+      isDependObserveCallback: false,
+    );
+    observeResult = result.observeResult;
+    var lastDisplayingChildModel = observeResult?.displayingChildModelList.last;
+    expect(lastDisplayingChildModel?.index, targetIndex);
+    expect(lastDisplayingChildModel?.trailingMarginToViewport, 0);
+
+    // Expand the last item.
+    itemHeightMap[targetIndex] = expandedItemHeight;
+    final refItemIndex = targetIndex;
+    await chatScrollObserver.standby(
+      mode: ChatScrollObserverHandleMode.specified,
+      refIndexType: ChatScrollObserverRefIndexType.itemIndex,
+      refItemIndex: refItemIndex,
+      refItemIndexAfterUpdate: refItemIndex,
+      customAdjustPositionDelta: (model) {
+        return expandedItemHeight - normalItemHeight;
+      },
+    );
+    await setState();
+    result = await observerController.dispatchOnceObserve(
+      isForce: true,
+      isDependObserveCallback: false,
+    );
+    observeResult = result.observeResult;
+    lastDisplayingChildModel = observeResult?.displayingChildModelList.last;
+    expect(lastDisplayingChildModel?.index, targetIndex);
+    expect(lastDisplayingChildModel?.trailingMarginToViewport, 0);
+
+    // Restore the last item to normal height.
+    itemHeightMap[targetIndex] = normalItemHeight;
+    await chatScrollObserver.standby(
+      mode: ChatScrollObserverHandleMode.specified,
+      refIndexType: ChatScrollObserverRefIndexType.itemIndex,
+      refItemIndex: refItemIndex,
+      refItemIndexAfterUpdate: refItemIndex,
+      customAdjustPositionDelta: (model) {
+        return normalItemHeight - expandedItemHeight;
+      },
+    );
+    await setState();
+    result = await observerController.dispatchOnceObserve(
+      isForce: true,
+      isDependObserveCallback: false,
+    );
+    observeResult = result.observeResult;
+    lastDisplayingChildModel = observeResult?.displayingChildModelList.last;
+    expect(lastDisplayingChildModel?.index, targetIndex);
+    expect(lastDisplayingChildModel?.trailingMarginToViewport, 0);
+
+    scrollController.dispose();
+  });
 }
 
 class ChatListView extends StatefulWidget {
@@ -173,12 +285,14 @@ class ChatListView extends StatefulWidget {
     required this.observerController,
     required this.chatScrollObserver,
     this.onReceiveScrollNotification,
+    this.itemBuilder,
   }) : super(key: key);
 
   final ScrollController scrollController;
   final ListObserverController observerController;
   final ChatScrollObserver chatScrollObserver;
   final Function()? onReceiveScrollNotification;
+  final NullableIndexedWidgetBuilder? itemBuilder;
 
   @override
   State<ChatListView> createState() => ChatListViewState();
@@ -194,17 +308,28 @@ class ChatListViewState extends State<ChatListView> {
       home: Scaffold(
         appBar: AppBar(),
         body: _buildListView(),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            widget.chatScrollObserver.standby(changeCount: 4);
-            setState(() {
-              dataList.insert(0, '-1');
-              dataList.insert(0, '-2');
-              dataList.insert(0, '-3');
-              dataList.insert(0, '-4');
-            });
-          },
-          child: const Icon(Icons.add),
+        floatingActionButton: Column(
+          verticalDirection: VerticalDirection.up,
+          children: [
+            FloatingActionButton(
+              onPressed: () {
+                widget.chatScrollObserver.standby(changeCount: 4);
+                setState(() {
+                  dataList.insert(0, '-1');
+                  dataList.insert(0, '-2');
+                  dataList.insert(0, '-3');
+                  dataList.insert(0, '-4');
+                });
+              },
+              child: const Icon(Icons.add),
+            ),
+            FloatingActionButton(
+              onPressed: () {
+                setState(() {});
+              },
+              child: const Icon(Icons.refresh),
+            ),
+          ],
         ),
       ),
     );
@@ -219,12 +344,13 @@ class ChatListViewState extends State<ChatListView> {
           observer: widget.chatScrollObserver,
         ),
         controller: widget.scrollController,
-        itemBuilder: (context, index) {
-          return SizedBox(
-            height: 100,
-            child: Center(child: Text(dataList[index])),
-          );
-        },
+        itemBuilder: widget.itemBuilder ??
+            (context, index) {
+              return SizedBox(
+                height: 100,
+                child: Center(child: Text(dataList[index])),
+              );
+            },
       ),
     );
     resultWidget = NotificationListener<ScrollNotification>(
