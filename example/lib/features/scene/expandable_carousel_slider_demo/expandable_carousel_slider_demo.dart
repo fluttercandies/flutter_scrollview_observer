@@ -171,7 +171,6 @@ class CarouselItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('lxf --- ');
     return Stack(
       children: [
         Positioned(
