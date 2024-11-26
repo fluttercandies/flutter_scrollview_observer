@@ -40,6 +40,7 @@ dependencies:
   easy_refresh: ^3.3.2+4
   visibility_detector: ^0.4.0+2
   flutter_sticky_header: ^0.6.5
+  carousel_slider: ^5.0.0
 
   scrollview_observer:
     path: ../
