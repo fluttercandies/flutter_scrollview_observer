@@ -46,7 +46,8 @@ mixin ObserveDisplayingChildModelMixin on ObserveDisplayingChildModel {
   double get viewportMainAxisExtent =>
       sliver.constraints.viewportMainAxisExtent;
 
-  /// The number of pixels the viewport can display in the main axis.
+  /// The number of pixels to offset the children in the opposite of the axis
+  /// direction.
   double get viewportPixels =>
       viewport.offset.hasPixels ? viewport.offset.pixels : 0;
 
