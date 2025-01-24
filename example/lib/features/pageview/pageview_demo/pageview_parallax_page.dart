@@ -175,7 +175,7 @@ class _PageViewParallaxPageState extends State<PageViewParallaxPage> {
       width: 80,
       height: 80,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.8),
+        color: Colors.white.withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text("Page $index"),

@@ -81,7 +81,7 @@ class _ListViewDynamicOffsetPageState extends State<ListViewDynamicOffsetPage> {
             },
           ),
           Container(
-            color: Colors.grey.withOpacity(_navBgAlpha),
+            color: Colors.grey.withValues(alpha: _navBgAlpha),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -158,8 +158,8 @@ class _ListViewDynamicOffsetPageState extends State<ListViewDynamicOffsetPage> {
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black54.withOpacity(
-                    _isShowNavTitle ? 1 : 0,
+                  color: Colors.black54.withValues(
+                    alpha: _isShowNavTitle ? 1 : 0,
                   ),
                 ),
               ),
