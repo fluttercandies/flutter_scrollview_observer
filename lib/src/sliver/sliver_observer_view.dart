@@ -295,7 +295,9 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
     }
 
     if (targetChild == null ||
-        !ObserverUtils.isValidListIndex(indexOfTargetChild)) return null;
+        !ObserverUtils.isValidListIndex(indexOfTargetChild)) {
+      return null;
+    }
     final targetCtx = ctxs[indexOfTargetChild];
     final firstChild = SliverViewportObserveDisplayingChildModel(
       sliverContext: targetCtx,
@@ -315,7 +317,9 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
         sliver: targetChild,
         viewportPixels: startCalcPixels,
         viewportBottomOffset: viewportBottomOffset,
-      )) break;
+      )) {
+        break;
+      }
 
       indexOfTargetChild = objList.indexOf(targetChild);
       if (ObserverUtils.isValidListIndex(indexOfTargetChild)) {

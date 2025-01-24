@@ -151,7 +151,9 @@ class ObserverUtils {
       scrollDirection: scrollDirection,
       targetChild: targetChild,
       toNextOverPercent: toNextOverPercent,
-    )) return false;
+    )) {
+      return false;
+    }
     final parentData = targetChild.parentData;
     if (parentData is! SliverMultiBoxAdaptorParentData) {
       return false;
