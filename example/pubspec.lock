@@ -114,10 +114,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_sticky_header
-      sha256: "017f398fbb45a589e01491861ca20eb6570a763fd9f3888165a978e11248c709"
+      sha256: "7f76d24d119424ca0c95c146b8627a457e8de8169b0d584f766c2c545db8f8be"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.5"
+    version: "0.7.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -246,7 +246,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.24.0"
+    version: "1.25.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -312,10 +312,10 @@ packages:
     dependency: transitive
     description:
       name: value_layout_builder
-      sha256: "98202ec1807e94ac72725b7f0d15027afde513c55c69ff3f41bcfccb950831bc"
+      sha256: c02511ea91ca5c643b514a33a38fa52536f74aa939ec367d02938b5ede6807fa
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.1"
+    version: "0.4.0"
   vector_math:
     dependency: transitive
     description:
@@ -336,10 +336,10 @@ packages:
     dependency: transitive
     description:
       name: video_player_android
-      sha256: e343701aa890b74a863fa460f5c0e628127ed06a975d7d9af6b697133fb25bdf
+      sha256: "7018dbcb395e2bca0b9a898e73989e67c0c4a5db269528e1b036ca38bcca0d0b"
       url: "https://pub.dev"
     source: hosted
-    version: "2.7.1"
+    version: "2.7.17"
   video_player_avfoundation:
     dependency: transitive
     description:
@@ -384,10 +384,10 @@ packages:
     dependency: "direct main"
     description:
       name: waterfall_flow
-      sha256: "8932d290186ab81459d1bae4ee8583739c0f4cdf62d828e71da361a340584b36"
+      sha256: e7ab5728fe536e53cf4b8ea97128112ad18c7f1d797d91f073bf396fa6910181
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "3.1.1"
   web:
     dependency: transitive
     description:
@@ -397,5 +397,5 @@ packages:
     source: hosted
     version: "1.1.0"
 sdks:
-  dart: ">=3.4.0 <4.0.0"
-  flutter: ">=3.22.0"
+  dart: ">=3.6.0 <4.0.0"
+  flutter: ">=3.27.0"
