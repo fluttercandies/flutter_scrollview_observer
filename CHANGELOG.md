@@ -1,3 +1,7 @@
+## 1.25.0
+- ChatScrollObserver
+  - Add `customAdjustPosition`.
+
 ## 1.24.0
 - ObserveModel
   - Add `displayingChildModelMap`.
