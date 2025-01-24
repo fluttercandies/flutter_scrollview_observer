@@ -167,6 +167,7 @@ void main() {
 
   testWidgets('Keeping position with customAdjustPositionDelta',
       (tester) async {
+    GlobalKey<ChatListViewState> key = GlobalKey();
     final scrollController = ScrollController();
     final observerController = ListObserverController(
       controller: scrollController,
@@ -178,6 +179,7 @@ void main() {
     const double normalItemHeight = 100;
 
     Widget widget = ChatListView(
+      key: key,
       scrollController: scrollController,
       observerController: observerController,
       chatScrollObserver: chatScrollObserver,
@@ -207,6 +209,35 @@ void main() {
     final displayingChildModelList =
         observeResult?.displayingChildModelList ?? [];
     expect(displayingChildModelList, isNotEmpty);
+    expect(observeResult?.firstChild?.index, 0);
+    expect(observeResult?.firstChild?.leadingMarginToViewport, 0);
+
+    // Check adjustPosition.
+    key.currentState?.updateData(
+      index: 1,
+      needSetState: true,
+    );
+    double? adjustPosition;
+    await chatScrollObserver.standby(
+      mode: ChatScrollObserverHandleMode.specified,
+      refIndexType: ChatScrollObserverRefIndexType.itemIndex,
+      refItemIndex: 0,
+      refItemIndexAfterUpdate: 0,
+      customAdjustPositionDelta: (model) {
+        adjustPosition = model.adjustPosition;
+        return null;
+      },
+    );
+    await tester.pumpAndSettle();
+    expect(adjustPosition, 0);
+
+    result = await observerController.dispatchOnceObserve(
+      isForce: true,
+      isDependObserveCallback: false,
+    );
+    observeResult = result.observeResult;
+    expect(observeResult?.firstChild?.index, 0);
+    expect(observeResult?.firstChild?.leadingMarginToViewport, 0);
 
     final targetIndex = displayingChildModelList.last.index + 1;
     // Jump to targetIndex and align its bottom with the viewport bottom.
@@ -261,6 +292,7 @@ void main() {
       refItemIndex: refItemIndex,
       refItemIndexAfterUpdate: refItemIndex,
       customAdjustPositionDelta: (model) {
+        adjustPosition = model.adjustPosition;
         return normalItemHeight - expandedItemHeight;
       },
     );
@@ -273,6 +305,76 @@ void main() {
     lastDisplayingChildModel = observeResult?.displayingChildModelList.last;
     expect(lastDisplayingChildModel?.index, targetIndex);
     expect(lastDisplayingChildModel?.trailingMarginToViewport, 0);
+    expect(adjustPosition, greaterThan(0));
+
+    scrollController.dispose();
+  });
+
+  testWidgets('Keeping position with customAdjustPosition', (tester) async {
+    GlobalKey<ChatListViewState> key = GlobalKey();
+    final scrollController = ScrollController();
+    final observerController = ListObserverController(
+      controller: scrollController,
+    );
+    ChatScrollObserverHandlePositionResultModel? onHandlePositionResultModel;
+    final chatScrollObserver = ChatScrollObserver(observerController)
+      ..onHandlePositionResultCallback = (model) {
+        onHandlePositionResultModel = model;
+      };
+
+    Widget widget = ChatListView(
+      key: key,
+      scrollController: scrollController,
+      observerController: observerController,
+      chatScrollObserver: chatScrollObserver,
+      itemBuilder: (context, index) {
+        final dataList = key.currentState?.dataList ?? [];
+        return Text(dataList[index]);
+      },
+    );
+    await tester.pumpWidget(widget);
+
+    final chatListViewState = key.currentState;
+    expect(chatListViewState, isNotNull);
+
+    final dataListLength = chatListViewState?.dataList.length ?? 0;
+    final lastIndex = dataListLength - 1;
+    observerController.jumpTo(index: lastIndex);
+    await tester.pumpAndSettle();
+
+    var result = await observerController.dispatchOnceObserve(
+      isForce: true,
+      isDependObserveCallback: false,
+    );
+    var lastModel = result.observeResult?.displayingChildModelList.last;
+    expect(lastModel?.index, lastIndex);
+    expect(lastModel?.trailingMarginToViewport, 0);
+    expect(onHandlePositionResultModel, isNull);
+
+    chatListViewState?.updateData(
+      index: lastIndex,
+      needSetState: true,
+    );
+    await chatScrollObserver.standby(
+      customAdjustPosition: (model) {
+        final delta =
+            model.newPosition.extentAfter - model.oldPosition.extentAfter;
+        return model.adjustPosition + delta;
+      },
+    );
+    await tester.pumpAndSettle();
+
+    result = await observerController.dispatchOnceObserve(
+      isForce: true,
+      isDependObserveCallback: false,
+    );
+    lastModel = result.observeResult?.displayingChildModelList.last;
+    expect(lastModel?.index, lastIndex);
+    expect(lastModel?.trailingMarginToViewport, 0);
+    expect(
+      onHandlePositionResultModel?.type,
+      ChatScrollObserverHandlePositionType.keepPosition,
+    );
 
     scrollController.dispose();
   });
@@ -301,6 +403,17 @@ class ChatListView extends StatefulWidget {
 class ChatListViewState extends State<ChatListView> {
   List<String> dataList =
       List.generate(100, (index) => index.toString()).toList();
+
+  void updateData({
+    int index = 0,
+    String? appendStr,
+    bool needSetState = true,
+  }) {
+    dataList[index] += appendStr ?? 'updateData' * 10;
+    if (needSetState) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

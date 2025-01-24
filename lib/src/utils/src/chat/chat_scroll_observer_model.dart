@@ -39,6 +39,9 @@ class ChatScrollObserverCustomAdjustPositionDeltaModel {
   /// The current velocity of the scroll position.
   final double velocity;
 
+  /// The scroll position should be given for new viewport dimensions.
+  final double adjustPosition;
+
   /// The [ChatScrollObserver] instance.
   final ChatScrollObserver observer;
 
@@ -50,7 +53,37 @@ class ChatScrollObserverCustomAdjustPositionDeltaModel {
     required this.newPosition,
     required this.isScrolling,
     required this.velocity,
+    required this.adjustPosition,
     required this.observer,
     required this.currentItemModel,
+  });
+}
+
+class ChatScrollObserverCustomAdjustPositionModel {
+  /// The old position.
+  final ScrollMetrics oldPosition;
+
+  /// The new position.
+  final ScrollMetrics newPosition;
+
+  /// Whether the ScrollView is scrolling.
+  final bool isScrolling;
+
+  /// The current velocity of the scroll position.
+  final double velocity;
+
+  /// The scroll position should be given for new viewport dimensions.
+  final double adjustPosition;
+
+  /// The [ChatScrollObserver] instance.
+  final ChatScrollObserver observer;
+
+  ChatScrollObserverCustomAdjustPositionModel({
+    required this.oldPosition,
+    required this.newPosition,
+    required this.isScrolling,
+    required this.velocity,
+    required this.adjustPosition,
+    required this.observer,
   });
 }

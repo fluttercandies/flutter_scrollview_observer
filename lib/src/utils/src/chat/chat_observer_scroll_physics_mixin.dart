@@ -37,6 +37,27 @@ mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
       ));
       return adjustPosition;
     }
+
+    // Customize the adjustPosition.
+    double? customAdjustPosition = observer.customAdjustPosition?.call(
+      ChatScrollObserverCustomAdjustPositionModel(
+        oldPosition: oldPosition,
+        newPosition: newPosition,
+        isScrolling: isScrolling,
+        velocity: velocity,
+        adjustPosition: adjustPosition,
+        observer: observer,
+      ),
+    );
+    if (customAdjustPosition != null) {
+      _handlePositionCallback(ChatScrollObserverHandlePositionResultModel(
+        type: ChatScrollObserverHandlePositionType.keepPosition,
+        mode: observer.innerMode,
+        changeCount: observer.changeCount,
+      ));
+      return customAdjustPosition;
+    }
+
     final model = observer.observeRefItem();
     if (model == null) {
       _handlePositionCallback(ChatScrollObserverHandlePositionResultModel(
@@ -60,6 +81,7 @@ mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
         newPosition: newPosition,
         isScrolling: isScrolling,
         velocity: velocity,
+        adjustPosition: adjustPosition,
         observer: observer,
         currentItemModel: model,
       ),

@@ -7,8 +7,13 @@
 import 'package:scrollview_observer/src/utils/src/chat/chat_scroll_observer_model.dart';
 
 /// Customize the delta of the adjustPosition.
-typedef ChatScrollObserverCustomAdjustPositionDelta = double Function(
+typedef ChatScrollObserverCustomAdjustPositionDelta = double? Function(
   ChatScrollObserverCustomAdjustPositionDeltaModel,
+);
+
+/// Customize the scroll position should be given new viewport dimensions.
+typedef ChatScrollObserverCustomAdjustPosition = double? Function(
+  ChatScrollObserverCustomAdjustPositionModel,
 );
 
 enum ChatScrollObserverHandlePositionType {

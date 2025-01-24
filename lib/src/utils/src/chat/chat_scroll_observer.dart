@@ -74,7 +74,14 @@ class ChatScrollObserver {
   ChatScrollObserverHandleMode innerMode = ChatScrollObserverHandleMode.normal;
 
   /// Customize the delta of the adjustPosition.
+  ///
+  /// If the return value is null, the default processing will be performed.
   ChatScrollObserverCustomAdjustPositionDelta? customAdjustPositionDelta;
+
+  /// Customize the scroll position for new viewport dimensions.
+  ///
+  /// If the return value is null, the default processing will be performed.
+  ChatScrollObserverCustomAdjustPosition? customAdjustPosition;
 
   /// Observation result of reference subparts after ScrollView children update.
   ListViewObserveDisplayingChildModel? observeRefItem() {
@@ -112,6 +119,7 @@ class ChatScrollObserver {
     int refItemRelativeIndexAfterUpdate = 0,
     int refItemIndex = 0,
     int refItemIndexAfterUpdate = 0,
+    ChatScrollObserverCustomAdjustPosition? customAdjustPosition,
     ChatScrollObserverCustomAdjustPositionDelta? customAdjustPositionDelta,
   }) async {
     innerMode = mode;
@@ -200,6 +208,7 @@ class ChatScrollObserver {
     innerRefItemIndex = _innerRefItemIndex;
     innerRefItemIndexAfterUpdate = _innerRefItemIndexAfterUpdate;
     innerRefItemLayoutOffset = _innerRefItemLayoutOffset;
+    this.customAdjustPosition = customAdjustPosition;
     this.customAdjustPositionDelta = customAdjustPositionDelta;
 
     // When the heights of items are similar, the viewport will not call
