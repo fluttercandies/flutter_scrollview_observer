@@ -460,7 +460,9 @@ class ObserverWidgetState<
     if (isDependObserveCallback) {
       if (onObserve == null &&
           onObserveAll == null &&
-          (innerListeners?.isEmpty ?? true)) return null;
+          (innerListeners?.isEmpty ?? true)) {
+        return null;
+      }
     }
 
     final isHandlingScroll =

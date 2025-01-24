@@ -248,7 +248,9 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
         isForbidObserveViewportCallback ? null : widget.onObserveViewport;
     if (isDependObserveCallback &&
         onObserveViewport == null &&
-        (innerSliverListeners?.isEmpty ?? true)) return null;
+        (innerSliverListeners?.isEmpty ?? true)) {
+      return null;
+    }
 
     final isHandlingScroll =
         widget.sliverController?.innerIsHandlingScroll ?? false;
