@@ -317,10 +317,12 @@ class ObserverWidgetState<
               .contains(notification.runtimeType)) {
             final isIgnoreInnerCanHandleObserve =
                 ScrollUpdateNotification != notification.runtimeType;
-            final platform = Theme.of(context).platform;
-            if (kIsWeb ||
-                platform == TargetPlatform.windows ||
-                platform == TargetPlatform.macOS) {
+            WidgetsBinding.instance.endOfFrame.then((_) {
+              // Need to wait for frame end to avoid inaccurate observation
+              // result, reasons as follows
+              //
+              // ======================== WEB ========================
+              //
               // Getting bad observation result because scrolling in Flutter Web
               // with mouse wheel is not smooth.
               // https://github.com/flutter/flutter/issues/78708
@@ -328,16 +330,19 @@ class ObserverWidgetState<
               //
               // issue
               // https://github.com/LinXunFeng/flutter_scrollview_observer/issues/31
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                handleContexts(
-                  isIgnoreInnerCanHandleObserve: isIgnoreInnerCanHandleObserve,
-                );
-              });
-            } else {
+              //
+              // ======================== APP ========================
+              //
+              // When using ScrollController's animateTo with a value exceeding
+              // the maximum scroll range, it will lead to inaccurate
+              // observation result.
+              //
+              // issue
+              // https://github.com/fluttercandies/flutter_scrollview_observer/issues/113
               handleContexts(
                 isIgnoreInnerCanHandleObserve: isIgnoreInnerCanHandleObserve,
               );
-            }
+            });
           }
           return false;
         },
@@ -449,7 +454,9 @@ class ObserverWidgetState<
     bool isIgnoreInnerCanHandleObserve = true,
   }) {
     if (!isIgnoreInnerCanHandleObserve) {
-      if (!innerCanHandleObserve) return null;
+      if (!innerCanHandleObserve) {
+        return null;
+      }
       updateInnerCanHandleObserve();
     }
 
@@ -467,7 +474,9 @@ class ObserverWidgetState<
 
     final isHandlingScroll =
         widget.sliverController?.innerIsHandlingScroll ?? false;
-    if (isHandlingScroll) return null;
+    if (isHandlingScroll) {
+      return null;
+    }
 
     List<BuildContext> ctxs = fetchTargetSliverContexts();
 

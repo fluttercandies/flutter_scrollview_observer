@@ -6,15 +6,18 @@ import 'package:scrollview_observer/src/common/observer_widget_tag_manager.dart'
 
 void main() {
   Widget getListView({
+    ScrollPhysics? physics,
     ScrollController? scrollController,
     int itemCount = 100,
     bool isFixedHeight = false,
     double? cacheExtent,
     NullableIndexedWidgetBuilder? itemBuilder,
+    IndexedWidgetBuilder? separatorBuilder,
   }) {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: ListView.separated(
+        physics: physics,
         controller: scrollController,
         itemBuilder: (ctx, index) {
           if (itemBuilder != null) {
@@ -31,9 +34,10 @@ void main() {
             ),
           );
         },
-        separatorBuilder: (ctx, index) {
-          return const SizedBox(height: 10);
-        },
+        separatorBuilder: separatorBuilder ??
+            (ctx, index) {
+              return const SizedBox(height: 10);
+            },
         itemCount: itemCount,
         cacheExtent: cacheExtent,
       ),
@@ -131,6 +135,7 @@ void main() {
       curve: Curves.easeInOut,
     );
     await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     expect(pageController.page, 3);
     expect(isCalledOnObserve, isFalse);
 
@@ -139,10 +144,54 @@ void main() {
       duration: const Duration(milliseconds: 100),
       curve: Curves.easeInOut,
     );
+    await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserve, isTrue);
 
     scrollController.dispose();
     pageController.dispose();
+  });
+
+  testWidgets('Check observation result after fast scrolling', (tester) async {
+    // Regression test for https://github.com/fluttercandies/flutter_scrollview_observer/issues/113
+    final scrollController = ScrollController();
+    final observerController = ListObserverController(
+      controller: scrollController,
+    );
+    const int itemCount = 50;
+    Widget widget = getListView(
+      scrollController: scrollController,
+      physics: const ClampingScrollPhysics(),
+      itemCount: itemCount,
+      itemBuilder: (context, index) => Text('$index'),
+      separatorBuilder: (context, index) => const SizedBox.shrink(),
+    );
+    int? lastItemIndex;
+    widget = ListViewObserver(
+      child: widget,
+      controller: observerController,
+      triggerOnObserveType: ObserverTriggerOnObserveType.directly,
+      onObserve: (result) {
+        lastItemIndex = result.displayingChildModelList.last.index;
+      },
+    );
+    await tester.pumpWidget(widget);
+
+    var result = await observerController.dispatchOnceObserve();
+    final offset = result.observeResult?.viewport.offset
+        as ScrollPositionWithSingleContext;
+    final maxScrollExtent = offset.maxScrollExtent;
+    scrollController.animateTo(
+      maxScrollExtent * 1000,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeOut,
+    );
+
+    await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
+    expect(lastItemIndex, itemCount - 1);
+
+    scrollController.dispose();
   });
 
   group('Scroll to index', () {

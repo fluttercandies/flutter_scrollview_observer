@@ -304,6 +304,7 @@ void main() {
       curve: Curves.easeInOut,
     );
     await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     expect(pageController.page, 3);
     expect(isCalledOnObserve, isFalse);
 
@@ -312,6 +313,8 @@ void main() {
       duration: const Duration(milliseconds: 100),
       curve: Curves.easeInOut,
     );
+    await tester.pumpAndSettle();
+    await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserve, isTrue);
 
     scrollController.dispose();
