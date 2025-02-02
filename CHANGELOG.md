@@ -1,3 +1,7 @@
+## 1.25.1
+- ObserverWidget
+  - Fix observation result inaccurate by @LinXunFeng in [#113](https://github.com/fluttercandies/flutter_scrollview_observer/issues/113).
+
 ## 1.25.0
 - ChatScrollObserver
   - Add `customAdjustPosition`.
