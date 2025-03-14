@@ -609,7 +609,6 @@ class ObserverWidgetState<
   void _notifyListeners(
     Map<BuildContext, M> changeResultMap,
   ) {
-    assert(_debugAssertNotDisposed());
     if (changeResultMap.isEmpty) return;
     final _listeners = innerListeners;
     if (_listeners == null || _listeners.isEmpty) return;

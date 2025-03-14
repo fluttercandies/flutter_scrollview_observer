@@ -317,6 +317,38 @@ void main() {
 
       scrollController.dispose();
     });
+
+    // Regression test for https://github.com/fluttercandies/flutter_scrollview_observer/issues/123
+    testWidgets(
+        'No exception when ListViewObserverState is disposed during scrolling',
+        (tester) async {
+      final scrollController = ScrollController();
+      final observerController = ListObserverController(
+        controller: scrollController,
+      );
+
+      Widget widget = getListView(
+        scrollController: scrollController,
+      );
+      widget = ListViewObserver(
+        child: widget,
+        controller: observerController,
+        onObserve: (_) {},
+      );
+      await tester.pumpWidget(widget);
+
+      observerController.animateTo(
+        index: 10,
+        duration: const Duration(seconds: 3),
+        curve: Curves.easeInOut,
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpWidget(Container());
+
+      scrollController.dispose();
+    });
   });
 
   group('Cache index offset', () {
