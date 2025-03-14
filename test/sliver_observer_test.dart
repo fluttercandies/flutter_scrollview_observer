@@ -1611,5 +1611,23 @@ void main() {
       expect(gridObserverState?.innerSliverListeners?.length, 0);
       expect(gridObserverState?.innerListeners?.length, 0);
     });
+
+    // Regression test for https://github.com/fluttercandies/flutter_scrollview_observer/issues/120
+    testWidgets(
+        'No exception when MixViewObserverState is disposed during scrolling',
+        (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+
+      observerController1.animateTo(
+        index: 60,
+        sliverContext: _sliverListCtx,
+        duration: const Duration(seconds: 3),
+        curve: Curves.easeInOut,
+      );
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpWidget(Container());
+    });
   });
 }

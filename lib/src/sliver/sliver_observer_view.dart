@@ -415,7 +415,6 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
   void _notifySliverListeners(
     SliverViewportObserveModel? observeViewportResult,
   ) {
-    assert(_debugAssertNotDisposed());
     if (observeViewportResult == null) return;
     final listeners = innerSliverListeners;
     if (listeners == null || listeners.isEmpty) return;
