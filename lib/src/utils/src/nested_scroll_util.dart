@@ -270,7 +270,7 @@ class NestedScrollUtil {
           targetOffset -= offset?.call(targetOffset) ?? 0;
           targetOffset += calcResult.targetChildLayoutOffset;
           if (duration != null && curve != null) {
-            outerScrollController.animateTo(
+            await outerScrollController.animateTo(
               targetOffset,
               duration: duration,
               curve: curve,
