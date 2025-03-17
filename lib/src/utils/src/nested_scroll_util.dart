@@ -131,7 +131,7 @@ class NestedScrollUtil {
   }
 
   /// Jump to the specified index position.
-  jumpTo({
+  Future jumpTo({
     required GlobalKey nestedScrollViewKey,
     required SliverObserverController observerController,
     required NestedScrollUtilPosition position,
@@ -145,14 +145,14 @@ class NestedScrollUtil {
   }) {
     assert(outerScrollController != null, 'outerScrollController is null');
     assert(bodyScrollController != null, 'bodyScrollController is null');
-    if (outerScrollController == null) return;
-    if (bodyScrollController == null) return;
+    if (outerScrollController == null) return Future.value();
+    if (bodyScrollController == null) return Future.value();
     switchScrollController(
       observerController: observerController,
       position: position,
     );
 
-    observerController.jumpTo(
+    return observerController.jumpTo(
       index: index,
       sliverContext: sliverContext,
       isFixedHeight: isFixedHeight,
@@ -170,7 +170,7 @@ class NestedScrollUtil {
   }
 
   /// Animate to the specified index position.
-  animateTo({
+  Future animateTo({
     required GlobalKey nestedScrollViewKey,
     required SliverObserverController observerController,
     required NestedScrollUtilPosition position,
@@ -186,14 +186,14 @@ class NestedScrollUtil {
   }) {
     assert(outerScrollController != null, 'outerScrollController is null');
     assert(bodyScrollController != null, 'bodyScrollController is null');
-    if (outerScrollController == null) return;
-    if (bodyScrollController == null) return;
+    if (outerScrollController == null) return Future.value();
+    if (bodyScrollController == null) return Future.value();
     switchScrollController(
       observerController: observerController,
       position: position,
     );
 
-    observerController.animateTo(
+    return observerController.animateTo(
       index: index,
       duration: duration,
       curve: curve,
