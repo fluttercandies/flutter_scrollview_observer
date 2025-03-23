@@ -1,3 +1,7 @@
+## 1.26.0
+- NestedScrollUtil
+  - Add await support for `animateTo` and `jumpTo` methods by @LinXunFeng.
+
 ## 1.25.2
 - ObserverWidget
   - Fix "ObserverWidgetState was used after being disposed" by @LinXunFeng in [#120](https://github.com/fluttercandies/flutter_scrollview_observer/issues/120) and [#123](https://github.com/fluttercandies/flutter_scrollview_observer/issues/123).
