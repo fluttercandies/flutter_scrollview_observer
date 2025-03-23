@@ -560,6 +560,8 @@ void main() {
       GlobalKey nestedScrollViewKey = GlobalKey();
       NestedScrollUtil? nestedScrollUtil;
       Map<BuildContext, ObserveModel> resultMap = {};
+      int sliverListItemCount = 30;
+      int sliverGridItemCount = 150;
 
       Widget _buildSliverGridView() {
         return SliverGrid(
@@ -582,7 +584,7 @@ void main() {
                 ),
               );
             },
-            childCount: 150,
+            childCount: sliverGridItemCount,
           ),
         );
       }
@@ -606,7 +608,7 @@ void main() {
                 ),
               );
             },
-            childCount: 30,
+            childCount: sliverListItemCount,
           ),
         );
       }
@@ -673,7 +675,12 @@ void main() {
         );
       }
 
-      Widget resetAll() {
+      Widget resetAll({
+        int listItemCount = 30,
+        int gridItemCount = 150,
+      }) {
+        sliverListItemCount = listItemCount;
+        sliverGridItemCount = gridItemCount;
         resultMap = {};
         nestedScrollUtil = NestedScrollUtil();
         outerScrollController = ScrollController();
@@ -956,6 +963,165 @@ void main() {
           );
         },
       );
+
+      testWidgets('Check animateTo Future completion', (tester) async {
+        resetAll();
+        await tester.pumpWidget(widget);
+
+        bool isFutureCompleted = false;
+        const Duration duration = Duration(seconds: 2);
+
+        // Start to scroll
+        Future future = nestedScrollUtil!.animateTo(
+          nestedScrollViewKey: nestedScrollViewKey,
+          observerController: observerController,
+          sliverContext: _sliverBodyListCtx,
+          position: NestedScrollUtilPosition.body,
+          index: 5,
+          duration: duration,
+          curve: Curves.linear,
+        );
+
+        future.whenComplete(() {
+          isFutureCompleted = true;
+        });
+
+        // Wait for scroll to start
+        await tester.pump();
+
+        // Verify scroll hasn't completed
+        expect(isFutureCompleted, false);
+
+        // Wait for scroll to complete
+        const intervalDuration = Duration(milliseconds: 100);
+        int intervalTime = 0;
+        while (tester.binding.hasScheduledFrame) {
+          await tester.pump(intervalDuration);
+          intervalTime++;
+        }
+        // Make sure the scroll executes and completes correctly.
+        expect(
+          intervalTime,
+          greaterThanOrEqualTo(
+            duration.inMilliseconds ~/ intervalDuration.inMilliseconds,
+          ),
+        );
+        expect(isFutureCompleted, true);
+
+        // Scroll back to index 0
+        isFutureCompleted = false;
+        intervalTime = 0;
+        future = nestedScrollUtil!.animateTo(
+          nestedScrollViewKey: nestedScrollViewKey,
+          observerController: observerController,
+          sliverContext: _sliverBodyListCtx,
+          position: NestedScrollUtilPosition.body,
+          index: 0,
+          duration: duration,
+          curve: Curves.easeInOut,
+        );
+
+        future.whenComplete(() {
+          isFutureCompleted = true;
+        });
+
+        // Wait for scroll to start
+        await tester.pump();
+
+        // Verify scroll hasn't completed
+        expect(isFutureCompleted, false);
+
+        // Wait for scroll to complete
+        while (tester.binding.hasScheduledFrame) {
+          await tester.pump(intervalDuration);
+          intervalTime++;
+        }
+        // Make sure the scroll executes and completes correctly.
+        expect(
+          intervalTime,
+          greaterThanOrEqualTo(
+            duration.inMilliseconds ~/ intervalDuration.inMilliseconds,
+          ),
+        );
+        expect(isFutureCompleted, true);
+      });
+
+      testWidgets('Check jumpTo Future completion', (tester) async {
+        int listItemCount = 100;
+        resetAll(
+          listItemCount: listItemCount,
+        );
+        await tester.pumpWidget(widget);
+
+        bool isFutureCompleted = false;
+
+        // Start to scroll
+        Future future = nestedScrollUtil!.jumpTo(
+          nestedScrollViewKey: nestedScrollViewKey,
+          observerController: observerController,
+          sliverContext: _sliverBodyListCtx,
+          position: NestedScrollUtilPosition.body,
+          // Need to use an unrendered item's index to force paging to find it.
+          index: listItemCount - 1,
+        );
+
+        future.whenComplete(() {
+          isFutureCompleted = true;
+        });
+
+        // Wait for scroll to start
+        await tester.pump();
+
+        // Verify scroll hasn't completed
+        expect(isFutureCompleted, false);
+
+        // Wait for scroll to complete
+        const intervalDuration = Duration(milliseconds: 100);
+        int intervalTime = 0;
+        while (tester.binding.hasScheduledFrame) {
+          await tester.pump(intervalDuration);
+          intervalTime++;
+        }
+        // Make sure the scroll executes and completes correctly.
+        expect(
+          intervalTime,
+          greaterThanOrEqualTo(0),
+        );
+        expect(isFutureCompleted, true);
+
+        // Scroll back to index 0
+        isFutureCompleted = false;
+        intervalTime = 0;
+        future = nestedScrollUtil!.jumpTo(
+          nestedScrollViewKey: nestedScrollViewKey,
+          observerController: observerController,
+          sliverContext: _sliverBodyListCtx,
+          position: NestedScrollUtilPosition.body,
+          index: 0,
+        );
+
+        future.whenComplete(() {
+          isFutureCompleted = true;
+        });
+
+        // Wait for scroll to start
+        await tester.pump();
+
+        // Verify scroll hasn't completed
+        expect(isFutureCompleted, false);
+
+        // Wait for scroll to complete
+        while (tester.binding.hasScheduledFrame) {
+          await tester.pump(intervalDuration);
+          intervalTime++;
+        }
+        // Make sure the scroll executes and completes correctly.
+        expect(
+          intervalTime,
+          greaterThanOrEqualTo(0),
+        );
+        expect(isFutureCompleted, true);
+      });
     },
   );
 
