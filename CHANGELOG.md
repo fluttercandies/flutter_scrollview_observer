@@ -1,3 +1,7 @@
+## 1.26.1
+- ChatScrollObserver
+  - Refine the logic of `standby` by @LinXunFeng.
+
 ## 1.26.0
 - NestedScrollUtil
   - Add await support for `animateTo` and `jumpTo` methods by @LinXunFeng.
