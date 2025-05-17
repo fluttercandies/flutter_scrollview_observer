@@ -83,7 +83,7 @@ class ChatScrollObserver {
   /// If the return value is null, the default processing will be performed.
   ChatScrollObserverCustomAdjustPosition? customAdjustPosition;
 
-  /// Observation result of reference subparts after ScrollView children update.
+  /// Observation result of reference item after ScrollView children update.
   ListViewObserveDisplayingChildModel? observeRefItem() {
     return observerController.observeItem(
       index: refItemIndexAfterUpdate,
@@ -127,20 +127,24 @@ class ChatScrollObserver {
     this.changeCount = changeCount;
     observeSwitchShrinkWrap();
 
-    final firstItemModel = observerController.observeFirstItem(
-      sliverContext: sliverContext,
-    );
-    if (firstItemModel == null) return;
     int _innerRefItemIndex;
     int _innerRefItemIndexAfterUpdate;
     double _innerRefItemLayoutOffset;
     switch (mode) {
       case ChatScrollObserverHandleMode.normal:
+        final firstItemModel = observerController.observeFirstItem(
+          sliverContext: sliverContext,
+        );
+        if (firstItemModel == null) return;
         _innerRefItemIndex = firstItemModel.index;
         _innerRefItemIndexAfterUpdate = _innerRefItemIndex + changeCount;
         _innerRefItemLayoutOffset = firstItemModel.layoutOffset;
         break;
       case ChatScrollObserverHandleMode.generative:
+        final firstItemModel = observerController.observeFirstItem(
+          sliverContext: sliverContext,
+        );
+        if (firstItemModel == null) return;
         int index = firstItemModel.index + changeCount;
         final model = observerController.observeItem(
           sliverContext: sliverContext,
@@ -161,6 +165,10 @@ class ChatScrollObserver {
 
         switch (refIndexType) {
           case ChatScrollObserverRefIndexType.relativeIndexStartFromCacheExtent:
+            final firstItemModel = observerController.observeFirstItem(
+              sliverContext: sliverContext,
+            );
+            if (firstItemModel == null) return;
             int index = firstItemModel.index + _refItemIndex;
             final model = observerController.observeItem(
               sliverContext: sliverContext,

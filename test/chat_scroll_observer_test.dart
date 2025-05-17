@@ -61,8 +61,10 @@ void main() {
     updateData({
       int index = 0,
     }) {
-      final appendStr = 'updateData' * 10;
-      key.currentState?.dataList[index] += appendStr;
+      key.currentState?.updateData(
+        index: index,
+        needSetState: true,
+      );
     }
 
     observerController.jumpTo(index: firstDisplayingChildIndex);
@@ -161,6 +163,100 @@ void main() {
       firstDisplayingChildIndex,
     );
     expectSync(result.observeResult?.firstChild?.leadingMarginToViewport, 0);
+
+    scrollController.dispose();
+  });
+
+  testWidgets(
+      'Keeping position with ChatScrollObserverHandleMode.specified when item changes by itself',
+      (tester) async {
+    GlobalKey<ChatListViewState> key = GlobalKey();
+    final scrollController = ScrollController();
+    final observerController = ListObserverController(
+      controller: scrollController,
+    );
+    final chatScrollObserver = ChatScrollObserver(observerController)
+      ..fixedPositionOffset = -1;
+    const observeItemSelfIndex = 0;
+
+    Widget widget = ChatListView(
+      key: key,
+      scrollController: scrollController,
+      observerController: observerController,
+      chatScrollObserver: chatScrollObserver,
+      itemBuilder: (context, index) {
+        final dataList = key.currentState?.dataList ?? [];
+        return Text(
+          dataList[index],
+          maxLines: 999,
+        );
+      },
+      dataList: ['initData' * 500],
+    );
+    await tester.pumpWidget(widget);
+
+    void updateData({
+      int index = 0,
+    }) {
+      key.currentState?.updateData(
+        index: index,
+        needSetState: true,
+      );
+    }
+
+    await tester.pumpAndSettle();
+    var result = await observerController.dispatchOnceObserve(
+      isDependObserveCallback: false,
+      isForce: true,
+    );
+    expectSync(
+      result.observeResult?.firstChild?.index ?? 0,
+      observeItemSelfIndex,
+    );
+    expectSync(
+      result.observeResult?.firstChild?.mainAxisSize,
+      greaterThanOrEqualTo(
+        result.observeResult?.viewport.paintBounds.height ?? 0,
+      ),
+    );
+    final previousTrailingMarginToViewport =
+        result.observeResult?.firstChild?.trailingMarginToViewport;
+
+    // itemIndex
+    await chatScrollObserver.standby(
+      mode: ChatScrollObserverHandleMode.specified,
+      refIndexType: ChatScrollObserverRefIndexType.itemIndex,
+      refItemIndex: observeItemSelfIndex,
+      refItemIndexAfterUpdate: observeItemSelfIndex,
+      customAdjustPositionDelta: (model) {
+        return model.newPosition.extentAfter - model.oldPosition.extentAfter;
+      },
+    );
+
+    updateData();
+    await tester.pumpAndSettle();
+    result = await observerController.dispatchOnceObserve(
+      isDependObserveCallback: false,
+      isForce: true,
+    );
+
+    expect(chatScrollObserver.refItemIndex, observeItemSelfIndex);
+    expect(
+      chatScrollObserver.refItemIndexAfterUpdate,
+      observeItemSelfIndex,
+    );
+    result = await observerController.dispatchOnceObserve(
+      isDependObserveCallback: false,
+      isForce: true,
+    );
+    expectSync(
+      result.observeResult?.firstChild?.index,
+      observeItemSelfIndex,
+    );
+    expectSync(
+      result.observeResult?.firstChild?.trailingMarginToViewport,
+      previousTrailingMarginToViewport,
+    );
 
     scrollController.dispose();
   });
@@ -388,6 +484,7 @@ class ChatListView extends StatefulWidget {
     required this.chatScrollObserver,
     this.onReceiveScrollNotification,
     this.itemBuilder,
+    this.dataList,
   }) : super(key: key);
 
   final ScrollController scrollController;
@@ -395,14 +492,25 @@ class ChatListView extends StatefulWidget {
   final ChatScrollObserver chatScrollObserver;
   final Function()? onReceiveScrollNotification;
   final NullableIndexedWidgetBuilder? itemBuilder;
+  final List<String>? dataList;
 
   @override
   State<ChatListView> createState() => ChatListViewState();
 }
 
 class ChatListViewState extends State<ChatListView> {
-  List<String> dataList =
+  late List<String> dataList = widget.dataList ??
       List.generate(100, (index) => index.toString()).toList();
+
+  void initData({
+    required List<String> dataList,
+    bool needSetState = true,
+  }) {
+    this.dataList = dataList;
+    if (needSetState) {
+      setState(() {});
+    }
+  }
 
   void updateData({
     int index = 0,
