@@ -3,9 +3,9 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-05-28 12:32:34
  */
-import 'package:flutter/material.dart';
 
-import 'features/home/home_page.dart';
+import 'package:flutter/material.dart';
+import 'package:scrollview_observer_example/common/route/route.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,12 +16,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const HomePage(),
+    return MaterialApp.router(
+      routerConfig: MyRoute.routerConfig,
     );
   }
 }
