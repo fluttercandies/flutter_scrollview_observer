@@ -38,7 +38,7 @@ dependencies:
   loading_more_list: ^5.0.3
   easy_refresh: ^3.3.2+4
   visibility_detector: ^0.4.0+2
-  flutter_sticky_header: ^0.7.0
+  flutter_sticky_header: ^0.8.0
   carousel_slider: ^5.0.0
   go_router: ^16.0.0
   get: any
