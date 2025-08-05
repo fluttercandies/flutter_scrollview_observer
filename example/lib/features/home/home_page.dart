@@ -231,6 +231,12 @@ class HomePage extends StatelessWidget {
             NavigationService.push(MyPage.expandableCarouselSlider);
           },
         ),
+        ListTile(
+          title: const Text("Detail Page"),
+          onTap: () {
+            NavigationService.push(MyPage.detail);
+          },
+        ),
       ],
     );
   }

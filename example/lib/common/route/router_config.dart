@@ -35,6 +35,7 @@ import 'package:scrollview_observer_example/features/scene/anchor_demo/anchor_wa
 import 'package:scrollview_observer_example/features/scene/azlist_demo/azlist_page.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/page/chat_gpt_page.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/page/chat_page.dart';
+import 'package:scrollview_observer_example/features/scene/detail/page/detail_page.dart';
 import 'package:scrollview_observer_example/features/scene/expandable_carousel_slider_demo/expandable_carousel_slider_demo.dart';
 import 'package:scrollview_observer_example/features/scene/image_tab_demo/image_tab_page.dart';
 import 'package:scrollview_observer_example/features/scene/scrollview_form_demo/scrollview_form_demo_page.dart';
@@ -88,6 +89,7 @@ class MyPage {
   static const visibilityScrollView = '/visibility_scroll_view';
   static const azList = '/az_list';
   static const expandableCarouselSlider = '/expandable_carousel_slider';
+  static const detail = '/detail';
 }
 
 class MyRoute {
@@ -247,6 +249,10 @@ class MyRoute {
     GoRoute(
       path: MyPage.expandableCarouselSlider,
       builder: (context, state) => const ExpandableCarouselSliderDemo(),
+    ),
+    GoRoute(
+      path: MyPage.detail,
+      builder: (context, state) => const DetailPage(),
     ),
   ];
 }
