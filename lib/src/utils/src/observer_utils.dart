@@ -39,30 +39,27 @@ class ObserverUtils {
   /// Calculate the anchor tab index.
   static int calcAnchorTabIndex({
     required ObserveModel observeModel,
-    required List<int> tabIndexs,
+    @Deprecated(
+      'It will be removed in version 2, please use [tabIndexes] instead',
+    )
+    List<int>? tabIndexs,
+    List<int>? tabIndexes,
     required int currentTabIndex,
   }) {
-    if (currentTabIndex >= tabIndexs.length) {
+    assert(
+      tabIndexs != null || tabIndexes != null,
+      'tabIndexes and tabIndexs cannot both be null.',
+    );
+    List<int> indexes = tabIndexes ?? tabIndexs ?? [];
+    if (currentTabIndex >= indexes.length) {
       return currentTabIndex;
     }
     if (observeModel is ListViewObserveModel) {
-      final topIndex = observeModel.firstChild?.index ?? 0;
-      final index = tabIndexs.indexOf(topIndex);
-      if (isValidListIndex(index)) {
-        return index;
-      }
-      var targetTabIndex = currentTabIndex - 1;
-      if (targetTabIndex < 0 || targetTabIndex >= tabIndexs.length) {
-        return currentTabIndex;
-      }
-      var curIndex = tabIndexs[currentTabIndex];
-      var lastIndex = tabIndexs[currentTabIndex - 1];
-      if (curIndex > topIndex && lastIndex < topIndex) {
-        final lastTabIndex = tabIndexs.indexOf(lastIndex);
-        if (isValidListIndex(lastTabIndex)) {
-          return lastTabIndex;
-        }
-      }
+      return calcAnchorTabIndexForList(
+        firstIndex: observeModel.firstChild?.index,
+        tabIndexes: indexes,
+        currentTabIndex: currentTabIndex,
+      );
     } else if (observeModel is GridViewObserveModel) {
       final firstGroupChildList = observeModel.firstGroupChildList;
       if (firstGroupChildList.isEmpty) {
@@ -72,9 +69,9 @@ class ObserverUtils {
       GridViewObserveDisplayingChildModel mainChildModel =
           firstGroupChildList.first;
       for (var firstGroupChildModel in firstGroupChildList) {
-        final index = tabIndexs.indexOf(firstGroupChildModel.index);
+        final index = indexes.indexOf(firstGroupChildModel.index);
         if (isValidListIndex(index)) {
-          // Found the target index from tabIndexs, return directly.
+          // Found the target index from indexes, return directly.
           return index;
         }
         if (mainChildModel.trailingMarginToViewport <
@@ -82,12 +79,12 @@ class ObserverUtils {
           mainChildModel = firstGroupChildModel;
         }
       }
-      // Target index not found from tabIndexs.
+      // Target index not found from indexes.
       var targetTabIndex = currentTabIndex - 1;
-      if (targetTabIndex < 0 || targetTabIndex >= tabIndexs.length) {
+      if (targetTabIndex < 0 || targetTabIndex >= indexes.length) {
         return currentTabIndex;
       }
-      var curIndex = tabIndexs[currentTabIndex];
+      var curIndex = indexes[currentTabIndex];
       final firstGroupIndexList =
           firstGroupChildList.map((e) => e.index).toList();
       final minOffset = mainChildModel.layoutOffset;
@@ -109,6 +106,62 @@ class ObserverUtils {
       }
     }
     return currentTabIndex;
+  }
+
+  /// Calculate the anchor tab index for list type.
+  ///
+  /// - [firstIndex] is the index of the first child widget.
+  /// - [tabIndexes] is the list of indexes of all tabs.
+  /// - [currentTabIndex] is the current tab index.
+  static int calcAnchorTabIndexForList({
+    int? firstIndex,
+    required List<int> tabIndexes,
+    required int currentTabIndex,
+  }) {
+    // Example:
+    // ====== exact match ======
+    // tabIndexes: [0, 6, 9, 11, 12, 16]
+    // firstIndex: 12
+    // result: 4 (the index of 12 in tabIndexes)
+    //
+    //  ====== no exact match ======
+    // tabIndexes: [0, 6, 9, 11, 12, 16]
+    // firstIndex: 10
+    // result: 2 (the index of 9 in tabIndexes)
+
+    if (tabIndexes.isEmpty) return currentTabIndex;
+    if (firstIndex == null) return currentTabIndex;
+    final target = firstIndex;
+    // If the target value is less than the minimum value, currentTabIndex is
+    // returned.
+    if (target < tabIndexes.first) return currentTabIndex;
+    // If the target value is greater than or equal to the maximum value, the
+    // maximum value is returned.
+    if (target >= tabIndexes.last) return tabIndexes.length - 1;
+
+    // Two-point search
+    int left = 0;
+    int right = tabIndexes.length - 1;
+    // The currentTabIndex is returned by default.
+    int resultIndex = currentTabIndex;
+
+    while (left <= right) {
+      int mid = (left + right) ~/ 2;
+      int midValue = tabIndexes[mid];
+
+      if (midValue == target) {
+        // Find an equal value and return its index.
+        return mid;
+      } else if (midValue < target) {
+        // Update the index of elements with the largest less than the target
+        // value.
+        resultIndex = mid;
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
+    }
+    return resultIndex;
   }
 
   /// Determines whether the offset at the bottom of the target child widget
