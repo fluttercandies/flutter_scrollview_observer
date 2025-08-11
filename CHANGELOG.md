@@ -1,3 +1,7 @@
+## 1.26.2
+- ObserverUtils
+  - Refine the logic of `calcAnchorTabIndex` method by @LinXunFeng.
+
 ## 1.26.1
 - ChatScrollObserver
   - Refine the logic of `standby` by @LinXunFeng.
