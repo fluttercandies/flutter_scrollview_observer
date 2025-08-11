@@ -35,6 +35,9 @@ class _DetailListViewState extends State<DetailListView>
   Widget build(BuildContext context) {
     Widget resultWidget = ListView.separated(
       controller: state.scrollController,
+      physics: ChatObserverClampingScrollPhysics(
+        observer: state.keepPositionObserver,
+      ),
       itemBuilder: (context, index) {
         switch (moduleTypes[index]) {
           case DetailModuleType.module1:
@@ -59,6 +62,13 @@ class _DetailListViewState extends State<DetailListView>
         return const Divider();
       },
       itemCount: moduleTypes.length,
+      // Set a large enough cacheExtent to ensure that the keep position
+      // function can work properly.
+      //
+      // More information and tips:
+      // https://github.com/fluttercandies/flutter_scrollview_observer/wiki/3%E3%80%81Chat-Observer
+      //
+      // Since the content of the current page is small, maxFinite is set up.
       cacheExtent: double.maxFinite,
     );
 

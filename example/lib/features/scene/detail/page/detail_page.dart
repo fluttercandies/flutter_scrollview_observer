@@ -4,11 +4,13 @@
  * @Date: 2025-08-02 19:57:05
  */
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 import 'package:scrollview_observer_example/features/scene/detail/logic/detail_logic.dart';
 import 'package:scrollview_observer_example/features/scene/detail/state/detail_state.dart';
+import 'package:scrollview_observer_example/features/scene/detail/widget/detail_config_view.dart';
 import 'package:scrollview_observer_example/features/scene/detail/widget/detail_list_view.dart';
 import 'package:scrollview_observer_example/features/scene/detail/widget/detail_nav_bar.dart';
 
@@ -53,16 +55,37 @@ class DetailPageState extends State<DetailPage>
   }
 
   Widget _buildBody() {
-    return const Stack(
+    if (state.showConfig) {
+      return const DetailConfigView();
+    }
+    return Stack(
       children: [
-        DetailListView(),
-        Positioned(
+        const DetailListView(),
+        const Positioned(
           top: 0,
           left: 0,
           right: 0,
           child: DetailNavBar(),
         ),
+        _buildLoading(),
       ],
+    );
+  }
+
+  Widget _buildLoading() {
+    return GetBuilder<DetailLogic>(
+      tag: logicTag,
+      id: DetailUpdateType.loading,
+      builder: (_) {
+        if (!state.showLoading) return const SizedBox.shrink();
+
+        return Positioned.fill(
+          child: Container(
+            color: Colors.white,
+            child: const CupertinoActivityIndicator(),
+          ),
+        );
+      },
     );
   }
 }

@@ -21,6 +21,7 @@ class DetailLogic extends GetxController with GetTickerProviderStateMixin {
   }
 
   void onDispose() {
+    state.isDisposed = true;
     onDisposeForNavBar();
     onDisposeForListView();
   }

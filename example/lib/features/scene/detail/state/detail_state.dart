@@ -4,7 +4,13 @@
  * @Date: 2025-08-02 19:57:05
  */
 
+import 'package:scrollview_observer_example/features/scene/detail/state/detail_state_config.dart';
 import 'package:scrollview_observer_example/features/scene/detail/state/detail_state_list_view.dart';
 import 'package:scrollview_observer_example/features/scene/detail/state/detail_state_nav_bar.dart';
 
-class DetailState with DetailStateForNavBar, DetailStateForListView {}
+class DetailState
+    with DetailStateForNavBar, DetailStateForListView, DetailStateForConfig {
+  bool isDisposed = false;
+
+  bool showLoading = true;
+}

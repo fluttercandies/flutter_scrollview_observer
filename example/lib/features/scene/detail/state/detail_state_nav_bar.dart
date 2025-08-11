@@ -9,7 +9,7 @@ import 'package:scrollview_observer_example/features/scene/detail/model/detail_n
 
 mixin DetailStateForNavBar {
   final double navBarHeight = kToolbarHeight;
-  
+
   double navBarAlpha = 0;
 
   TabController? navBarTabController;

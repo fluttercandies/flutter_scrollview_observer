@@ -53,6 +53,12 @@ extension DetailLogicForNavBar on DetailLogic {
     );
   }
 
+  void updateNavBarTabIndex(int index) {
+    final navBarTabController = state.navBarTabController;
+    if (navBarTabController == null) return;
+    navBarTabController.index = index;
+  }
+
   void updateNavBarAlpha() {
     if (!state.scrollController.position.hasPixels) return;
     state.scrollController.position.pixels;

@@ -20,7 +20,7 @@ class _AnchorListPageState extends State<AnchorListPage>
   late ListObserverController observerController;
   late TabController _tabController;
   List tabs = ["News(0)", "History(5)", "Picture(10)"];
-  List<int> tabIndexs = [0, 5, 10];
+  List<int> tabIndexes = [0, 5, 10];
 
   @override
   void initState() {
@@ -48,7 +48,7 @@ class _AnchorListPageState extends State<AnchorListPage>
             tabs: tabs.map((e) => Tab(text: e)).toList(),
             onTap: (index) {
               observerController.animateTo(
-                index: tabIndexs[index],
+                index: tabIndexes[index],
                 duration: const Duration(milliseconds: 250),
                 curve: Curves.ease,
               );
@@ -62,7 +62,7 @@ class _AnchorListPageState extends State<AnchorListPage>
         onObserve: (resultModel) {
           _tabController.index = ObserverUtils.calcAnchorTabIndex(
             observeModel: resultModel,
-            tabIndexs: tabIndexs,
+            tabIndexes: tabIndexes,
             currentTabIndex: _tabController.index,
           );
         },

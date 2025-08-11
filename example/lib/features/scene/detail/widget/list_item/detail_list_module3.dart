@@ -5,7 +5,10 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
+import 'package:scrollview_observer_example/features/scene/detail/logic/detail_logic.dart';
+import 'package:scrollview_observer_example/features/scene/detail/state/detail_state.dart';
 import 'package:scrollview_observer_example/features/scene/detail/widget/detail_list_item_wrapper.dart';
 
 class DetailListModule3 extends StatefulWidget {
@@ -17,6 +20,8 @@ class DetailListModule3 extends StatefulWidget {
 
 class _DetailListModule3State extends State<DetailListModule3>
     with DetailLogicConsumerMixin<DetailListModule3> {
+  DetailState get state => logic.state;
+
   List<IconData> icons = [
     Icons.flight,
     Icons.restaurant,
@@ -41,12 +46,20 @@ class _DetailListModule3State extends State<DetailListModule3>
 
   @override
   Widget build(BuildContext context) {
-    Widget resultWidget = _buildGridView();
-    resultWidget = DetailListItemWrapper(
-      title: 'Module 3',
-      child: resultWidget,
+    return GetBuilder<DetailLogic>(
+      tag: logicTag,
+      id: DetailUpdateType.module3,
+      builder: (_) {
+        if (!state.haveDataForModule3) return const SizedBox.shrink();
+
+        Widget resultWidget = _buildGridView();
+        resultWidget = DetailListItemWrapper(
+          title: 'Module 3',
+          child: resultWidget,
+        );
+        return resultWidget;
+      },
     );
-    return resultWidget;
   }
 
   Widget _buildGridView() {

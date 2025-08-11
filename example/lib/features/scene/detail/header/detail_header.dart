@@ -16,6 +16,10 @@ typedef DetailLogicConsumerMixin<W extends StatefulWidget>
 
 enum DetailUpdateType {
   navBar,
+  config,
+  loading,
+  module3,
+  module6,
 }
 
 enum DetailModuleType {
