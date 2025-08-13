@@ -4,6 +4,7 @@
  * @Date: 2025-08-02 20:03:56
  */
 
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
@@ -33,11 +34,41 @@ class _DetailListViewState extends State<DetailListView>
 
   @override
   Widget build(BuildContext context) {
+    Widget resultWidget;
+
+    switch (state.configRefreshIndicator) {
+      case DetailRefreshIndicatorType.none:
+        resultWidget = _buildListView();
+        break;
+      case DetailRefreshIndicatorType.footer:
+        resultWidget = EasyRefresh.builder(
+          footer: const MaterialFooter(),
+          onLoad: () async {
+            await Future.delayed(const Duration(seconds: 2));
+          },
+          childBuilder: (context, physics) {
+            return _buildListView(physics: physics);
+          },
+        );
+        break;
+    }
+
+    return resultWidget;
+  }
+
+  Widget _buildListView({
+    ScrollPhysics? physics,
+  }) {
+    ScrollPhysics _physics = ChatObserverClampingScrollPhysics(
+      observer: state.keepPositionObserver,
+    );
+    if (physics != null) {
+      _physics = physics.applyTo(_physics);
+    }
+
     Widget resultWidget = ListView.separated(
       controller: state.scrollController,
-      physics: ChatObserverClampingScrollPhysics(
-        observer: state.keepPositionObserver,
-      ),
+      physics: _physics,
       itemBuilder: (context, index) {
         switch (moduleTypes[index]) {
           case DetailModuleType.module1:

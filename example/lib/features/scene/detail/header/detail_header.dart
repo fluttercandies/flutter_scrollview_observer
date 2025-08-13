@@ -32,3 +32,8 @@ enum DetailModuleType {
   module7,
   module8,
 }
+
+enum DetailRefreshIndicatorType {
+  none,
+  footer,
+}

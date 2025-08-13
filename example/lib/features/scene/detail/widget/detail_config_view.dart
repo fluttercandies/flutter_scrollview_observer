@@ -49,6 +49,7 @@ class _DetailConfigViewState extends State<DetailConfigView>
     return ListView(
       children: [
         _buildDefaultAnchor(),
+        _buildRefreshPosition(),
       ],
     );
   }
@@ -63,6 +64,22 @@ class _DetailConfigViewState extends State<DetailConfigView>
           if (module == null) return;
           state.configSelectedAnchor = module;
         },
+        inputDecorationTheme: inputDecorationTheme(),
+      ),
+    );
+  }
+
+  Widget _buildRefreshPosition() {
+    return ListTile(
+      title: const Text('Refresh Indicator'),
+      trailing: DropdownMenu<DetailRefreshIndicatorType>(
+        initialSelection: state.configRefreshIndicator,
+        dropdownMenuEntries: state.configRefreshIndicatorEntries,
+        onSelected: (DetailRefreshIndicatorType? position) {
+          if (position == null) return;
+          state.configRefreshIndicator = position;
+        },
+        inputDecorationTheme: inputDecorationTheme(),
       ),
     );
   }
@@ -78,6 +95,16 @@ class _DetailConfigViewState extends State<DetailConfigView>
         child: const Text('Confirm'),
       ),
     );
+    resultWidget = Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      child: resultWidget,
+    );
     return resultWidget;
+  }
+
+  InputDecorationTheme inputDecorationTheme() {
+    return const InputDecorationTheme(
+      isCollapsed: true,
+    );
   }
 }

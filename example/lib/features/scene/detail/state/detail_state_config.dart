@@ -14,9 +14,29 @@ mixin DetailStateForConfig {
 
   List<DropdownMenuEntry<DetailModuleType>> get configDefaultAnchorEntries {
     List<DropdownMenuEntry<DetailModuleType>> entries = [];
-    for (final DetailModuleType moduleType in DetailModuleType.values) {
+    for (final moduleType in DetailModuleType.values) {
       entries.add(
-        DropdownMenuEntry(value: moduleType, label: moduleType.name),
+        DropdownMenuEntry(
+          value: moduleType,
+          label: moduleType.name,
+        ),
+      );
+    }
+    return entries;
+  }
+
+  DetailRefreshIndicatorType configRefreshIndicator =
+      DetailRefreshIndicatorType.none;
+
+  List<DropdownMenuEntry<DetailRefreshIndicatorType>>
+      get configRefreshIndicatorEntries {
+    List<DropdownMenuEntry<DetailRefreshIndicatorType>> entries = [];
+    for (final moduleType in DetailRefreshIndicatorType.values) {
+      entries.add(
+        DropdownMenuEntry(
+          value: moduleType,
+          label: moduleType.name,
+        ),
       );
     }
     return entries;
