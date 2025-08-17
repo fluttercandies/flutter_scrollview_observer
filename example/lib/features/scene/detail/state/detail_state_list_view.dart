@@ -17,7 +17,11 @@ mixin DetailStateForListView {
 
   late ListObserverController observerController = ListObserverController(
     controller: scrollController,
-  )..cacheJumpIndexOffset = false;
+  )
+    ..observeIntervalForScrolling = const Duration(milliseconds: 50)
+    // Since there are modules loaded asynchronously, which will cause the
+    // cache to be offset inaccurately, so it is set to false here
+    ..cacheJumpIndexOffset = false;
 
   late ChatScrollObserver keepPositionObserver = ChatScrollObserver(
     observerController,

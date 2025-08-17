@@ -8,13 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 
 class DetailListItemWrapper extends StatefulWidget {
-  final String title;
+  final String? title;
   final Widget child;
 
   const DetailListItemWrapper({
     super.key,
-    required this.title,
     required this.child,
+    this.title,
   });
 
   @override
@@ -23,6 +23,8 @@ class DetailListItemWrapper extends StatefulWidget {
 
 class _DetailListItemWrapperState extends State<DetailListItemWrapper>
     with DetailLogicConsumerMixin<DetailListItemWrapper> {
+  String get title => widget.title ?? '';
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -30,13 +32,16 @@ class _DetailListItemWrapperState extends State<DetailListItemWrapper>
       children: [
         _buildTitle(),
         widget.child,
+        const SizedBox(height: 10),
       ],
     );
   }
 
   Widget _buildTitle() {
+    if (title.isEmpty) return const SizedBox.shrink();
+
     Widget resultWidget = Text(
-      widget.title,
+      title,
       style: Theme.of(context).textTheme.titleLarge,
     );
     resultWidget = Padding(

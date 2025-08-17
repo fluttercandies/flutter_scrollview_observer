@@ -6,6 +6,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
+import 'package:scrollview_observer_example/features/scene/detail/widget/detail_list_item_wrapper.dart';
 
 class DetailListModule1 extends StatefulWidget {
   const DetailListModule1({super.key});
@@ -19,6 +20,9 @@ class _DetailListModule1State extends State<DetailListModule1>
   @override
   Widget build(BuildContext context) {
     Widget resultWidget = _buildPageView();
+    resultWidget = DetailListItemWrapper(
+      child: resultWidget,
+    );
     return resultWidget;
   }
 

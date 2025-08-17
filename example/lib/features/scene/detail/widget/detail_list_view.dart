@@ -90,11 +90,14 @@ class _DetailListViewState extends State<DetailListView>
         }
       },
       separatorBuilder: (context, index) {
-        return const Divider();
+        return Container(
+          color: Colors.black12,
+          height: 1,
+        );
       },
       itemCount: moduleTypes.length,
       // Set a large enough cacheExtent to ensure that the keep position
-      // function can work properly.
+      // functionality can work properly.
       //
       // More information and tips:
       // https://github.com/fluttercandies/flutter_scrollview_observer/wiki/3%E3%80%81Chat-Observer

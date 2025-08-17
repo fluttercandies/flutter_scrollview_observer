@@ -99,12 +99,12 @@ extension DetailLogicForListView on DetailLogic {
     update(ids);
   }
 
-  /// Show loading first, and hide loading after the ListView is rendered.
-  void firstTimeRenderListView() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      state.showLoading = false;
-      update([DetailUpdateType.loading]);
-    });
+  /// Show loading first, and hide loading after setting the index of the
+  /// TabBar and scrolling to the corresponding module.
+  void firstTimeRenderListView() async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    state.showLoading = false;
+    update([DetailUpdateType.loading]);
   }
 
   void loadAsyncDataForListView() {
