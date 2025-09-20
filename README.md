@@ -29,6 +29,8 @@ Chat: [Join WeChat group](https://mp.weixin.qq.com/s/JBbMstn0qW6M71hh-BRKzw)
 - [Flutter - Supports observing NestedScrollView, with greater compatibility 😈](https://medium.com/@linxunfeng/flutter-supports-observing-nestedscrollview-with-greater-compatibility-86f49dce7955) | [WeChat](https://mp.weixin.qq.com/s/1dsmRg8q2VJ6HzasLgoVpA) | [JueJin](https://juejin.cn/post/7388444606456840211)
 - [Flutter - Offset effect in PageView](https://medium.com/@linxunfeng/flutter-offset-effect-in-pageview-cec39572d56a) | [WeChat](https://mp.weixin.qq.com/s/Q8zk89bgr_8bgWQ4F86VUQ) | [JueJin](https://juejin.cn/post/7411516362916216859)
 - [Flutter - Parallax effect in PageView](https://medium.com/@linxunfeng/flutter-parallax-effect-in-pageview-ccff6b0b34aa) | [WeChat](https://mp.weixin.qq.com/s/Fi-X2eJRWj17sqCcVqbPRQ) | [JueJin](https://juejin.cn/post/7416655730214699017)
+- [Flutter - Syncing Detail Page TabBar with Modules? Nailed It!](https://medium.com/@linxunfeng/flutter-syncing-detail-page-tabbar-with-modules-nailed-it-60f2ca67e100) | [WeChat](https://mp.weixin.qq.com/s/uLRLzxS4IqmCq0gewTS8kQ) | [JueJin](https://juejin.cn/post/7538868042961911817)
+- [Flutter - Initial Anchor And Optimization For Detail Pages](https://medium.com/@linxunfeng/flutter-initial-anchor-and-optimization-for-detail-pages-86aa5b9c4186) | [WeChat](https://mp.weixin.qq.com/s/hRPc_eHjl0OSKFKfmj6q_g) | [JueJin](https://juejin.cn/post/7541801054188109850)
 
 ## 🔨 Feature
 

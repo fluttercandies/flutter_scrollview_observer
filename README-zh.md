@@ -28,6 +28,8 @@ Language: 中文 | [English](https://github.com/fluttercandies/flutter_scrollvie
 - [Flutter - 支持观察NestedScrollView，兼容性更强 😈](https://mp.weixin.qq.com/s/1dsmRg8q2VJ6HzasLgoVpA) | [备用链接](https://juejin.cn/post/7388444606456840211)
 - [Flutter - 轻松实现PageView卡片偏移效果](https://mp.weixin.qq.com/s/Q8zk89bgr_8bgWQ4F86VUQ) | [备用链接](https://juejin.cn/post/7411516362916216859)
 - [Flutter - 轻松搞定炫酷视差(Parallax)效果](https://mp.weixin.qq.com/s/Fi-X2eJRWj17sqCcVqbPRQ) | [备用链接](https://juejin.cn/post/7416655730214699017)
+- [Flutter - 详情页 TabBar 与模块联动？秒了！](https://mp.weixin.qq.com/s/uLRLzxS4IqmCq0gewTS8kQ) | [备用链接](https://juejin.cn/post/7538868042961911817)
+- [Flutter - 详情页初始锚点与优化](https://mp.weixin.qq.com/s/hRPc_eHjl0OSKFKfmj6q_g) | [备用链接](https://juejin.cn/post/7541801054188109850)
 
 ## 🔨 功能点
 
