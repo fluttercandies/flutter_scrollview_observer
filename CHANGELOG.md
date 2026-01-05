@@ -1,3 +1,9 @@
+## 1.26.3
+- ObserverWidget
+  - Fix incorrect tag comparison in `_checkTagChange` by @LinXunFeng in [#143](https://github.com/fluttercandies/flutter_scrollview_observer/issues/143).
+- ObserverController
+  - Add missing type annotations by @LinXunFeng.
+
 ## 1.26.2
 - ObserverUtils
   - Refine the logic of `calcAnchorTabIndex` method by @LinXunFeng.
