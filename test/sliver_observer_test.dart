@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -1794,6 +1796,78 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
       await tester.pumpWidget(Container());
+    });
+
+    testWidgets(
+        'innerTagChangeCount should not increase when tag remains unchanged',
+        (tester) async {
+      const String tag = 'tag1';
+      scrollController = ScrollController();
+      Widget scrollView = _buildScrollView(scrollController: scrollController);
+
+      widget = SliverViewObserver(
+        tag: tag,
+        child: scrollView,
+      );
+
+      await tester.pumpWidget(widget);
+      await tester.pumpAndSettle();
+
+      // Get ObserverWidgetState
+      final itemFinder = find.byType(SliverViewObserver);
+      final observerState = tester.state<MixViewObserverState>(itemFinder);
+      expect(observerState, isNotNull);
+
+      // Record initial tagChangeCount
+      final initialTagChangeCount = observerState.innerTagChangeCount;
+
+      // Refresh widget but keep tag unchanged
+      widget = SliverViewObserver(
+        tag: tag,
+        child: scrollView,
+      );
+      await tester.pumpWidget(widget);
+      await tester.pumpAndSettle();
+
+      // Verify that tagChangeCount has not increased
+      expect(observerState.innerTagChangeCount, initialTagChangeCount);
+      expect(observerState.innerTagChangeCount, 0);
+    });
+
+    testWidgets('No exception in _checkTagChange during refresh and dispose',
+        (tester) async {
+      // Regression test for https://github.com/fluttercandies/flutter_scrollview_observer/issues/143
+      scrollController = ScrollController();
+      Widget scrollView = _buildScrollView(scrollController: scrollController);
+      widget = SliverViewObserver(
+        tag: 'tag1',
+        child: scrollView,
+      );
+      await tester.pumpWidget(widget);
+
+      // Get ObserverWidgetState
+      final itemFinder = find.byType(SliverViewObserver);
+      final observerState = tester.state<MixViewObserverState>(itemFinder);
+
+      // Create a controllable Future
+      final completer = Completer<void>();
+      observerState.innerCheckTagChangeEndOfFrame = completer.future;
+
+      widget = SliverViewObserver(
+        tag: 'tag2',
+        child: scrollView,
+      );
+      await tester.pumpWidget(widget);
+
+      // Dispose widget before endOfFrame completes
+      await tester.pumpWidget(Container());
+
+      // Complete Future to simulate endOfFrame callback execution
+      // (widget has already been disposed at this point)
+      completer.complete();
+
+      // Verify no exception is thrown
+      await tester.pumpAndSettle();
     });
   });
 }

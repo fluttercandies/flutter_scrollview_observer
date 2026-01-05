@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -1008,6 +1010,78 @@ void main() {
         onObserveAll: onObserveAllCallback,
       );
       expect(observerState?.innerListeners?.length, 0);
+    });
+
+    testWidgets(
+        'innerTagChangeCount should not increase when tag remains unchanged',
+        (tester) async {
+      const String tag = 'tag1';
+      scrollController = ScrollController();
+      Widget listView = getListView(scrollController: scrollController);
+
+      widget = ListViewObserver(
+        tag: tag,
+        child: listView,
+      );
+
+      await tester.pumpWidget(widget);
+      await tester.pumpAndSettle();
+
+      // Get ObserverWidgetState
+      final itemFinder = find.byType(ListViewObserver);
+      final observerState = tester.state<ListViewObserverState>(itemFinder);
+      expect(observerState, isNotNull);
+
+      // Record initial tagChangeCount
+      final initialTagChangeCount = observerState.innerTagChangeCount;
+
+      // Refresh widget but keep tag unchanged
+      widget = ListViewObserver(
+        tag: tag,
+        child: listView,
+      );
+      await tester.pumpWidget(widget);
+      await tester.pumpAndSettle();
+
+      // Verify that tagChangeCount has not increased
+      expect(observerState.innerTagChangeCount, initialTagChangeCount);
+      expect(observerState.innerTagChangeCount, 0);
+    });
+
+    testWidgets('No exception in _checkTagChange during refresh and dispose',
+        (tester) async {
+      // Regression test for https://github.com/fluttercandies/flutter_scrollview_observer/issues/143
+      scrollController = ScrollController();
+      Widget listView = getListView(scrollController: scrollController);
+      widget = ListViewObserver(
+        tag: 'tag1',
+        child: listView,
+      );
+      await tester.pumpWidget(widget);
+
+      // Get ObserverWidgetState
+      final itemFinder = find.byType(ListViewObserver);
+      final observerState = tester.state<ListViewObserverState>(itemFinder);
+
+      // Create a controllable Future
+      final completer = Completer<void>();
+      observerState.innerCheckTagChangeEndOfFrame = completer.future;
+
+      widget = ListViewObserver(
+        tag: 'tag2',
+        child: listView,
+      );
+      await tester.pumpWidget(widget);
+
+      // Dispose widget before endOfFrame completes
+      await tester.pumpWidget(Container());
+
+      // Complete Future to simulate endOfFrame callback execution
+      // (widget has already been disposed at this point)
+      completer.complete();
+
+      // Verify no exception is thrown
+      await tester.pumpAndSettle();
     });
   });
 }

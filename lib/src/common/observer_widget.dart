@@ -244,6 +244,18 @@ class ObserverWidgetState<
   LinkedList<ObserverListenerEntry<M>>? innerListeners =
       LinkedList<ObserverListenerEntry<M>>();
 
+  /// The number of times the tag has changed.
+  @protected
+  @visibleForTesting
+  int innerTagChangeCount = 0;
+
+  /// The future that completes at the end of the current frame, used in
+  /// [_checkTagChange].
+  /// This can be assigned in tests for custom behavior.
+  @protected
+  @visibleForTesting
+  Future<void>? innerCheckTagChangeEndOfFrame;
+
   bool _debugAssertNotDisposed() {
     assert(() {
       if (innerListeners == null) {
@@ -550,10 +562,12 @@ class ObserverWidgetState<
   void _checkTagChange(T oldWidget) async {
     final oldTag = oldWidget.tag ?? '';
     final tag = widget.tag ?? '';
-    if (tag == oldWidget) return;
+    if (tag == oldTag) return;
+    innerTagChangeCount++;
     // Execute after the current frame ends to avoid getting an outdated
     // ObserverWidgetTagManager.
-    await WidgetsBinding.instance.endOfFrame;
+    await (innerCheckTagChangeEndOfFrame ?? WidgetsBinding.instance.endOfFrame);
+    if (!mounted) return;
     final _scopeContext = scopeContext;
     if (_scopeContext == null) return;
     assert(_scopeContext.mounted);
