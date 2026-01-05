@@ -47,7 +47,7 @@ class ObserverController {
   Function()? innerReattachCallBack;
 
   /// Reset all data
-  innerReset() {
+  void innerReset() {
     indexOffsetMap = {};
     innerIsHandlingScroll = false;
   }
@@ -62,7 +62,7 @@ class ObserverController {
   }
 
   /// Get the latest target sliver [BuildContext] and reset some of the old data.
-  reattach() {
+  void reattach() {
     if (innerReattachCallBack == null) return;
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
       innerReattachCallBack!();
