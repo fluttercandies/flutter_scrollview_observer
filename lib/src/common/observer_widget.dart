@@ -312,7 +312,7 @@ class ObserverWidgetState<
             resultModel: result,
           );
         }
-        return true;
+        return false;
       },
       child: NotificationListener<ScrollNotification>(
         onNotification: (notification) {
