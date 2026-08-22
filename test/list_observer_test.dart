@@ -408,6 +408,102 @@ void main() {
     });
   });
 
+  group('Scroll to index after the item count changed', () {
+    // https://github.com/fluttercandies/flutter_scrollview_observer/issues/150
+    //
+    // The sliver may skip its layout phase when the item count changes but
+    // none of the existing children needs to be laid out again, which makes
+    // its scrollExtent outdated, so the scrolling would be clamped to the
+    // outdated maxScrollExtent.
+    const double viewportHeight = 360;
+    const double itemHeight = 60;
+    const double separatorHeight = 8;
+
+    // Building the same widget for the same index on purpose, so that no
+    // existing child needs to be laid out again after the rebuild.
+    Widget buildItem(BuildContext ctx, int index) => const SizedBox(
+          height: itemHeight,
+          child: Center(child: Text('item')),
+        );
+
+    Future<void> testJumpToTheLastIndex(
+      WidgetTester tester, {
+      required bool isSeparated,
+      required double realMaxScrollExtent,
+    }) async {
+      tester.view.physicalSize = const Size(800, viewportHeight);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      final scrollController = ScrollController();
+      final observerController = ListObserverController(
+        controller: scrollController,
+      );
+
+      var itemCount = 20;
+      late StateSetter setStateFn;
+      Widget widget = StatefulBuilder(builder: (context, setState) {
+        setStateFn = setState;
+        return Directionality(
+          textDirection: TextDirection.ltr,
+          child: isSeparated
+              ? ListView.separated(
+                  controller: scrollController,
+                  itemBuilder: buildItem,
+                  separatorBuilder: (ctx, index) =>
+                      const SizedBox(height: separatorHeight),
+                  itemCount: itemCount,
+                )
+              : ListView.builder(
+                  controller: scrollController,
+                  itemBuilder: buildItem,
+                  itemCount: itemCount,
+                ),
+        );
+      });
+      widget = ListViewObserver(
+        child: widget,
+        controller: observerController,
+      );
+      await tester.pumpWidget(widget);
+      await tester.pumpAndSettle();
+
+      final maxScrollExtentBefore = scrollController.position.maxScrollExtent;
+
+      itemCount = 40;
+      setStateFn(() {});
+      await tester.pumpAndSettle();
+
+      // The maxScrollExtent is outdated here, that is the root cause.
+      expect(scrollController.position.maxScrollExtent, maxScrollExtentBefore);
+
+      observerController.jumpTo(index: itemCount - 1, isFixedHeight: true);
+      await tester.pumpAndSettle();
+
+      expect(scrollController.position.maxScrollExtent, realMaxScrollExtent);
+      expect(scrollController.offset, realMaxScrollExtent);
+
+      scrollController.dispose();
+    }
+
+    testWidgets('Jump to the last index in ListView', (tester) async {
+      await testJumpToTheLastIndex(
+        tester,
+        isSeparated: false,
+        realMaxScrollExtent: 40 * itemHeight - viewportHeight,
+      );
+    });
+
+    testWidgets('Jump to the last index in separated ListView', (tester) async {
+      await testJumpToTheLastIndex(
+        tester,
+        isSeparated: true,
+        realMaxScrollExtent:
+            40 * itemHeight + 39 * separatorHeight - viewportHeight,
+      );
+    });
+  });
+
   testWidgets('Check displayPercentage', (tester) async {
     final scrollController = ScrollController();
     final observerController = ListObserverController(

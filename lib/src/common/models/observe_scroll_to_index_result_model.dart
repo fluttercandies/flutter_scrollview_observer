@@ -38,9 +38,18 @@ class ObservePrepareScrollToIndexModel {
   /// The offset of the target child widget on the main axis.
   double targetChildLayoutOffset;
 
+  /// Whether the remaining scrollable extent is enough to scroll to the
+  /// target child widget.
+  ///
+  /// It will be [false] when [calculateTargetLayoutOffset] has been clamped to
+  /// the maximum scrollable offset, which means the target child widget cannot
+  /// be reached by this scrolling.
+  bool isEnoughScroll;
+
   ObservePrepareScrollToIndexModel({
     required this.calculateTargetLayoutOffset,
     required this.precedingScrollExtent,
     required this.targetChildLayoutOffset,
+    this.isEnoughScroll = true,
   });
 }

@@ -5,6 +5,7 @@
  */
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
@@ -248,6 +249,10 @@ mixin ObserverControllerForInfo on ObserverController {
 mixin ObserverControllerForScroll on ObserverControllerForInfo {
   static const Duration _findingDuration = Duration(milliseconds: 1);
   static const Curve _findingCurve = Curves.ease;
+
+  /// The maximum number of times to correct the target offset when the
+  /// scrolling has been clamped by an outdated [SliverGeometry.scrollExtent].
+  static const int _maxScrollToIndexCorrectionCount = 5;
 
   /// Whether to cache the offset when jump to a specified index position.
   /// Defaults to true.
@@ -495,12 +500,17 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
         padding: padding,
         offset: offset,
       );
-      await _scrollTo(
+      await _scrollToWithCorrection(
         isAnimateTo: isAnimateTo,
         duration: duration,
         curve: curve,
         controller: _controller,
+        obj: obj,
         calcResult: calcResult,
+        childSize: targetScrollChildModel.size,
+        alignment: alignment,
+        padding: padding,
+        offset: offset,
         onPrepareScrollToIndex: onPrepareScrollToIndex,
       );
 
@@ -627,12 +637,17 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       offset: offset,
     );
     childLayoutOffset = calcResult.calculateTargetLayoutOffset;
-    await _scrollTo(
+    await _scrollToWithCorrection(
       isAnimateTo: isAnimateTo,
       duration: isAnimateTo ? duration : null,
       curve: isAnimateTo ? curve : null,
       controller: _controller,
+      obj: obj,
       calcResult: calcResult,
+      childSize: childMainAxisSize,
+      alignment: alignment,
+      padding: padding,
+      offset: offset,
       onPrepareScrollToIndex: onPrepareScrollToIndex,
     );
     _handleScrollEnd(context: ctx, completer: completer);
@@ -878,6 +893,85 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
     }
   }
 
+  /// Scrolling to the target offset, then correcting it when the scrolling has
+  /// been clamped by an outdated [SliverGeometry.scrollExtent].
+  ///
+  /// A [RenderSliverMultiBoxAdaptor] may skip its layout phase when the number
+  /// of children changes but none of the existing children needs to be laid
+  /// out again. In that case its [SliverGeometry.scrollExtent] is still the
+  /// old one, so the target offset is clamped to the outdated
+  /// [ScrollPosition.maxScrollExtent] and the target child widget cannot be
+  /// reached.
+  ///
+  /// Fortunately, the scrolling itself changes [ScrollPosition.pixels], which
+  /// makes the sliver receive different [SliverConstraints] and be laid out
+  /// again, so a fresh [SliverGeometry.scrollExtent] is available in the next
+  /// frame. By recalculating and scrolling again until the target offset no
+  /// longer changes, the target child widget can be reached without asking the
+  /// developer to scroll twice.
+  /// https://github.com/fluttercandies/flutter_scrollview_observer/issues/150
+  Future<void> _scrollToWithCorrection({
+    required bool isAnimateTo,
+    required Duration? duration,
+    required Curve? curve,
+    required ScrollController controller,
+    required RenderSliverMultiBoxAdaptor obj,
+    required ObservePrepareScrollToIndexModel calcResult,
+    required double childSize,
+    required double alignment,
+    required EdgeInsets padding,
+    required ObserverLocateIndexOffsetCallback? offset,
+    required ObserverOnPrepareScrollToIndex? onPrepareScrollToIndex,
+  }) async {
+    await _scrollTo(
+      isAnimateTo: isAnimateTo,
+      duration: duration,
+      curve: curve,
+      controller: controller,
+      calcResult: calcResult,
+      onPrepareScrollToIndex: onPrepareScrollToIndex,
+    );
+    // The scrolling has been handled by the developer externally.
+    if (onPrepareScrollToIndex != null) return;
+    var result = calcResult;
+    var lastTargetOffset = result.calculateTargetLayoutOffset;
+    var correctionCount = 0;
+    while (!result.isEnoughScroll &&
+        correctionCount < _maxScrollToIndexCorrectionCount) {
+      correctionCount++;
+      // Waiting for the sliver to be laid out again.
+      await WidgetsBinding.instance.endOfFrame;
+      if (!controller.hasClients || !obj.attached || obj.geometry == null) {
+        return;
+      }
+      // The layout offset of the target child widget never changes, only the
+      // scrollExtent of the sliver does.
+      result = _calculateTargetLayoutOffset(
+        obj: obj,
+        childLayoutOffset: result.targetChildLayoutOffset,
+        childSize: childSize,
+        alignment: alignment,
+        padding: padding,
+        offset: offset,
+      );
+      // The target offset is stable, which means the current offset is already
+      // the real maximum scrollable offset.
+      if ((result.calculateTargetLayoutOffset - lastTargetOffset).abs() <
+          precisionErrorTolerance) {
+        return;
+      }
+      lastTargetOffset = result.calculateTargetLayoutOffset;
+      await _scrollTo(
+        isAnimateTo: isAnimateTo,
+        duration: duration,
+        curve: curve,
+        controller: controller,
+        calcResult: result,
+        onPrepareScrollToIndex: onPrepareScrollToIndex,
+      );
+    }
+  }
+
   /// Getting target safety layout offset for scrolling to index.
   /// This can avoid jitter.
   ObservePrepareScrollToIndexModel _calculateTargetLayoutOffset({
@@ -948,6 +1042,7 @@ mixin ObserverControllerForScroll on ObserverControllerForInfo {
       calculateTargetLayoutOffset: calculateTargetLayoutOffset,
       precedingScrollExtent: precedingScrollExtent,
       targetChildLayoutOffset: childLayoutOffset,
+      isEnoughScroll: isEnoughScroll,
     );
   }
 
