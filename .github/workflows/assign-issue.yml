@@ -4,6 +4,8 @@ on:
   issues:
     types: [opened]
 
+permissions: {}
+
 jobs:
   auto-assign:
     runs-on: ubuntu-latest
@@ -11,7 +13,7 @@ jobs:
       issues: write
     steps:
       - name: 'Auto-assign issue'
-        uses: pozil/auto-assign-issue@v1
+        uses: pozil/auto-assign-issue@65947009a243e6b3993edeef4e64df3ca85d760c # v1.14.0
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           assignees: LinXunFeng
