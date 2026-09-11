@@ -4,12 +4,12 @@
  * @Date: 2023-05-27 11:51:24
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 class AnchorWaterfallPage extends StatefulWidget {
-  const AnchorWaterfallPage({Key? key}) : super(key: key);
+  const AnchorWaterfallPage({super.key});
 
   @override
   State<AnchorWaterfallPage> createState() => _AnchorWaterfallPageState();
@@ -59,16 +59,17 @@ class _AnchorWaterfallPageState extends State<AnchorWaterfallPage>
         ),
       ),
       body: GridViewObserver(
-        child: _buildGridView(),
         controller: observerController,
         customTargetRenderSliverType: (renderObject) {
           return renderObject is RenderSliverWaterfallFlow;
         },
         onObserve: (resultModel) {
           debugPrint(
-              'firstGroupChildIndexList -- ${resultModel.firstGroupChildList.map((e) => e.index).toList()}');
+            'firstGroupChildIndexList -- ${resultModel.firstGroupChildList.map((e) => e.index).toList()}',
+          );
           debugPrint(
-              'displayingChildIndexList -- ${resultModel.displayingChildIndexList}');
+            'displayingChildIndexList -- ${resultModel.displayingChildIndexList}',
+          );
 
           _tabController.index = ObserverUtils.calcAnchorTabIndex(
             observeModel: resultModel,
@@ -76,6 +77,7 @@ class _AnchorWaterfallPageState extends State<AnchorWaterfallPage>
             currentTabIndex: _tabController.index,
           );
         },
+        child: _buildGridView(),
       ),
     );
   }
@@ -92,8 +94,8 @@ class _AnchorWaterfallPageState extends State<AnchorWaterfallPage>
         return Container(
           alignment: Alignment.center,
           color: Colors.teal[100 * (index % 9)],
-          child: Text('grid item $index'),
           height: 50.0 + 100.0 * (index % 9),
+          child: Text('grid item $index'),
         );
       },
       itemCount: 20,

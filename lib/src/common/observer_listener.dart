@@ -6,12 +6,12 @@
 
 import 'dart:collection';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
 import 'package:scrollview_observer/src/common/observer_typedef.dart';
 
-class ObserverListenerEntry<M extends ObserveModel>
+base class ObserverListenerEntry<M extends ObserveModel>
     extends LinkedListEntry<ObserverListenerEntry<M>> {
   ObserverListenerEntry({
     required this.context,

@@ -6,19 +6,20 @@
 
 import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
 import 'package:scrollview_observer/src/common/observer_notification_result.dart';
-import 'package:scrollview_observer/src/common/typedefs.dart';
 import 'package:scrollview_observer/src/listview/models/listview_observe_model.dart';
 
 class ListViewOnceObserveNotificationResult
-    extends CommonOnceObserveNotificationResult<ListViewObserveModel,
-        ObserverHandleContextsResultModel<ListViewObserveModel>> {
+    extends
+        CommonOnceObserveNotificationResult<
+          ListViewObserveModel,
+          ObserverHandleContextsResultModel<ListViewObserveModel>
+        > {
   ListViewOnceObserveNotificationResult({
-    required ObserverWidgetObserveResultType type,
+    required super.type,
     required ObserverHandleContextsResultModel<ListViewObserveModel>
-        observeResult,
+    observeResult,
   }) : super(
-          type: type,
-          observeResult: observeResult.changeResultModel,
-          observeAllResult: observeResult.changeResultMap,
-        );
+         observeResult: observeResult.changeResultModel,
+         observeAllResult: observeResult.changeResultMap,
+       );
 }

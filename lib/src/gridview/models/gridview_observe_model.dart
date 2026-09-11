@@ -11,18 +11,16 @@ import 'package:scrollview_observer/src/gridview/models/gridview_observe_display
 class GridViewObserveModel extends ObserveModel {
   GridViewObserveModel({
     required this.sliverGrid,
-    required RenderViewportBase viewport,
+    required super.viewport,
     required this.firstGroupChildList,
     required this.displayingChildModelList,
     required this.displayingChildModelMap,
-    required bool visible,
+    required super.visible,
   }) : super(
-          visible: visible,
-          sliver: sliverGrid,
-          viewport: viewport,
-          innerDisplayingChildModelList: displayingChildModelList,
-          innerDisplayingChildModelMap: displayingChildModelMap,
-        );
+         sliver: sliverGrid,
+         innerDisplayingChildModelList: displayingChildModelList,
+         innerDisplayingChildModelMap: displayingChildModelMap,
+       );
 
   /// The target sliverGrid.
   RenderSliverMultiBoxAdaptor sliverGrid;
@@ -42,7 +40,9 @@ class GridViewObserveModel extends ObserveModel {
     if (other is GridViewObserveModel) {
       return listEquals(firstGroupChildList, other.firstGroupChildList) &&
           listEquals(
-              displayingChildModelList, other.displayingChildModelList) &&
+            displayingChildModelList,
+            other.displayingChildModelList,
+          ) &&
           mapEquals(displayingChildModelMap, other.displayingChildModelMap);
     } else {
       return false;

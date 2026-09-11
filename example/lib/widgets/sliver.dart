@@ -4,7 +4,7 @@
  * @Date: 2024-05-29 22:20:12
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 typedef SliverHeaderBuilder = Widget Function(
   BuildContext context,
@@ -17,15 +17,15 @@ class SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
     required this.maxHeight,
     this.minHeight = 0,
     required Widget child,
-  })  : builder = ((a, b, c) => child),
-        assert(minHeight <= maxHeight && minHeight >= 0);
+  }) : builder = ((a, b, c) => child),
+       assert(minHeight <= maxHeight && minHeight >= 0);
 
   SliverHeaderDelegate.fixedHeight({
     required double height,
     required Widget child,
-  })  : builder = ((a, b, c) => child),
-        maxHeight = height,
-        minHeight = height;
+  }) : builder = ((a, b, c) => child),
+       maxHeight = height,
+       minHeight = height;
 
   SliverHeaderDelegate.builder({
     required this.maxHeight,

@@ -4,7 +4,7 @@
  * @Date: 2023-10-28 11:35:03
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
 class AzListIndexBar extends StatefulWidget {
@@ -12,20 +12,17 @@ class AzListIndexBar extends StatefulWidget {
 
   final List<String> symbols;
 
-  final void Function(
-    int index,
-    Offset cursorOffset,
-  )? onSelectionUpdate;
+  final void Function(int index, Offset cursorOffset)? onSelectionUpdate;
 
   final void Function()? onSelectionEnd;
 
   const AzListIndexBar({
-    Key? key,
+    super.key,
     required this.parentKey,
     required this.symbols,
     this.onSelectionUpdate,
     this.onSelectionEnd,
-  }) : super(key: key);
+  });
 
   @override
   State<AzListIndexBar> createState() => _AzListIndexBarState();
@@ -41,9 +38,9 @@ class _AzListIndexBarState extends State<AzListIndexBar> {
   @override
   Widget build(BuildContext context) {
     Widget resultWidget = ListViewObserver(
-      child: _buildListView(),
       controller: observerController,
       dynamicLeadingOffset: () => observeOffset,
+      child: _buildListView(),
     );
     resultWidget = GestureDetector(
       onVerticalDragUpdate: _onGestureHandler,
@@ -82,8 +79,8 @@ class _AzListIndexBarState extends State<AzListIndexBar> {
               child: resultWidget,
             );
             resultWidget = Align(
-              child: resultWidget,
               alignment: Alignment.centerLeft,
+              child: resultWidget,
             );
             return resultWidget;
           },
@@ -93,7 +90,7 @@ class _AzListIndexBarState extends State<AzListIndexBar> {
     );
   }
 
-  _onGestureHandler(dynamic details) async {
+  Future<void> _onGestureHandler(dynamic details) async {
     if (details is! DragUpdateDetails && details is! DragDownDetails) return;
     observeOffset = details.localPosition.dy;
 
@@ -119,13 +116,10 @@ class _AzListIndexBarState extends State<AzListIndexBar> {
       firstChildRenderObjOffset.dx,
       firstChildRenderObjOffset.dy + firstChildModel.size.width * 0.5,
     );
-    widget.onSelectionUpdate?.call(
-      firstChildIndex,
-      cursorOffset,
-    );
+    widget.onSelectionUpdate?.call(firstChildIndex, cursorOffset);
   }
 
-  _onGestureEnd([_]) {
+  void _onGestureEnd([_]) {
     selectedIndex.value = -1;
     widget.onSelectionEnd?.call();
   }

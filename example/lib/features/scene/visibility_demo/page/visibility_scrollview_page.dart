@@ -4,13 +4,13 @@
  * @Date: 2023-08-25 23:14:20
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/scene/visibility_demo/mixin/visibility_exposure_mixin.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class VisibilityScrollViewPage extends StatefulWidget {
-  const VisibilityScrollViewPage({Key? key}) : super(key: key);
+  const VisibilityScrollViewPage({super.key});
 
   @override
   State<VisibilityScrollViewPage> createState() =>
@@ -31,12 +31,8 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
     return Scaffold(
       body: SliverViewObserver(
         controller: observerController,
-        child: _buildScrollView(),
         sliverContexts: () {
-          return [
-            if (_sliverListCtx != null) _sliverListCtx!,
-            if (_sliverGridCtx != null) _sliverGridCtx!,
-          ];
+          return [?_sliverListCtx, ?_sliverGridCtx];
         },
         // autoTriggerObserveTypes: const [
         //   ObserverAutoTriggerObserveType.scrollEnd,
@@ -79,6 +75,7 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
             );
           }
         },
+        child: _buildScrollView(),
       ),
     );
   }
@@ -109,30 +106,25 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
 
   Widget _buildSliverListView() {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (ctx, index) {
-          _sliverListCtx ??= ctx;
-          final isEven = index % 2 == 0;
-          final needExpose = index == needExposeIndex;
-          return Container(
-            height: isEven ? 200 : 100,
-            color: needExpose
-                ? Colors.purple
-                : isEven
-                    ? Colors.red
-                    : Colors.black12,
-            child: Center(
-              child: Text(
-                "index -- $index",
-                style: TextStyle(
-                  color: isEven ? Colors.white : Colors.black,
-                ),
-              ),
+      delegate: SliverChildBuilderDelegate((ctx, index) {
+        _sliverListCtx ??= ctx;
+        final isEven = index % 2 == 0;
+        final needExpose = index == needExposeIndex;
+        return Container(
+          height: isEven ? 200 : 100,
+          color: needExpose
+              ? Colors.purple
+              : isEven
+              ? Colors.red
+              : Colors.black12,
+          child: Center(
+            child: Text(
+              "index -- $index",
+              style: TextStyle(color: isEven ? Colors.white : Colors.black),
             ),
-          );
-        },
-        childCount: 10,
-      ),
+          ),
+        );
+      }, childCount: 10),
     );
   }
 
@@ -143,9 +135,7 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
         child: Container(
           height: 200,
           color: Colors.blue,
-          child: const Center(
-            child: Text('Middle Sliver'),
-          ),
+          child: const Center(child: Text('Middle Sliver')),
         ),
       ),
       onVisibilityChanged: (info) {
@@ -164,26 +154,21 @@ class _VisibilityScrollViewPageState extends State<VisibilityScrollViewPage>
         crossAxisSpacing: 10.0,
         childAspectRatio: 2.0,
       ),
-      delegate: SliverChildBuilderDelegate(
-        (BuildContext context, int index) {
-          _sliverGridCtx ??= context;
+      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+        _sliverGridCtx ??= context;
 
-          final needExpose = index == needExposeIndex;
+        final needExpose = index == needExposeIndex;
 
-          return Container(
-            color: needExpose ? Colors.purple : Colors.green,
-            child: Center(
-              child: Text(
-                'index -- $index',
-                style: TextStyle(
-                  color: needExpose ? Colors.white : Colors.black,
-                ),
-              ),
+        return Container(
+          color: needExpose ? Colors.purple : Colors.green,
+          child: Center(
+            child: Text(
+              'index -- $index',
+              style: TextStyle(color: needExpose ? Colors.white : Colors.black),
             ),
-          );
-        },
-        childCount: 20,
-      ),
+          ),
+        );
+      }, childCount: 20),
     );
   }
 }

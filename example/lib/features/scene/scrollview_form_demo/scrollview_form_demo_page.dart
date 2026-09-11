@@ -4,12 +4,12 @@
  * @Date: 2023-08-10 22:35:59
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/utils/random.dart';
 
 class ScrollViewFormDemoPage extends StatefulWidget {
-  const ScrollViewFormDemoPage({Key? key}) : super(key: key);
+  const ScrollViewFormDemoPage({super.key});
 
   @override
   State<ScrollViewFormDemoPage> createState() => _ScrollViewFormDemoPageState();
@@ -35,7 +35,7 @@ class _ScrollViewFormDemoPageState extends State<ScrollViewFormDemoPage> {
     'photo-1556799483-e642a45aeb68',
   ];
 
-  handleFormFocus() async {
+  Future<void> handleFormFocus() async {
     if (!formFocusNode.hasFocus) return;
     // Wait for the keyboard to fully display.
     await Future.delayed(const Duration(milliseconds: 600));
@@ -47,10 +47,10 @@ class _ScrollViewFormDemoPageState extends State<ScrollViewFormDemoPage> {
     if (!result.isSuccess) return;
 
     // Find the observation result for the form item.
-    final formResultModel =
-        result.observeResult?.displayingChildModelList.firstWhere((element) {
-      return element.index == formIndex;
-    });
+    final formResultModel = result.observeResult?.displayingChildModelList
+        .firstWhere((element) {
+          return element.index == formIndex;
+        });
     if (formResultModel == null) return;
     // Let the bottom of the form item view be fully displayed.
     observerController.controller?.animateTo(
@@ -109,14 +109,9 @@ class _ScrollViewFormDemoPageState extends State<ScrollViewFormDemoPage> {
         children: <Widget>[
           const Text(
             'Feedback',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          TextField(
-            focusNode: formFocusNode,
-          ),
+          TextField(focusNode: formFocusNode),
           Container(
             width: double.infinity,
             color: Colors.white,
@@ -151,7 +146,7 @@ class _ScrollViewFormDemoPageState extends State<ScrollViewFormDemoPage> {
           child: CircularProgressIndicator(
             value: loadingProgress.expectedTotalBytes != null
                 ? loadingProgress.cumulativeBytesLoaded /
-                    loadingProgress.expectedTotalBytes!
+                      loadingProgress.expectedTotalBytes!
                 : null,
           ),
         );
@@ -165,8 +160,6 @@ class _ScrollViewFormDemoPageState extends State<ScrollViewFormDemoPage> {
   }
 
   String _fetchImgUrl() {
-    return 'https://images.unsplash.com/' +
-        imgUrlList[RandomTool.genInt(max: imgUrlList.length)] +
-        '?auto=format&fit=crop&w=375&q=100';
+    return 'https://images.unsplash.com/${imgUrlList[RandomTool.genInt(max: imgUrlList.length)]}?auto=format&fit=crop&w=375&q=100';
   }
 }

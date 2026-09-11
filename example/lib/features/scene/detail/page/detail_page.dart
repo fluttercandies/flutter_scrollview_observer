@@ -4,8 +4,8 @@
  * @Date: 2025-08-02 19:57:05
  */
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get/get.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 import 'package:scrollview_observer_example/features/scene/detail/logic/detail_logic.dart';
@@ -40,18 +40,13 @@ class DetailPageState extends State<DetailPage>
       tag: logicTag,
       assignId: true,
       builder: (_) {
-        return Scaffold(
-          appBar: _buildAppBar(),
-          body: _buildBody(),
-        );
+        return Scaffold(appBar: _buildAppBar(), body: _buildBody());
       },
     );
   }
 
   AppBar _buildAppBar() {
-    return AppBar(
-      title: const Text('Detail Page'),
-    );
+    return AppBar(title: const Text('Detail Page'));
   }
 
   Widget _buildBody() {
@@ -61,12 +56,7 @@ class DetailPageState extends State<DetailPage>
     return Stack(
       children: [
         const DetailListView(),
-        const Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          child: DetailNavBar(),
-        ),
+        const Positioned(top: 0, left: 0, right: 0, child: DetailNavBar()),
         _buildLoading(),
       ],
     );

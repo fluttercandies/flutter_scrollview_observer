@@ -4,7 +4,7 @@
  * @Date: 2025-08-02 21:32:39
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 import 'package:scrollview_observer_example/features/scene/detail/widget/detail_list_item_wrapper.dart';
 
@@ -68,9 +68,7 @@ class _DetailListModule7State extends State<DetailListModule7>
     resultWidget = Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: resultWidget,
     );
     return resultWidget;
@@ -89,20 +87,14 @@ class _DetailListModule7State extends State<DetailListModule7>
   Widget _buildListItemProgress(double progress) {
     return Text(
       '${(progress * 100).toInt()}% Done',
-      style: const TextStyle(
-        color: Colors.grey,
-        fontSize: 14,
-      ),
+      style: const TextStyle(color: Colors.grey, fontSize: 14),
     );
   }
 
   Widget _buildListItemTitle(int index) {
     return Text(
       'Task ${index + 1}: Data Sync',
-      style: const TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-      ),
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
     );
   }
 }

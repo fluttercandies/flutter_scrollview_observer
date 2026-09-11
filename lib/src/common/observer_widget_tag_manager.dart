@@ -4,15 +4,12 @@
  * @Date: 2024-11-03 14:40:40
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class ObserverWidgetTagManager extends InheritedWidget {
   final Map<String, BuildContext> _tagMap = {};
 
-  ObserverWidgetTagManager({
-    Key? key,
-    required Widget child,
-  }) : super(key: key, child: child);
+  ObserverWidgetTagManager({super.key, required super.child});
 
   /// Getting the [ObserverWidgetTagManager] instance.
   ///
@@ -23,10 +20,7 @@ class ObserverWidgetTagManager extends InheritedWidget {
   }
 
   /// Setting the tag and context.
-  void set(
-    String tag,
-    BuildContext context,
-  ) {
+  void set(String tag, BuildContext context) {
     _tagMap[tag] = context;
   }
 
@@ -36,9 +30,7 @@ class ObserverWidgetTagManager extends InheritedWidget {
   }
 
   /// Getting the context by tag.
-  BuildContext? context(
-    String tag,
-  ) {
+  BuildContext? context(String tag) {
     return _tagMap[tag];
   }
 

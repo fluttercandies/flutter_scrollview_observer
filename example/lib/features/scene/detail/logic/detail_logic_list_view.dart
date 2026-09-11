@@ -4,7 +4,7 @@
  * @Date: 2025-08-03 21:02:30
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/common/route/route.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
@@ -37,9 +37,7 @@ extension DetailLogicForListView on DetailLogic {
   }
 
   void initIndexPositionForListView() {
-    final defaultIndexModel = ObserverIndexPositionModel(
-      index: 0,
-    );
+    final defaultIndexModel = ObserverIndexPositionModel(index: 0);
     ObserverIndexPositionModel indexModel = defaultIndexModel;
 
     () {
@@ -75,9 +73,7 @@ extension DetailLogicForListView on DetailLogic {
   }
 
   /// When updating the module widget, keep the current position unchanged.
-  void updateAndKeepPositionForListView([
-    List<Object>? ids,
-  ]) {
+  void updateAndKeepPositionForListView([List<Object>? ids]) {
     () async {
       final result = await state.observerController.dispatchOnceObserve(
         isForce: true,
@@ -115,8 +111,10 @@ extension DetailLogicForListView on DetailLogic {
       // update([DetailUpdateType.module3]);
       updateAndKeepPositionForListView([DetailUpdateType.module3]);
       checkAnchorForListView(DetailModuleType.module3);
+      final context = NavigationService.context;
+      if (!context.mounted) return;
       SnackBarUtil.showSnackBar(
-        context: NavigationService.context,
+        context: context,
         text: 'Module3 has been displayed',
       );
     });
@@ -127,8 +125,10 @@ extension DetailLogicForListView on DetailLogic {
       // update([DetailUpdateType.module6]);
       updateAndKeepPositionForListView([DetailUpdateType.module6]);
       checkAnchorForListView(DetailModuleType.module6);
+      final context = NavigationService.context;
+      if (!context.mounted) return;
       SnackBarUtil.showSnackBar(
-        context: NavigationService.context,
+        context: context,
         text: 'Module6 has been displayed',
       );
     });

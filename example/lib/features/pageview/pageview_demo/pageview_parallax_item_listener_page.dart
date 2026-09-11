@@ -4,13 +4,13 @@
  * @Date: 2024-11-14 22:41:51
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:scrollview_observer/scrollview_observer.dart';
 
 class PageViewParallaxItemListenerPage extends StatefulWidget {
-  const PageViewParallaxItemListenerPage({Key? key}) : super(key: key);
+  const PageViewParallaxItemListenerPage({super.key});
 
   @override
   State<PageViewParallaxItemListenerPage> createState() =>
@@ -21,21 +21,24 @@ class _PageViewParallaxItemListenerPageState
     extends State<PageViewParallaxItemListenerPage> {
   late PageController pageController;
 
-  List<String> pageItemBgPicList = [
-    '11898897',
-    '26653530',
-    '12974784',
-    '943459',
-    '4424178',
-    '20433037',
-    '4424137',
-    '4955810',
-    '4424137',
-    '18847956',
-  ]
-      .map((id) =>
-          'https://images.pexels.com/photos/$id/pexels-photo-$id.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')
-      .toList();
+  List<String> pageItemBgPicList =
+      [
+            '11898897',
+            '26653530',
+            '12974784',
+            '943459',
+            '4424178',
+            '20433037',
+            '4424137',
+            '4955810',
+            '4424137',
+            '18847956',
+          ]
+          .map(
+            (id) =>
+                'https://images.pexels.com/photos/$id/pexels-photo-$id.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+          )
+          .toList();
 
   int get pageItemCount => pageItemBgPicList.length;
 
@@ -46,16 +49,10 @@ class _PageViewParallaxItemListenerPageState
   @override
   void initState() {
     super.initState();
-    pageController = PageController(
-      initialPage: 4,
-      viewportFraction: 0.9,
-    );
-    pageItemBgPicAlignmentXList = List.generate(
-      pageItemCount,
-      (index) {
-        return ValueNotifier<double>(0);
-      },
-    );
+    pageController = PageController(initialPage: 4, viewportFraction: 0.9);
+    pageItemBgPicAlignmentXList = List.generate(pageItemCount, (index) {
+      return ValueNotifier<double>(0);
+    });
 
     Future.delayed(const Duration(milliseconds: 100)).then((_) {
       observerController.dispatchOnceObserve();
@@ -78,24 +75,17 @@ class _PageViewParallaxItemListenerPageState
       appBar: AppBar(
         title: const Text(
           "PageView - Parallax",
-          style: TextStyle(
-            color: Colors.white,
-          ),
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.black87,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
       ),
-      body: Center(
-        child: _buildPageView(),
-      ),
+      body: Center(child: _buildPageView()),
     );
   }
 
@@ -104,24 +94,22 @@ class _PageViewParallaxItemListenerPageState
       controller: pageController,
       itemBuilder: (context, index) {
         // return _buildPageItem(index);
-        return ParallaxItemView(
-          index: index,
-          imgUrl: pageItemBgPicList[index],
-        );
+        return ParallaxItemView(index: index, imgUrl: pageItemBgPicList[index]);
       },
       itemCount: pageItemCount,
     );
     resultWidget = ListViewObserver(
       controller: observerController,
-      child: resultWidget,
       triggerOnObserveType: ObserverTriggerOnObserveType.directly,
       customTargetRenderSliverType: (renderObj) {
         return renderObj is RenderSliverFillViewport;
       },
+      child: resultWidget,
     );
 
     resultWidget = SizedBox(
-      height: (MediaQuery.sizeOf(context).height -
+      height:
+          (MediaQuery.sizeOf(context).height -
               MediaQuery.paddingOf(context).top -
               kToolbarHeight) *
           0.8,
@@ -136,10 +124,10 @@ class ParallaxItemView extends StatefulWidget {
   final String imgUrl;
 
   const ParallaxItemView({
-    Key? key,
+    super.key,
     required this.index,
     required this.imgUrl,
-  }) : super(key: key);
+  });
 
   @override
   State<ParallaxItemView> createState() => _ParallaxItemViewState();
@@ -156,9 +144,7 @@ class _ParallaxItemViewState extends State<ParallaxItemView> {
 
     removeListener();
     observerState = ListViewObserver.of(context)
-      ..addListener(
-        onObserve: handleObserverResult,
-      );
+      ..addListener(onObserve: handleObserverResult);
   }
 
   @override
@@ -169,15 +155,11 @@ class _ParallaxItemViewState extends State<ParallaxItemView> {
   }
 
   void removeListener() {
-    observerState?.removeListener(
-      onObserve: handleObserverResult,
-    );
+    observerState?.removeListener(onObserve: handleObserverResult);
     observerState = null;
   }
 
-  void handleObserverResult(
-    ListViewObserveModel result,
-  ) {
+  void handleObserverResult(ListViewObserveModel result) {
     if (result.displayingChildModelMap.isEmpty) return;
     final model = result.displayingChildModelMap[widget.index];
     if (model == null) {

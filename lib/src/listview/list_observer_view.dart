@@ -3,10 +3,9 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 
-import 'package:scrollview_observer/src/common/observer_typedef.dart';
 import 'package:scrollview_observer/src/common/observer_widget.dart';
 import 'package:scrollview_observer/src/listview/models/listview_observe_model.dart';
 import 'package:scrollview_observer/src/notification.dart';
@@ -14,50 +13,36 @@ import 'package:scrollview_observer/src/observer_core.dart';
 
 import 'list_observer_controller.dart';
 
-class ListViewObserver extends ObserverWidget<ListObserverController,
-    ListViewObserveModel, ListViewOnceObserveNotification> {
+class ListViewObserver
+    extends
+        ObserverWidget<
+          ListObserverController,
+          ListViewObserveModel,
+          ListViewOnceObserveNotification
+        > {
   /// The callback of getting all sliverList's buildContext.
   final List<BuildContext> Function()? sliverListContexts;
 
   final ListObserverController? controller;
 
   const ListViewObserver({
-    Key? key,
-    required Widget child,
-    String? tag,
+    super.key,
+    required super.child,
+    super.tag,
     this.controller,
     this.sliverListContexts,
-    OnObserveAllCallback<ListViewObserveModel>? onObserveAll,
-    OnObserveCallback<ListViewObserveModel>? onObserve,
-    double leadingOffset = 0,
-    double Function()? dynamicLeadingOffset,
-    double toNextOverPercent = 1,
-    ScrollNotificationPredicate? scrollNotificationPredicate,
-    List<ObserverAutoTriggerObserveType>? autoTriggerObserveTypes,
-    ObserverTriggerOnObserveType triggerOnObserveType =
-        ObserverTriggerOnObserveType.displayingItemsChange,
-    ListViewObserveModel? Function(BuildContext context)? customHandleObserve,
-    bool Function(RenderObject?)? customTargetRenderSliverType,
-    bool cancelOnceObserveNotificationBubbling = true,
-  }) : super(
-          key: key,
-          child: child,
-          tag: tag,
-          sliverController: controller,
-          sliverContexts: sliverListContexts,
-          onObserveAll: onObserveAll,
-          onObserve: onObserve,
-          leadingOffset: leadingOffset,
-          dynamicLeadingOffset: dynamicLeadingOffset,
-          toNextOverPercent: toNextOverPercent,
-          scrollNotificationPredicate: scrollNotificationPredicate,
-          autoTriggerObserveTypes: autoTriggerObserveTypes,
-          triggerOnObserveType: triggerOnObserveType,
-          customHandleObserve: customHandleObserve,
-          customTargetRenderSliverType: customTargetRenderSliverType,
-          cancelOnceObserveNotificationBubbling:
-              cancelOnceObserveNotificationBubbling,
-        );
+    super.onObserveAll,
+    super.onObserve,
+    super.leadingOffset,
+    super.dynamicLeadingOffset,
+    super.toNextOverPercent,
+    super.scrollNotificationPredicate,
+    super.autoTriggerObserveTypes,
+    super.triggerOnObserveType,
+    super.customHandleObserve,
+    super.customTargetRenderSliverType,
+    super.cancelOnceObserveNotificationBubbling,
+  }) : super(sliverController: controller, sliverContexts: sliverListContexts);
 
   @override
   State<ListViewObserver> createState() => ListViewObserverState();
@@ -77,20 +62,16 @@ class ListViewObserver extends ObserverWidget<ListObserverController,
   ///
   /// * [ListViewObserver.of], which is similar to this method, but asserts if no
   ///   [ListViewObserver] instance is found.
-  static ListViewObserverState? maybeOf(
-    BuildContext context, {
-    String? tag,
-  }) {
-    final _state = ObserverWidget.maybeOf<
-        ListObserverController,
-        ListViewObserveModel,
-        ListViewOnceObserveNotification,
-        ListViewObserver>(
-      context,
-      tag: tag,
-    );
-    if (_state is! ListViewObserverState) return null;
-    return _state;
+  static ListViewObserverState? maybeOf(BuildContext context, {String? tag}) {
+    final state =
+        ObserverWidget.maybeOf<
+          ListObserverController,
+          ListViewObserveModel,
+          ListViewOnceObserveNotification,
+          ListViewObserver
+        >(context, tag: tag);
+    if (state is! ListViewObserverState) return null;
+    return state;
   }
 
   /// Returning the closest instance of this class that encloses the given
@@ -109,19 +90,15 @@ class ListViewObserver extends ObserverWidget<ListObserverController,
   ///
   /// * [ObserverWidget.maybeOf], which is similar to this method, but returns
   ///   null if no [ObserverWidget] instance is found.
-  static ListViewObserverState of(
-    BuildContext context, {
-    String? tag,
-  }) {
-    final _state = ObserverWidget.of<
-        ListObserverController,
-        ListViewObserveModel,
-        ListViewOnceObserveNotification,
-        ListViewObserver>(
-      context,
-      tag: tag,
-    );
-    return _state as ListViewObserverState;
+  static ListViewObserverState of(BuildContext context, {String? tag}) {
+    final state =
+        ObserverWidget.of<
+          ListObserverController,
+          ListViewObserveModel,
+          ListViewOnceObserveNotification,
+          ListViewObserver
+        >(context, tag: tag);
+    return state as ListViewObserverState;
   }
 
   /// Determine whether the [obj] is a supported RenderSliver type.
@@ -140,8 +117,14 @@ class ListViewObserver extends ObserverWidget<ListObserverController,
   }
 }
 
-class ListViewObserverState extends ObserverWidgetState<ListObserverController,
-    ListViewObserveModel, ListViewOnceObserveNotification, ListViewObserver> {
+class ListViewObserverState
+    extends
+        ObserverWidgetState<
+          ListObserverController,
+          ListViewObserveModel,
+          ListViewOnceObserveNotification,
+          ListViewObserver
+        > {
   @override
   ListViewObserveModel? handleObserve(BuildContext ctx) {
     if (widget.customHandleObserve != null) {

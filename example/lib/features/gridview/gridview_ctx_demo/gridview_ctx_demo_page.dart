@@ -3,12 +3,12 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
 
 class GridViewCtxDemoPage extends StatefulWidget {
-  const GridViewCtxDemoPage({Key? key}) : super(key: key);
+  const GridViewCtxDemoPage({super.key});
 
   @override
   State<GridViewCtxDemoPage> createState() => _GridViewCtxDemoPageState();
@@ -35,7 +35,7 @@ class _GridViewCtxDemoPageState extends State<GridViewCtxDemoPage> {
       appBar: AppBar(title: const Text("GridView")),
       body: GridViewObserver(
         sliverGridContexts: () {
-          return [if (_sliverGridViewContext != null) _sliverGridViewContext!];
+          return [?_sliverGridViewContext];
         },
         onObserveAll: (resultMap) {
           final model = resultMap[_sliverGridViewContext];
@@ -45,7 +45,8 @@ class _GridViewCtxDemoPageState extends State<GridViewCtxDemoPage> {
           });
 
           debugPrint(
-              'firstGroupChildList -- ${model.firstGroupChildList.map((e) => e.index)}');
+            'firstGroupChildList -- ${model.firstGroupChildList.map((e) => e.index)}',
+          );
           debugPrint('displaying -- ${model.displayingChildIndexList}');
         },
         child: _buildGridView(),
@@ -74,9 +75,7 @@ class _GridViewCtxDemoPageState extends State<GridViewCtxDemoPage> {
         }
         return Container(
           color: (_hitIndexs.contains(index)) ? Colors.red : Colors.blue[100],
-          child: Center(
-            child: Text('index -- $index'),
-          ),
+          child: Center(child: Text('index -- $index')),
         );
       },
       itemCount: 50,

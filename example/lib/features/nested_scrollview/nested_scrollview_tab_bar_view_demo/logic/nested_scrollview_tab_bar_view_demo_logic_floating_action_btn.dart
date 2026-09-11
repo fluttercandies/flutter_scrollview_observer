@@ -12,9 +12,7 @@ import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 extension NestedScrollViewTabBarViewDemoLogicForFAB
     on NestedScrollViewTabBarViewDemoLogic {
-  void handleFABClick(
-    NestedScrollviewTabBarViewDemoFABClickType type,
-  ) {
+  void handleFABClick(NestedScrollviewTabBarViewDemoFABClickType type) {
     final context = state.rootContext;
     if (context == null) return;
 

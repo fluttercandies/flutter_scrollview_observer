@@ -12,18 +12,16 @@ import 'listview_observe_displaying_child_model.dart';
 class ListViewObserveModel extends ObserveModel {
   ListViewObserveModel({
     required this.sliverList,
-    required RenderViewportBase viewport,
+    required super.viewport,
     required this.firstChild,
     required this.displayingChildModelList,
     required this.displayingChildModelMap,
-    required bool visible,
+    required super.visible,
   }) : super(
-          visible: visible,
-          sliver: sliverList,
-          viewport: viewport,
-          innerDisplayingChildModelList: displayingChildModelList,
-          innerDisplayingChildModelMap: displayingChildModelMap,
-        );
+         sliver: sliverList,
+         innerDisplayingChildModelList: displayingChildModelList,
+         innerDisplayingChildModelMap: displayingChildModelMap,
+       );
 
   /// The target sliverList.
   /// It would be [RenderSliverList] or [RenderSliverFixedExtentList].
@@ -44,7 +42,9 @@ class ListViewObserveModel extends ObserveModel {
     if (other is ListViewObserveModel) {
       return firstChild == other.firstChild &&
           listEquals(
-              displayingChildModelList, other.displayingChildModelList) &&
+            displayingChildModelList,
+            other.displayingChildModelList,
+          ) &&
           mapEquals(displayingChildModelMap, other.displayingChildModelMap);
     } else {
       return false;

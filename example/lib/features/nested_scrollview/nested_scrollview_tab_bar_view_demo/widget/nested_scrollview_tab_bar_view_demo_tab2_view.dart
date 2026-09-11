@@ -4,7 +4,7 @@
  * @Date: 2026-02-24 22:33:19
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get/get.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/header/nested_scrollview_tab_bar_view_demo_header.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/logic/nested_scrollview_tab_bar_view_demo_logic.dart';
@@ -23,7 +23,8 @@ class _NestedScrollviewTabBarViewDemoTab2ViewState
     extends State<NestedScrollviewTabBarViewDemoTab2View>
     with
         NestedScrollviewTabBarViewDemoLogicConsumerMixin<
-            NestedScrollviewTabBarViewDemoTab2View> {
+          NestedScrollviewTabBarViewDemoTab2View
+        > {
   NestedScrollViewTabBarViewDemoState get state => logic.state;
 
   @override
@@ -40,9 +41,7 @@ class _NestedScrollviewTabBarViewDemoTab2ViewState
   Widget _buildBody() {
     return CustomScrollView(
       key: const PageStorageKey("tab2"),
-      slivers: [
-        _buildSliverGrid(),
-      ],
+      slivers: [_buildSliverGrid()],
     );
   }
 
@@ -54,26 +53,23 @@ class _NestedScrollviewTabBarViewDemoTab2ViewState
         crossAxisSpacing: 10.0,
         childAspectRatio: 2.0,
       ),
-      delegate: SliverChildBuilderDelegate(
-        (ctx, index) {
-          logic.updateNestedScrollUtilBodySliverContextsIfNeed(
-            oldCtx: state.tab2SliverGridCtx,
-            newCtx: ctx,
-            toRecordCtx: () {
-              state.tab2SliverGridCtx = ctx;
-            },
-          );
+      delegate: SliverChildBuilderDelegate((ctx, index) {
+        logic.updateNestedScrollUtilBodySliverContextsIfNeed(
+          oldCtx: state.tab2SliverGridCtx,
+          newCtx: ctx,
+          toRecordCtx: () {
+            state.tab2SliverGridCtx = ctx;
+          },
+        );
 
-          return Container(
-            color: state.hitIndexesForTab2Grid.contains(index)
-                ? Colors.green
-                : Colors.blue[100],
-            alignment: Alignment.center,
-            child: Text('Tab 2 - Grid Item $index'),
-          );
-        },
-        childCount: 30,
-      ),
+        return Container(
+          color: state.hitIndexesForTab2Grid.contains(index)
+              ? Colors.green
+              : Colors.blue[100],
+          alignment: Alignment.center,
+          child: Text('Tab 2 - Grid Item $index'),
+        );
+      }, childCount: 30),
     );
     resultWidget = SliverPadding(
       padding: const EdgeInsets.all(8),

@@ -4,18 +4,14 @@
  * @Date: 2025-08-03 15:07:52
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 
 class DetailListItemWrapper extends StatefulWidget {
   final String? title;
   final Widget child;
 
-  const DetailListItemWrapper({
-    super.key,
-    required this.child,
-    this.title,
-  });
+  const DetailListItemWrapper({super.key, required this.child, this.title});
 
   @override
   State<DetailListItemWrapper> createState() => _DetailListItemWrapperState();
@@ -29,11 +25,7 @@ class _DetailListItemWrapperState extends State<DetailListItemWrapper>
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildTitle(),
-        widget.child,
-        const SizedBox(height: 10),
-      ],
+      children: [_buildTitle(), widget.child, const SizedBox(height: 10)],
     );
   }
 
@@ -45,11 +37,7 @@ class _DetailListItemWrapperState extends State<DetailListItemWrapper>
       style: Theme.of(context).textTheme.titleLarge,
     );
     resultWidget = Padding(
-      padding: const EdgeInsets.only(
-        top: 16,
-        left: 8,
-        bottom: 8,
-      ),
+      padding: const EdgeInsets.only(top: 16, left: 8, bottom: 8),
       child: resultWidget,
     );
     return resultWidget;

@@ -4,7 +4,7 @@
  * @Date: 2025-08-02 21:32:17
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 import 'package:scrollview_observer_example/features/scene/detail/widget/detail_list_item_wrapper.dart';
 
@@ -20,9 +20,7 @@ class _DetailListModule1State extends State<DetailListModule1>
   @override
   Widget build(BuildContext context) {
     Widget resultWidget = _buildPageView();
-    resultWidget = DetailListItemWrapper(
-      child: resultWidget,
-    );
+    resultWidget = DetailListItemWrapper(child: resultWidget);
     return resultWidget;
   }
 
@@ -33,10 +31,7 @@ class _DetailListModule1State extends State<DetailListModule1>
         return _buildPageItem(index);
       },
     );
-    resultWidget = SizedBox(
-      height: 200,
-      child: resultWidget,
-    );
+    resultWidget = SizedBox(height: 200, child: resultWidget);
     return resultWidget;
   }
 
@@ -44,11 +39,7 @@ class _DetailListModule1State extends State<DetailListModule1>
     Widget resultWidget = Stack(
       children: [
         _buildPageItemBody(index),
-        Positioned(
-          top: 16,
-          right: 16,
-          child: _buildPageItemIndex(index),
-        ),
+        Positioned(top: 16, right: 16, child: _buildPageItemIndex(index)),
       ],
     );
     resultWidget = Container(
@@ -109,16 +100,10 @@ class _DetailListModule1State extends State<DetailListModule1>
   Widget _buildPageItemIndex(int index) {
     Widget resultWidget = Text(
       '${index + 1}/5',
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 12,
-      ),
+      style: const TextStyle(color: Colors.white, fontSize: 12),
     );
     resultWidget = Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 4,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.black,
         borderRadius: BorderRadius.circular(8),

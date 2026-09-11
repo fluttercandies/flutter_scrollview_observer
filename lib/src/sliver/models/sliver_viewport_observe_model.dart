@@ -17,7 +17,7 @@ class SliverViewportObserveModel {
 
   /// Stores observing model list of displaying children widgets.
   final List<SliverViewportObserveDisplayingChildModel>
-      displayingChildModelList;
+  displayingChildModelList;
 
   SliverViewportObserveModel({
     required this.viewport,

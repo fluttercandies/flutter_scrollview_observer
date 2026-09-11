@@ -4,7 +4,7 @@
  * @Date: 2024-05-29 22:22:07
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class SlideAnimation extends StatelessWidget {
   final Curve curve;
@@ -18,15 +18,14 @@ class SlideAnimation extends StatelessWidget {
   final AnimationController controller;
 
   const SlideAnimation({
-    Key? key,
+    super.key,
     this.curve = Curves.ease,
     required this.controller,
     double? verticalOffset,
     double? horizontalOffset,
     required this.child,
-  })  : verticalOffset = verticalOffset ?? 0.0,
-        horizontalOffset = horizontalOffset ?? 0.0,
-        super(key: key);
+  }) : verticalOffset = verticalOffset ?? 0.0,
+       horizontalOffset = horizontalOffset ?? 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -72,11 +71,11 @@ class FadeInAnimation extends StatelessWidget {
   final AnimationController controller;
 
   const FadeInAnimation({
-    Key? key,
+    super.key,
     this.curve = Curves.ease,
     required this.controller,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -95,10 +94,7 @@ class FadeInAnimation extends StatelessWidget {
       ),
     );
 
-    return Opacity(
-      opacity: opacityAnimation.value,
-      child: child,
-    );
+    return Opacity(opacity: opacityAnimation.value, child: child);
   }
 }
 
@@ -112,10 +108,10 @@ class AnimationExecutor extends StatefulWidget {
   final AnimationController controller;
 
   const AnimationExecutor({
-    Key? key,
+    super.key,
     required this.builder,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   State<AnimationExecutor> createState() => _AnimationExecutorState();

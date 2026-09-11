@@ -4,7 +4,7 @@
  * @Date: 2025-08-03 21:08:34
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/features/scene/detail/model/detail_nav_bar_tab_model.dart';
 
 mixin DetailStateForNavBar {

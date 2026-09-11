@@ -3,13 +3,13 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
 import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class ListViewFixedHeightDemoPage extends StatefulWidget {
-  const ListViewFixedHeightDemoPage({Key? key}) : super(key: key);
+  const ListViewFixedHeightDemoPage({super.key});
 
   @override
   State<ListViewFixedHeightDemoPage> createState() =>
@@ -20,8 +20,9 @@ class _ListViewFixedHeightDemoPageState
     extends State<ListViewFixedHeightDemoPage> {
   int _hitIndex = 0;
 
-  ScrollController scrollController =
-      ScrollController(initialScrollOffset: 1000);
+  ScrollController scrollController = ScrollController(
+    initialScrollOffset: 1000,
+  );
 
   late ListObserverController observerController;
 
@@ -36,14 +37,12 @@ class _ListViewFixedHeightDemoPageState
       );
 
     // Trigger an observation manually
-    ambiguate(WidgetsBinding.instance)?.endOfFrame.then(
-      (_) {
-        // After layout
-        if (mounted) {
-          observerController.dispatchOnceObserve();
-        }
-      },
-    );
+    ambiguate(WidgetsBinding.instance)?.endOfFrame.then((_) {
+      // After layout
+      if (mounted) {
+        observerController.dispatchOnceObserve();
+      }
+    });
   }
 
   @override
@@ -57,7 +56,6 @@ class _ListViewFixedHeightDemoPageState
     return Scaffold(
       appBar: AppBar(title: const Text("ListView")),
       body: ListViewObserver(
-        child: _buildListView(),
         controller: observerController,
         onObserve: (resultModel) {
           // print('visible -- ${resultModel.visible}');
@@ -74,20 +72,19 @@ class _ListViewFixedHeightDemoPageState
 
           for (var item in resultModel.displayingChildModelList) {
             debugPrint(
-                'item - ${item.index} - ${item.leadingMarginToViewport} - ${item.trailingMarginToViewport}');
+              'item - ${item.index} - ${item.leadingMarginToViewport} - ${item.trailingMarginToViewport}',
+            );
           }
           setState(() {
             _hitIndex = resultModel.firstChild?.index ?? 0;
           });
         },
+        child: _buildListView(),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.airline_stops_outlined),
         onPressed: () {
-          SnackBarUtil.showSnackBar(
-            context: context,
-            text: 'Jump to row 100',
-          );
+          SnackBarUtil.showSnackBar(context: context, text: 'Jump to row 100');
           observerController.jumpTo(index: 100, isFixedHeight: true);
           // observerController.animateTo(
           //   index: 100,
@@ -130,9 +127,6 @@ class _ListViewFixedHeightDemoPageState
   }
 
   Container _buildSeparatorView() {
-    return Container(
-      color: Colors.white,
-      height: 5,
-    );
+    return Container(color: Colors.white, height: 5);
   }
 }

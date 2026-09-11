@@ -4,17 +4,17 @@
  * @Date: 2022-09-27 22:46:36
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/model/chat_model.dart';
 
 class ChatItemWidget extends StatelessWidget {
   const ChatItemWidget({
-    Key? key,
+    super.key,
     required this.chatModel,
     required this.index,
     required this.itemCount,
     this.onRemove,
-  }) : super(key: key);
+  });
 
   final ChatModel chatModel;
   final int index;
@@ -37,12 +37,7 @@ class ChatItemWidget extends StatelessWidget {
             color: isOwn ? Colors.blue : Colors.white30,
           ),
           child: Center(
-            child: Text(
-              nickName,
-              style: const TextStyle(
-                color: Colors.white,
-              ),
-            ),
+            child: Text(nickName, style: const TextStyle(color: Colors.white)),
           ),
         ),
         const SizedBox(width: 10),
@@ -68,12 +63,7 @@ class ChatItemWidget extends StatelessWidget {
         const SizedBox(width: 50),
       ],
     );
-    resultWidget = Column(
-      children: [
-        resultWidget,
-        const SizedBox(height: 15),
-      ],
-    );
+    resultWidget = Column(children: [resultWidget, const SizedBox(height: 15)]);
     resultWidget = Dismissible(
       key: UniqueKey(),
       child: resultWidget,

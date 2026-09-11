@@ -4,7 +4,7 @@
  * @Date: 2026-02-24 23:03:32
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get/get.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/header/nested_scrollview_tab_bar_view_demo_header.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/logic/nested_scrollview_tab_bar_view_demo_logic.dart';
@@ -23,7 +23,8 @@ class _NestedScrollviewTabBarViewDemoHeaderListSliverState
     extends State<NestedScrollviewTabBarViewDemoHeaderListSliver>
     with
         NestedScrollviewTabBarViewDemoLogicConsumerMixin<
-            NestedScrollviewTabBarViewDemoHeaderListSliver> {
+          NestedScrollviewTabBarViewDemoHeaderListSliver
+        > {
   NestedScrollViewTabBarViewDemoState get state => logic.state;
 
   @override
@@ -39,27 +40,24 @@ class _NestedScrollviewTabBarViewDemoHeaderListSliverState
 
   Widget _buildSliverList() {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (ctx, index) {
-          logic.updateNestedScrollUtilHeaderSliverContextsIfNeed(
-            oldCtx: state.headerSliverListCtx,
-            newCtx: ctx,
-            toRecordCtx: () {
-              state.headerSliverListCtx = ctx;
-            },
-          );
+      delegate: SliverChildBuilderDelegate((ctx, index) {
+        logic.updateNestedScrollUtilHeaderSliverContextsIfNeed(
+          oldCtx: state.headerSliverListCtx,
+          newCtx: ctx,
+          toRecordCtx: () {
+            state.headerSliverListCtx = ctx;
+          },
+        );
 
-          return ListTile(
-            title: Text("Header Item $index"),
-            tileColor: state.hitIndexForHeaderListCtx == index
-                ? Colors.orange
-                : index % 2 == 0
-                    ? Colors.grey[100]
-                    : Colors.white,
-          );
-        },
-        childCount: 5,
-      ),
+        return ListTile(
+          title: Text("Header Item $index"),
+          tileColor: state.hitIndexForHeaderListCtx == index
+              ? Colors.orange
+              : index % 2 == 0
+              ? Colors.grey[100]
+              : Colors.white,
+        );
+      }, childCount: 5),
     );
   }
 }

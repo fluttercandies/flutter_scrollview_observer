@@ -13,8 +13,5 @@ class DetailNavBarTabModel {
 
   String get title => '${type.name[0].toUpperCase()}${type.name.substring(1)}';
 
-  DetailNavBarTabModel({
-    required this.type,
-    required this.index,
-  });
+  DetailNavBarTabModel({required this.type, required this.index});
 }

@@ -11,7 +11,7 @@ mixin VisibilityExposureMixin {
   Map<dynamic, bool> exposureRecordMap = {};
 
   /// Reset exposure record
-  resetExposureRecordMap() {
+  void resetExposureRecordMap() {
     exposureRecordMap.clear();
   }
 
@@ -28,7 +28,7 @@ mixin VisibilityExposureMixin {
   /// [needExposeCallback] Whether to participate in the callback of exposure
   /// calculation.
   /// [toExposeCallback] Callback for exposure conditions met.
-  handleExposure({
+  void handleExposure({
     required dynamic resultModel,
     double toExposeDisplayPercent = 0.5,
     dynamic Function(int index)? recordKeyCallback,

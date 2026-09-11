@@ -4,7 +4,7 @@
  * @Date: 2023-12-04 20:15:33
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
@@ -69,12 +69,12 @@ class NestedScrollUtil {
 
     final remainingContextOverlap =
         remainingSliverRenderObj!.constraints.overlap;
-    final sliverContextExtraOverlap =
-        (remainingContextOverlap - offset.dy).clamp(0, double.infinity);
+    final sliverContextExtraOverlap = (remainingContextOverlap - offset.dy)
+        .clamp(0, double.infinity);
 
-    var _obj = ObserverUtils.findRenderObject(sliverContext);
-    if (_obj is! RenderSliverMultiBoxAdaptor) return null;
-    return sliverContextExtraOverlap + _obj.constraints.overlap;
+    var obj = ObserverUtils.findRenderObject(sliverContext);
+    if (obj is! RenderSliverMultiBoxAdaptor) return null;
+    return sliverContextExtraOverlap + obj.constraints.overlap;
   }
 
   /// Calculate the [precedingScrollExtent] for [sliverContext].
@@ -83,9 +83,9 @@ class NestedScrollUtil {
     required BuildContext sliverContext,
   }) {
     double precedingScrollExtent = 0;
-    var _obj = ObserverUtils.findRenderObject(sliverContext);
-    if (_obj is! RenderSliverMultiBoxAdaptor) return null;
-    precedingScrollExtent = _obj.constraints.precedingScrollExtent;
+    var obj = ObserverUtils.findRenderObject(sliverContext);
+    if (obj is! RenderSliverMultiBoxAdaptor) return null;
+    precedingScrollExtent = obj.constraints.precedingScrollExtent;
 
     // Get SliverFillRemaining
     final remainingSliverContext = fetchRemainingSliverContext(

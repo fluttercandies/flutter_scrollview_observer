@@ -3,7 +3,7 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-07-20 00:32:40
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
@@ -15,12 +15,11 @@ class ListObserverController extends ObserverController
         ObserverControllerForInfo,
         ObserverControllerForScroll,
         ObserverControllerForNotification<
-            ListViewObserveModel,
-            ObserverHandleContextsResultModel<ListViewObserveModel>,
-            ListViewOnceObserveNotificationResult> {
-  ListObserverController({
-    ScrollController? controller,
-  }) : super(controller: controller);
+          ListViewObserveModel,
+          ObserverHandleContextsResultModel<ListViewObserveModel>,
+          ListViewOnceObserveNotificationResult
+        > {
+  ListObserverController({super.controller});
 
   /// Dispatch a [ListViewOnceObserveNotification]
   Future<ListViewOnceObserveNotificationResult> dispatchOnceObserve({
@@ -72,10 +71,10 @@ class ListObserverController extends ObserverController
   /// Create a observation notification result.
   @override
   ListViewOnceObserveNotificationResult
-      innerCreateOnceObserveNotificationResult({
+  innerCreateOnceObserveNotificationResult({
     required ObserverWidgetObserveResultType resultType,
     required ObserverHandleContextsResultModel<ListViewObserveModel>?
-        resultModel,
+    resultModel,
   }) {
     return ListViewOnceObserveNotificationResult(
       type: resultType,

@@ -4,7 +4,7 @@
  * @Date: 2026-02-23 22:19:39
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get/get.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/header/nested_scrollview_tab_bar_view_demo_header.dart';
@@ -32,7 +32,8 @@ class NestedScrollViewTabBarViewDemoPageState
     extends State<NestedScrollViewTabBarViewDemoPage>
     with
         NestedScrollviewTabBarViewDemoLogicPutMixin<
-            NestedScrollViewTabBarViewDemoPage>,
+          NestedScrollViewTabBarViewDemoPage
+        >,
         TickerProviderStateMixin {
   NestedScrollViewTabBarViewDemoState get state => logic.state;
 
@@ -85,17 +86,18 @@ class NestedScrollViewTabBarViewDemoPageState
           ),
         ];
       },
-      body: Builder(builder: (context) {
-        final innerScrollController = PrimaryScrollController.of(context);
-        if (nestedScrollUtil.bodyScrollController != innerScrollController) {
-          nestedScrollUtil.bodyScrollController = innerScrollController;
-        }
-        return _buildTabBarView();
-      }),
+      body: Builder(
+        builder: (context) {
+          final innerScrollController = PrimaryScrollController.of(context);
+          if (nestedScrollUtil.bodyScrollController != innerScrollController) {
+            nestedScrollUtil.bodyScrollController = innerScrollController;
+          }
+          return _buildTabBarView();
+        },
+      ),
     );
 
     resultWidget = SliverViewObserver(
-      child: resultWidget,
       sliverContexts: () {
         final sliverHeaderListCtx = state.headerSliverListCtx;
         final sliverTab1ListCtx = state.sliverTab1ListCtx;
@@ -104,11 +106,11 @@ class NestedScrollViewTabBarViewDemoPageState
         final sliverTab3GridCtx = state.tab3SliverGridCtx;
 
         return [
-          if (sliverHeaderListCtx != null) sliverHeaderListCtx,
-          if (sliverTab1ListCtx != null) sliverTab1ListCtx,
-          if (sliverTab2GridCtx != null) sliverTab2GridCtx,
-          if (sliverTab3ListCtx != null) sliverTab3ListCtx,
-          if (sliverTab3GridCtx != null) sliverTab3GridCtx,
+          ?sliverHeaderListCtx,
+          ?sliverTab1ListCtx,
+          ?sliverTab2GridCtx,
+          ?sliverTab3ListCtx,
+          ?sliverTab3GridCtx,
         ];
       },
       customOverlap: (sliverContext) {
@@ -118,6 +120,7 @@ class NestedScrollViewTabBarViewDemoPageState
         );
       },
       onObserveAll: logic.handleOnObserveAll,
+      child: resultWidget,
     );
 
     return resultWidget;
@@ -140,9 +143,7 @@ class NestedScrollViewTabBarViewDemoPageState
       title: const Text("Nested & TabBarView"),
       pinned: true,
       forceElevated: innerBoxIsScrolled,
-      actions: const [
-        NestedScrollviewTabBarViewDemoScrollTypeSwitch(),
-      ],
+      actions: const [NestedScrollviewTabBarViewDemoScrollTypeSwitch()],
     );
   }
 }

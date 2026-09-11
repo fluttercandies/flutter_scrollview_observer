@@ -4,7 +4,7 @@
  * @Date: 2023-10-28 15:56:01
 
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class AzListCursor extends StatelessWidget {
   final double size;
@@ -13,11 +13,7 @@ class AzListCursor extends StatelessWidget {
 
   final double arrowSize = 30;
 
-  const AzListCursor({
-    Key? key,
-    required this.size,
-    required this.title,
-  }) : super(key: key);
+  const AzListCursor({super.key, required this.size, required this.title});
 
   @override
   Widget build(BuildContext context) {

@@ -4,7 +4,7 @@
  * @Date: 2026-02-24 23:12:26
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get/get.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/header/nested_scrollview_tab_bar_view_demo_header.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/logic/nested_scrollview_tab_bar_view_demo_logic.dart';
@@ -23,7 +23,8 @@ class _NestedScrollviewTabBarViewDemoFloatingActionBtnState
     extends State<NestedScrollviewTabBarViewDemoFloatingActionBtn>
     with
         NestedScrollviewTabBarViewDemoLogicConsumerMixin<
-            NestedScrollviewTabBarViewDemoFloatingActionBtn> {
+          NestedScrollviewTabBarViewDemoFloatingActionBtn
+        > {
   NestedScrollViewTabBarViewDemoState get state => logic.state;
 
   @override

@@ -6,7 +6,7 @@
 
 import 'dart:collection';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
@@ -23,8 +23,13 @@ import 'package:scrollview_observer/src/utils/observer_utils.dart';
 import 'models/sliver_viewport_observe_model.dart';
 import 'sliver_observer_controller.dart';
 
-class SliverViewObserver extends ObserverWidget<SliverObserverController,
-    ObserveModel, ScrollViewOnceObserveNotification> {
+class SliverViewObserver
+    extends
+        ObserverWidget<
+          SliverObserverController,
+          ObserveModel,
+          ScrollViewOnceObserveNotification
+        > {
   /// The callback of getting all slivers those are displayed in viewport.
   final OnObserveViewportCallback? onObserveViewport;
 
@@ -41,46 +46,32 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
   final SliverObserverController? controller;
 
   const SliverViewObserver({
-    Key? key,
-    required Widget child,
-    String? tag,
+    super.key,
+    required super.child,
+    super.tag,
     this.controller,
     @Deprecated(
-        'It will be removed in version 2, please use [sliverContexts] instead')
+      'It will be removed in version 2, please use [sliverContexts] instead',
+    )
     List<BuildContext> Function()? sliverListContexts,
     List<BuildContext> Function()? sliverContexts,
-    OnObserveAllCallback<ObserveModel>? onObserveAll,
-    OnObserveCallback<ObserveModel>? onObserve,
+    super.onObserveAll,
+    super.onObserve,
     this.onObserveViewport,
-    double leadingOffset = 0,
-    double Function()? dynamicLeadingOffset,
+    super.leadingOffset,
+    super.dynamicLeadingOffset,
     this.customOverlap,
-    double toNextOverPercent = 1,
-    ScrollNotificationPredicate? scrollNotificationPredicate,
-    List<ObserverAutoTriggerObserveType>? autoTriggerObserveTypes,
-    ObserverTriggerOnObserveType triggerOnObserveType =
-        ObserverTriggerOnObserveType.displayingItemsChange,
-    ObserveModel? Function(BuildContext context)? customHandleObserve,
+    super.toNextOverPercent,
+    super.scrollNotificationPredicate,
+    super.autoTriggerObserveTypes,
+    super.triggerOnObserveType,
+    super.customHandleObserve,
     this.extendedHandleObserve,
-    bool cancelOnceObserveNotificationBubbling = true,
+    super.cancelOnceObserveNotificationBubbling,
   }) : super(
-          key: key,
-          child: child,
-          tag: tag,
-          sliverController: controller,
-          sliverContexts: sliverContexts ?? sliverListContexts,
-          onObserveAll: onObserveAll,
-          onObserve: onObserve,
-          leadingOffset: leadingOffset,
-          dynamicLeadingOffset: dynamicLeadingOffset,
-          toNextOverPercent: toNextOverPercent,
-          scrollNotificationPredicate: scrollNotificationPredicate,
-          autoTriggerObserveTypes: autoTriggerObserveTypes,
-          triggerOnObserveType: triggerOnObserveType,
-          customHandleObserve: customHandleObserve,
-          cancelOnceObserveNotificationBubbling:
-              cancelOnceObserveNotificationBubbling,
-        );
+         sliverController: controller,
+         sliverContexts: sliverContexts ?? sliverListContexts,
+       );
 
   @override
   State<SliverViewObserver> createState() => MixViewObserverState();
@@ -100,17 +91,16 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
   ///
   /// * [SliverViewObserver.of], which is similar to this method, but asserts
   ///   if no [SliverViewObserver] instance is found.
-  static MixViewObserverState? maybeOf(
-    BuildContext context, {
-    String? tag,
-  }) {
-    final _state = ObserverWidget.maybeOf<SliverObserverController,
-        ObserveModel, ScrollViewOnceObserveNotification, SliverViewObserver>(
-      context,
-      tag: tag,
-    );
-    if (_state is! MixViewObserverState) return null;
-    return _state;
+  static MixViewObserverState? maybeOf(BuildContext context, {String? tag}) {
+    final state =
+        ObserverWidget.maybeOf<
+          SliverObserverController,
+          ObserveModel,
+          ScrollViewOnceObserveNotification,
+          SliverViewObserver
+        >(context, tag: tag);
+    if (state is! MixViewObserverState) return null;
+    return state;
   }
 
   /// Returning the closest instance of this class that encloses the given
@@ -129,21 +119,26 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
   ///
   /// * [ObserverWidget.maybeOf], which is similar to this method, but returns
   ///   null if no [ObserverWidget] instance is found.
-  static MixViewObserverState of(
-    BuildContext context, {
-    String? tag,
-  }) {
-    final _state = ObserverWidget.of<SliverObserverController, ObserveModel,
-        ScrollViewOnceObserveNotification, SliverViewObserver>(
-      context,
-      tag: tag,
-    );
-    return _state as MixViewObserverState;
+  static MixViewObserverState of(BuildContext context, {String? tag}) {
+    final state =
+        ObserverWidget.of<
+          SliverObserverController,
+          ObserveModel,
+          ScrollViewOnceObserveNotification,
+          SliverViewObserver
+        >(context, tag: tag);
+    return state as MixViewObserverState;
   }
 }
 
-class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
-    ObserveModel, ScrollViewOnceObserveNotification, SliverViewObserver> {
+class MixViewObserverState
+    extends
+        ObserverWidgetState<
+          SliverObserverController,
+          ObserveModel,
+          ScrollViewOnceObserveNotification,
+          SliverViewObserver
+        > {
   /// The last viewport observation result.
   SliverViewportObserveModel? lastViewportObserveResultModel;
 
@@ -221,15 +216,15 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
     if (widget.customHandleObserve != null) {
       return widget.customHandleObserve?.call(ctx);
     }
-    final _obj = ObserverUtils.findRenderObject(ctx);
-    if (ListViewObserver.isSupportRenderSliverType(_obj)) {
+    final obj = ObserverUtils.findRenderObject(ctx);
+    if (ListViewObserver.isSupportRenderSliverType(obj)) {
       return ObserverCore.handleListObserve(
         context: ctx,
         fetchLeadingOffset: fetchLeadingOffset,
         customOverlap: widget.customOverlap,
         toNextOverPercent: widget.toNextOverPercent,
       );
-    } else if (_obj is RenderSliverGrid) {
+    } else if (obj is RenderSliverGrid) {
       return ObserverCore.handleGridObserve(
         context: ctx,
         fetchLeadingOffset: fetchLeadingOffset,
@@ -247,8 +242,9 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
   }) {
     final isForbidObserveViewportCallback =
         widget.sliverController?.isForbidObserveViewportCallback ?? false;
-    final onObserveViewport =
-        isForbidObserveViewportCallback ? null : widget.onObserveViewport;
+    final onObserveViewport = isForbidObserveViewportCallback
+        ? null
+        : widget.onObserveViewport;
     if (isDependObserveCallback &&
         onObserveViewport == null &&
         (innerSliverListeners?.isEmpty ?? true)) {
@@ -308,7 +304,7 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
     );
 
     List<SliverViewportObserveDisplayingChildModel> displayingChildModelList = [
-      firstChild
+      firstChild,
     ];
 
     // Find the remaining children that are being displayed.
@@ -328,10 +324,12 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
       if (ObserverUtils.isValidListIndex(indexOfTargetChild)) {
         // The current targetChild is target.
         final context = ctxs[indexOfTargetChild];
-        displayingChildModelList.add(SliverViewportObserveDisplayingChildModel(
-          sliverContext: context,
-          sliver: targetChild,
-        ));
+        displayingChildModelList.add(
+          SliverViewportObserveDisplayingChildModel(
+            sliverContext: context,
+            sliver: targetChild,
+          ),
+        );
       }
       // continue to check next child.
       targetChild = viewport.childAfter(targetChild);
@@ -379,10 +377,12 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
     );
     // Add the listener for the viewport observation.
     if (onObserveViewport != null) {
-      innerSliverListeners?.add(SliverObserverListenerEntry(
-        context: context,
-        onObserveViewport: onObserveViewport,
-      ));
+      innerSliverListeners?.add(
+        SliverObserverListenerEntry(
+          context: context,
+          onObserveViewport: onObserveViewport,
+        ),
+      );
     }
   }
 
@@ -430,20 +430,23 @@ class MixViewObserverState extends ObserverWidgetState<SliverObserverController,
           entry.onObserveViewport?.call(observeViewportResult);
         }
       } catch (exception, stack) {
-        FlutterError.reportError(FlutterErrorDetails(
-          exception: exception,
-          stack: stack,
-          library: 'scrollview_observer',
-          context:
-              ErrorDescription('while dispatching result for $runtimeType'),
-          informationCollector: () => <DiagnosticsNode>[
-            DiagnosticsProperty<ObserverWidgetState>(
-              'The $runtimeType sending result was',
-              this,
-              style: DiagnosticsTreeStyle.errorProperty,
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: exception,
+            stack: stack,
+            library: 'scrollview_observer',
+            context: ErrorDescription(
+              'while dispatching result for $runtimeType',
             ),
-          ],
-        ));
+            informationCollector: () => <DiagnosticsNode>[
+              DiagnosticsProperty<ObserverWidgetState>(
+                'The $runtimeType sending result was',
+                this,
+                style: DiagnosticsTreeStyle.errorProperty,
+              ),
+            ],
+          ),
+        );
       }
     }
   }

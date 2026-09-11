@@ -3,7 +3,7 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2023-06-08 21:59:07
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/features/scene/video_auto_play_list/widgets/video_widget.dart';
 import 'package:scrollview_observer_example/features/scene/waterfall_flow_demo/waterfall_flow_type.dart';
 
@@ -17,12 +17,12 @@ class WaterfallFlowGridItemView extends StatelessWidget {
   bool get isHit => selfType == hitType && selfIndex == hitIndex;
 
   const WaterfallFlowGridItemView({
-    Key? key,
+    super.key,
     required this.selfIndex,
     required this.selfType,
     required this.hitIndex,
     required this.hitType,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +41,7 @@ class WaterfallFlowGridItemView extends StatelessWidget {
         isHit ? _buildVideo() : _buildCover(),
         const SizedBox(height: 10),
         Text('grid item $selfIndex'),
-        SizedBox(
-          height: 50.0 + 50.0 * (selfIndex % 2),
-        ),
+        SizedBox(height: 50.0 + 50.0 * (selfIndex % 2)),
       ],
     );
   }
@@ -65,7 +63,7 @@ class WaterfallFlowGridItemView extends StatelessWidget {
             child: CircularProgressIndicator(
               value: loadingProgress.expectedTotalBytes != null
                   ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
+                        loadingProgress.expectedTotalBytes!
                   : null,
             ),
           ),

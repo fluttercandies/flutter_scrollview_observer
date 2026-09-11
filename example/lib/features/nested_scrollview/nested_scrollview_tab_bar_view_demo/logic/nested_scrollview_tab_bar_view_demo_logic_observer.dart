@@ -4,7 +4,7 @@
  * @Date: 2026-02-24 23:16:49
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/header/nested_scrollview_tab_bar_view_demo_header.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/logic/nested_scrollview_tab_bar_view_demo_logic.dart';
@@ -17,9 +17,7 @@ extension NestedScrollViewTabBarViewDemoLogicForObserver
     required Function() toRecordCtx,
   }) {
     if (oldCtx == newCtx) return;
-    state.nestedScrollUtil.headerSliverContexts.remove(
-      oldCtx,
-    );
+    state.nestedScrollUtil.headerSliverContexts.remove(oldCtx);
     toRecordCtx.call();
     state.nestedScrollUtil.headerSliverContexts.add(newCtx);
   }
@@ -30,9 +28,7 @@ extension NestedScrollViewTabBarViewDemoLogicForObserver
     required Function() toRecordCtx,
   }) {
     if (oldCtx == newCtx) return;
-    state.nestedScrollUtil.bodySliverContexts.remove(
-      oldCtx,
-    );
+    state.nestedScrollUtil.bodySliverContexts.remove(oldCtx);
     toRecordCtx.call();
     state.nestedScrollUtil.bodySliverContexts.add(newCtx);
   }
@@ -45,9 +41,7 @@ extension NestedScrollViewTabBarViewDemoLogicForObserver
         debugPrint("SliverListHeaderCtx: ${model.displayingChildIndexList}");
         if (state.hitIndexForHeaderListCtx == model.firstChild?.index) return;
         state.hitIndexForHeaderListCtx = model.firstChild?.index ?? 0;
-        update([
-          NestedScrollviewTabBarViewDemoUpdateType.headerSliverList,
-        ]);
+        update([NestedScrollviewTabBarViewDemoUpdateType.headerSliverList]);
         return;
       }
 
@@ -57,9 +51,7 @@ extension NestedScrollViewTabBarViewDemoLogicForObserver
         debugPrint("sliverTab1ListCtx: ${model.displayingChildIndexList}");
         if (state.hitIndexForTab1ListCtx == model.firstChild?.index) return;
         state.hitIndexForTab1ListCtx = model.firstChild?.index ?? 0;
-        update([
-          NestedScrollviewTabBarViewDemoUpdateType.tab1View,
-        ]);
+        update([NestedScrollviewTabBarViewDemoUpdateType.tab1View]);
         return;
       }
 
@@ -67,13 +59,12 @@ extension NestedScrollViewTabBarViewDemoLogicForObserver
       if (key == state.tab2SliverGridCtx) {
         final model = value as GridViewObserveModel;
         debugPrint("sliverTab2GridCtx: ${model.displayingChildIndexList}");
-        final firstGroupChildIndexList =
-            model.firstGroupChildList.map((e) => e.index).toList();
+        final firstGroupChildIndexList = model.firstGroupChildList
+            .map((e) => e.index)
+            .toList();
         if (state.hitIndexesForTab2Grid == firstGroupChildIndexList) return;
         state.hitIndexesForTab2Grid = firstGroupChildIndexList;
-        update([
-          NestedScrollviewTabBarViewDemoUpdateType.tab2View,
-        ]);
+        update([NestedScrollviewTabBarViewDemoUpdateType.tab2View]);
         return;
       }
 
@@ -83,9 +74,7 @@ extension NestedScrollViewTabBarViewDemoLogicForObserver
         debugPrint("sliverTab3ListCtx: ${model.displayingChildIndexList}");
         if (state.hitIndexForTab3ListCtx == model.firstChild?.index) return;
         state.hitIndexForTab3ListCtx = model.firstChild?.index ?? 0;
-        update([
-          NestedScrollviewTabBarViewDemoUpdateType.tab3ViewSliverList,
-        ]);
+        update([NestedScrollviewTabBarViewDemoUpdateType.tab3ViewSliverList]);
         return;
       }
 
@@ -93,13 +82,12 @@ extension NestedScrollViewTabBarViewDemoLogicForObserver
       if (key == state.tab3SliverGridCtx) {
         final model = value as GridViewObserveModel;
         debugPrint("sliverTab3GridCtx: ${model.displayingChildIndexList}");
-        final firstGroupChildIndexList =
-            model.firstGroupChildList.map((e) => e.index).toList();
+        final firstGroupChildIndexList = model.firstGroupChildList
+            .map((e) => e.index)
+            .toList();
         if (state.hitIndexesForTab3Grid == firstGroupChildIndexList) return;
         state.hitIndexesForTab3Grid = firstGroupChildIndexList;
-        update([
-          NestedScrollviewTabBarViewDemoUpdateType.tab3ViewSliverGrid,
-        ]);
+        update([NestedScrollviewTabBarViewDemoUpdateType.tab3ViewSliverGrid]);
         return;
       }
     });
@@ -121,10 +109,7 @@ extension NestedScrollViewTabBarViewDemoLogicForObserver
         curve: Curves.easeInOut,
         sliverContext: sliverContext,
         offset: (targetOffset) {
-          return calcPersistentHeaderExtent(
-            targetOffset,
-            isBody: isBody,
-          );
+          return calcPersistentHeaderExtent(targetOffset, isBody: isBody);
         },
       );
     } else {
@@ -135,19 +120,13 @@ extension NestedScrollViewTabBarViewDemoLogicForObserver
         index: index,
         sliverContext: sliverContext,
         offset: (targetOffset) {
-          return calcPersistentHeaderExtent(
-            targetOffset,
-            isBody: isBody,
-          );
+          return calcPersistentHeaderExtent(targetOffset, isBody: isBody);
         },
       );
     }
   }
 
-  double calcPersistentHeaderExtent(
-    double offset, {
-    required bool isBody,
-  }) {
+  double calcPersistentHeaderExtent(double offset, {required bool isBody}) {
     double value = ObserverUtils.calcPersistentHeaderExtent(
       key: state.appBarKey,
       offset: offset,

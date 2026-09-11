@@ -3,12 +3,12 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
 
 class HorizontalListViewPage extends StatefulWidget {
-  const HorizontalListViewPage({Key? key}) : super(key: key);
+  const HorizontalListViewPage({super.key});
 
   @override
   State<HorizontalListViewPage> createState() => _HorizontalListViewPageState();
@@ -36,7 +36,7 @@ class _HorizontalListViewPageState extends State<HorizontalListViewPage> {
       body: ListViewObserver(
         child: _buildListView(),
         sliverListContexts: () {
-          return [if (_sliverListViewContext != null) _sliverListViewContext!];
+          return [?_sliverListViewContext];
         },
         onObserveAll: (resultMap) {
           final model = resultMap[_sliverListViewContext];
@@ -84,9 +84,6 @@ class _HorizontalListViewPageState extends State<HorizontalListViewPage> {
   }
 
   Container _buildSeparatorView() {
-    return Container(
-      color: Colors.white,
-      width: 5,
-    );
+    return Container(color: Colors.white, width: 5);
   }
 }

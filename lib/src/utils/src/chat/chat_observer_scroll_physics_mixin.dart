@@ -3,7 +3,7 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-09-29 22:47:10
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
 
@@ -30,11 +30,13 @@ mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
     if (newPosition.extentBefore <= observer.fixedPositionOffset ||
         !isNeedFixedPosition ||
         observer.isRemove) {
-      _handlePositionCallback(ChatScrollObserverHandlePositionResultModel(
-        type: ChatScrollObserverHandlePositionType.none,
-        mode: observer.innerMode,
-        changeCount: observer.changeCount,
-      ));
+      _handlePositionCallback(
+        ChatScrollObserverHandlePositionResultModel(
+          type: ChatScrollObserverHandlePositionType.none,
+          mode: observer.innerMode,
+          changeCount: observer.changeCount,
+        ),
+      );
       return adjustPosition;
     }
 
@@ -50,29 +52,35 @@ mixin ChatObserverScrollPhysicsMixin on ScrollPhysics {
       ),
     );
     if (customAdjustPosition != null) {
-      _handlePositionCallback(ChatScrollObserverHandlePositionResultModel(
-        type: ChatScrollObserverHandlePositionType.keepPosition,
-        mode: observer.innerMode,
-        changeCount: observer.changeCount,
-      ));
+      _handlePositionCallback(
+        ChatScrollObserverHandlePositionResultModel(
+          type: ChatScrollObserverHandlePositionType.keepPosition,
+          mode: observer.innerMode,
+          changeCount: observer.changeCount,
+        ),
+      );
       return customAdjustPosition;
     }
 
     final model = observer.observeRefItem();
     if (model == null) {
-      _handlePositionCallback(ChatScrollObserverHandlePositionResultModel(
-        type: ChatScrollObserverHandlePositionType.none,
-        mode: observer.innerMode,
-        changeCount: observer.changeCount,
-      ));
+      _handlePositionCallback(
+        ChatScrollObserverHandlePositionResultModel(
+          type: ChatScrollObserverHandlePositionType.none,
+          mode: observer.innerMode,
+          changeCount: observer.changeCount,
+        ),
+      );
       return adjustPosition;
     }
 
-    _handlePositionCallback(ChatScrollObserverHandlePositionResultModel(
-      type: ChatScrollObserverHandlePositionType.keepPosition,
-      mode: observer.innerMode,
-      changeCount: observer.changeCount,
-    ));
+    _handlePositionCallback(
+      ChatScrollObserverHandlePositionResultModel(
+        type: ChatScrollObserverHandlePositionType.keepPosition,
+        mode: observer.innerMode,
+        changeCount: observer.changeCount,
+      ),
+    );
 
     // Customize the delta of the adjustPosition.
     double? customDelta = observer.customAdjustPositionDelta?.call(

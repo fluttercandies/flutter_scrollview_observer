@@ -4,12 +4,12 @@
  * @Date: 2024-08-03 14:09:53
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
 class PageViewDemoPage extends StatefulWidget {
-  const PageViewDemoPage({Key? key}) : super(key: key);
+  const PageViewDemoPage({super.key});
 
   @override
   State<PageViewDemoPage> createState() => _PageViewDemoPageState();
@@ -20,21 +20,24 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
 
   late PageController pageController;
 
-  List<String> pageItemBgPicList = [
-    '11898897',
-    '26653530',
-    '12974784',
-    '943459',
-    '4424178',
-    '20433037',
-    '4424137',
-    '4955810',
-    '4424137',
-    '18847956',
-  ]
-      .map((id) =>
-          'https://images.pexels.com/photos/$id/pexels-photo-$id.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')
-      .toList();
+  List<String> pageItemBgPicList =
+      [
+            '11898897',
+            '26653530',
+            '12974784',
+            '943459',
+            '4424178',
+            '20433037',
+            '4424137',
+            '4955810',
+            '4424137',
+            '18847956',
+          ]
+          .map(
+            (id) =>
+                'https://images.pexels.com/photos/$id/pexels-photo-$id.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+          )
+          .toList();
 
   int get pageItemCount => pageItemBgPicList.length;
 
@@ -45,16 +48,10 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
   @override
   void initState() {
     super.initState();
-    pageController = PageController(
-      initialPage: 4,
-      viewportFraction: 0.8,
-    );
-    pageItemOffsetYList = List.generate(
-      pageItemCount,
-      (index) {
-        return ValueNotifier<double>(0);
-      },
-    );
+    pageController = PageController(initialPage: 4, viewportFraction: 0.8);
+    pageItemOffsetYList = List.generate(pageItemCount, (index) {
+      return ValueNotifier<double>(0);
+    });
 
     Future.delayed(const Duration(milliseconds: 100)).then((_) {
       observerController.dispatchOnceObserve();
@@ -74,18 +71,10 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "PageView",
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
+        title: const Text("PageView", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.black87,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -94,12 +83,7 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
       body: Stack(
         children: [
           _buildMap(),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: _buildPageView(),
-          ),
+          Positioned(left: 0, right: 0, bottom: 0, child: _buildPageView()),
         ],
       ),
     );
@@ -122,9 +106,7 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
           right: 0,
           top: 0,
           bottom: 0,
-          child: Container(
-            color: Colors.black38,
-          ),
+          child: Container(color: Colors.black38),
         ),
       ],
     );
@@ -141,7 +123,6 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
     );
     resultWidget = ListViewObserver(
       controller: observerController,
-      child: resultWidget,
       triggerOnObserveType: ObserverTriggerOnObserveType.directly,
       onObserve: (resultModel) {
         final displayingChildModelList = resultModel.displayingChildModelList;
@@ -157,11 +138,9 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
       customTargetRenderSliverType: (renderObj) {
         return renderObj is RenderSliverFillViewport;
       },
-    );
-    resultWidget = SizedBox(
-      height: 300,
       child: resultWidget,
     );
+    resultWidget = SizedBox(height: 300, child: resultWidget);
     return resultWidget;
   }
 
@@ -187,9 +166,7 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
             width: double.infinity,
             alignment: Alignment.center,
             height: 44,
-            decoration: const BoxDecoration(
-              color: Colors.white54,
-            ),
+            decoration: const BoxDecoration(color: Colors.white54),
             child: Text("Page $index"),
           ),
         ],
@@ -212,9 +189,6 @@ class _PageViewDemoPageState extends State<PageViewDemoPage> {
   }
 
   Widget _buildPageItemBgPicView(int index) {
-    return Image.network(
-      pageItemBgPicList[index],
-      fit: BoxFit.cover,
-    );
+    return Image.network(pageItemBgPicList[index], fit: BoxFit.cover);
   }
 }

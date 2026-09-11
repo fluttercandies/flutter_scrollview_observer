@@ -4,23 +4,17 @@
  * @Date: 2025-08-02 19:57:05
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:getx_helper/getx_helper.dart';
 import 'package:scrollview_observer_example/features/scene/detail/logic/detail_logic.dart';
 
-typedef DetailLogicPutMixin<W extends StatefulWidget>
-    = GetxLogicPutStateMixin<DetailLogic, W>;
+typedef DetailLogicPutMixin<W extends StatefulWidget> =
+    GetxLogicPutStateMixin<DetailLogic, W>;
 
-typedef DetailLogicConsumerMixin<W extends StatefulWidget>
-    = GetxLogicConsumerStateMixin<DetailLogic, W>;
+typedef DetailLogicConsumerMixin<W extends StatefulWidget> =
+    GetxLogicConsumerStateMixin<DetailLogic, W>;
 
-enum DetailUpdateType {
-  navBar,
-  config,
-  loading,
-  module3,
-  module6,
-}
+enum DetailUpdateType { navBar, config, loading, module3, module6 }
 
 enum DetailModuleType {
   module1,
@@ -33,7 +27,4 @@ enum DetailModuleType {
   module8,
 }
 
-enum DetailRefreshIndicatorType {
-  none,
-  footer,
-}
+enum DetailRefreshIndicatorType { none, footer }

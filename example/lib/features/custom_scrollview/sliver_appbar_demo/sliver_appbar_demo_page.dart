@@ -4,13 +4,13 @@
  * @Date: 2022-08-20 09:22:52
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
 import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class SliverAppBarDemoPage extends StatefulWidget {
-  const SliverAppBarDemoPage({Key? key}) : super(key: key);
+  const SliverAppBarDemoPage({super.key});
 
   @override
   State<SliverAppBarDemoPage> createState() => _SliverAppBarDemoPageState();
@@ -44,9 +44,7 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
 
     // Trigger an observation manually
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
-      observerController.dispatchOnceObserve(
-        sliverContext: _sliverListCtx!,
-      );
+      observerController.dispatchOnceObserve(sliverContext: _sliverListCtx!);
     });
   }
 
@@ -61,12 +59,8 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
     return Scaffold(
       body: SliverViewObserver(
         controller: observerController,
-        child: _buildScrollView(),
         sliverContexts: () {
-          return [
-            if (_sliverListCtx != null) _sliverListCtx!,
-            if (_sliverGridCtx != null) _sliverGridCtx!,
-          ];
+          return [?_sliverListCtx, ?_sliverGridCtx];
         },
         autoTriggerObserveTypes: const [
           ObserverAutoTriggerObserveType.scrollEnd,
@@ -82,7 +76,8 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
             debugPrint('1 firstChild.size -- ${model1.firstChild?.size}');
             debugPrint('1 displaying -- ${model1.displayingChildIndexList}');
             debugPrint(
-                '1 displaying -- index${model1.firstChild?.index} -- ${model1.firstChild?.displayPercentage}');
+              '1 displaying -- index${model1.firstChild?.index} -- ${model1.firstChild?.displayPercentage}',
+            );
             setState(() {
               _hitIndexForCtx1 = model1.firstChild?.index ?? 0;
             });
@@ -95,11 +90,13 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
             debugPrint('2 visible -- ${model2.visible}');
             debugPrint('2 displaying -- ${model2.displayingChildIndexList}');
             setState(() {
-              _hitIndexsForGrid =
-                  model2.firstGroupChildList.map((e) => e.index).toList();
+              _hitIndexsForGrid = model2.firstGroupChildList
+                  .map((e) => e.index)
+                  .toList();
             });
           }
         },
+        child: _buildScrollView(),
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -172,25 +169,21 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
 
   Widget _buildSliverListView() {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (ctx, index) {
-          _sliverListCtx ??= ctx;
-          return Container(
-            height: (index % 2 == 0) ? 80 : 50,
-            color: _hitIndexForCtx1 == index ? Colors.red : Colors.black12,
-            child: Center(
-              child: Text(
-                "index -- $index",
-                style: TextStyle(
-                  color:
-                      _hitIndexForCtx1 == index ? Colors.white : Colors.black,
-                ),
+      delegate: SliverChildBuilderDelegate((ctx, index) {
+        _sliverListCtx ??= ctx;
+        return Container(
+          height: (index % 2 == 0) ? 80 : 50,
+          color: _hitIndexForCtx1 == index ? Colors.red : Colors.black12,
+          child: Center(
+            child: Text(
+              "index -- $index",
+              style: TextStyle(
+                color: _hitIndexForCtx1 == index ? Colors.white : Colors.black,
               ),
             ),
-          );
-        },
-        childCount: 20,
-      ),
+          ),
+        );
+      }, childCount: 20),
     );
   }
 
@@ -202,20 +195,15 @@ class _SliverAppBarDemoPageState extends State<SliverAppBarDemoPage> {
         crossAxisSpacing: 10.0,
         childAspectRatio: 2.0,
       ),
-      delegate: SliverChildBuilderDelegate(
-        (BuildContext context, int index) {
-          _sliverGridCtx ??= context;
-          return Container(
-            color: (_hitIndexsForGrid.contains(index))
-                ? Colors.green
-                : Colors.blue[100],
-            child: Center(
-              child: Text('index -- $index'),
-            ),
-          );
-        },
-        childCount: 20,
-      ),
+      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+        _sliverGridCtx ??= context;
+        return Container(
+          color: (_hitIndexsForGrid.contains(index))
+              ? Colors.green
+              : Colors.blue[100],
+          child: Center(child: Text('index -- $index')),
+        );
+      }, childCount: 20),
     );
   }
 

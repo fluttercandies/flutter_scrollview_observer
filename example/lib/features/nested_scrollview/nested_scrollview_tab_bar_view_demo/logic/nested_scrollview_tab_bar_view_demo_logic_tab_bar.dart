@@ -4,7 +4,7 @@
  * @Date: 2026-02-24 23:14:47
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/header/nested_scrollview_tab_bar_view_demo_header.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/logic/nested_scrollview_tab_bar_view_demo_logic.dart';
 
@@ -17,9 +17,7 @@ extension NestedScrollViewTabBarViewDemoLogicForTabBar
     );
     state.tabController.addListener(() {
       if (state.tabController.indexIsChanging) return;
-      update([
-        NestedScrollviewTabBarViewDemoUpdateType.floatingActionButton,
-      ]);
+      update([NestedScrollviewTabBarViewDemoUpdateType.floatingActionButton]);
     });
   }
 

@@ -5,7 +5,7 @@
  */
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:scrollview_observer_example/common/route/route.dart';
 import 'package:scrollview_observer_example/features/custom_scrollview/custom_scrollview_demo/custom_scrollview_center_demo_page.dart';
@@ -101,18 +101,13 @@ class MyRoute {
   static final routerConfig = GoRouter(
     routes: routes,
     initialLocation: MyPage.home,
-    observers: [
-      observer,
-    ],
+    observers: [observer],
     navigatorKey: NavigationService.navigatorKey,
     debugLogDiagnostics: !kReleaseMode,
   );
 
   static final List<RouteBase> routes = [
-    GoRoute(
-      path: MyPage.home,
-      builder: (context, state) => const HomePage(),
-    ),
+    GoRoute(path: MyPage.home, builder: (context, state) => const HomePage()),
     GoRoute(
       path: MyPage.listView,
       builder: (context, state) => const ListViewDemoPage(),
@@ -221,10 +216,7 @@ class MyRoute {
       path: MyPage.imageTab,
       builder: (context, state) => const ImageTabPage(),
     ),
-    GoRoute(
-      path: MyPage.chat,
-      builder: (context, state) => const ChatPage(),
-    ),
+    GoRoute(path: MyPage.chat, builder: (context, state) => const ChatPage()),
     GoRoute(
       path: MyPage.chatGPT,
       builder: (context, state) => const ChatGPTPage(),

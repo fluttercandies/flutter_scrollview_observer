@@ -4,11 +4,11 @@
  * @Date: 2022-08-22 22:17:55
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
 class ImageTabPage extends StatefulWidget {
-  const ImageTabPage({Key? key}) : super(key: key);
+  const ImageTabPage({super.key});
 
   @override
   State<ImageTabPage> createState() => _ImageTabPageState();
@@ -85,10 +85,7 @@ class _ImageTabPageState extends State<ImageTabPage> {
         scrollDirection: Axis.horizontal,
       ),
     );
-    resultWidget = SizedBox(
-      height: 100,
-      child: resultWidget,
-    );
+    resultWidget = SizedBox(height: 100, child: resultWidget);
     return resultWidget;
   }
 
@@ -140,7 +137,7 @@ class _ImageTabPageState extends State<ImageTabPage> {
           child: CircularProgressIndicator(
             value: loadingProgress.expectedTotalBytes != null
                 ? loadingProgress.cumulativeBytesLoaded /
-                    loadingProgress.expectedTotalBytes!
+                      loadingProgress.expectedTotalBytes!
                 : null,
           ),
         );
@@ -149,15 +146,10 @@ class _ImageTabPageState extends State<ImageTabPage> {
   }
 
   Container _buildSeparatorView() {
-    return Container(
-      color: Colors.white,
-      width: 5,
-    );
+    return Container(color: Colors.white, width: 5);
   }
 
   String _fetchImgUrl(int index) {
-    return 'https://images.unsplash.com/' +
-        imgUrlList[index] +
-        '?auto=format&fit=crop&w=375&q=100';
+    return 'https://images.unsplash.com/${imgUrlList[index]}?auto=format&fit=crop&w=375&q=100';
   }
 }

@@ -5,7 +5,7 @@
  */
 
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/helper/chat_data_helper.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/model/chat_model.dart';
@@ -15,7 +15,7 @@ import 'package:scrollview_observer_example/utils/keyboard.dart';
 import 'package:scrollview_observer_example/utils/random.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key}) : super(key: key);
+  const ChatPage({super.key});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -118,9 +118,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
             },
             child: Text(
               isShowClassicHeaderAndFooter ? "Classic" : "Material",
-              style: const TextStyle(
-                fontSize: 18,
-              ),
+              style: const TextStyle(fontSize: 18),
             ),
           ),
           IconButton(
@@ -129,7 +127,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
               _addMessage(RandomTool.genInt(min: 1, max: 3));
             },
             icon: const Icon(Icons.add_comment),
-          )
+          ),
         ],
       ),
       body: _buildBody(),
@@ -137,14 +135,16 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   }
 
   Widget _buildPageOverlay() {
-    return Overlay(initialEntries: [
-      OverlayEntry(
-        builder: (context) {
-          pageOverlayContext = context;
-          return Container();
-        },
-      )
-    ]);
+    return Overlay(
+      initialEntries: [
+        OverlayEntry(
+          builder: (context) {
+            pageOverlayContext = context;
+            return Container();
+          },
+        ),
+      ],
+    );
   }
 
   Widget _buildBody() {
@@ -163,18 +163,12 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     resultWidget = Column(
       children: [
         Expanded(child: resultWidget),
-        CompositedTransformTarget(
-          link: layerLink,
-          child: Container(),
-        ),
+        CompositedTransformTarget(link: layerLink, child: Container()),
         _buildEditView(),
         const SafeArea(top: false, child: SizedBox.shrink()),
       ],
     );
-    resultWidget = Stack(children: [
-      resultWidget,
-      _buildPageOverlay(),
-    ]);
+    resultWidget = Stack(children: [resultWidget, _buildPageOverlay()]);
     return resultWidget;
   }
 
@@ -259,10 +253,9 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
             await Future.delayed(const Duration(seconds: 2));
           },
           childBuilder: (context, physics) {
-            var scrollViewPhysics =
-                physics.applyTo(ChatObserverClampingScrollPhysics(
-              observer: chatObserver,
-            ));
+            var scrollViewPhysics = physics.applyTo(
+              ChatObserverClampingScrollPhysics(observer: chatObserver),
+            );
             Widget resultWidget = ListView.builder(
               physics: chatObserver.isShrinkWrap
                   ? const NeverScrollableScrollPhysics()
@@ -297,8 +290,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
                 physics: scrollViewPhysics,
                 child: Container(
                   alignment: Alignment.topCenter,
-                  child: resultWidget,
                   height: constraints.maxHeight + 0.001,
+                  child: resultWidget,
                 ),
               );
             }
@@ -311,30 +304,32 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
           child: resultWidget,
         );
         resultWidget = Align(
-          child: resultWidget,
           alignment: Alignment.topCenter,
+          child: resultWidget,
         );
         return resultWidget;
       },
     );
   }
 
-  addUnreadTipView() {
-    Overlay.of(pageOverlayContext!).insert(OverlayEntry(
-      builder: (BuildContext context) => UnconstrainedBox(
-        child: CompositedTransformFollower(
-          link: layerLink,
-          followerAnchor: Alignment.bottomRight,
-          targetAnchor: Alignment.topRight,
-          offset: const Offset(-20, 0),
-          child: Material(
-            type: MaterialType.transparency,
-            // color: Colors.green,
-            child: _buildUnreadTipView(),
+  void addUnreadTipView() {
+    Overlay.of(pageOverlayContext!).insert(
+      OverlayEntry(
+        builder: (BuildContext context) => UnconstrainedBox(
+          child: CompositedTransformFollower(
+            link: layerLink,
+            followerAnchor: Alignment.bottomRight,
+            targetAnchor: Alignment.topRight,
+            offset: const Offset(-20, 0),
+            child: Material(
+              type: MaterialType.transparency,
+              // color: Colors.green,
+              child: _buildUnreadTipView(),
+            ),
           ),
         ),
       ),
-    ));
+    );
   }
 
   List<ChatModel> createChatModels({int num = 3}) {
@@ -343,7 +338,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
         .toList();
   }
 
-  _addMessage(int count) {
+  void _addMessage(int count) {
     chatObserver.standby(changeCount: count);
     setState(() {
       needIncrementUnreadMsgCount = true;
@@ -353,10 +348,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     });
   }
 
-  updateUnreadMsgCount({
-    bool isReset = false,
-    int changeCount = 1,
-  }) {
+  void updateUnreadMsgCount({bool isReset = false, int changeCount = 1}) {
     needIncrementUnreadMsgCount = false;
     if (isReset) {
       unreadMsgCount.value = 0;
@@ -365,7 +357,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     }
   }
 
-  scrollControllerListener() {
+  void scrollControllerListener() {
     if (scrollController.offset < 50) {
       updateUnreadMsgCount(isReset: true);
     }

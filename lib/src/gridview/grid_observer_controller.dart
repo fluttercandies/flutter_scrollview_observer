@@ -3,7 +3,7 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-07-20 00:32:40
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
@@ -15,12 +15,11 @@ class GridObserverController extends ObserverController
         ObserverControllerForInfo,
         ObserverControllerForScroll,
         ObserverControllerForNotification<
-            GridViewObserveModel,
-            ObserverHandleContextsResultModel<GridViewObserveModel>,
-            GridViewOnceObserveNotificationResult> {
-  GridObserverController({
-    ScrollController? controller,
-  }) : super(controller: controller);
+          GridViewObserveModel,
+          ObserverHandleContextsResultModel<GridViewObserveModel>,
+          GridViewOnceObserveNotificationResult
+        > {
+  GridObserverController({super.controller});
 
   /// Dispatch a [GridViewOnceObserveNotification]
   Future<GridViewOnceObserveNotificationResult> dispatchOnceObserve({
@@ -72,10 +71,10 @@ class GridObserverController extends ObserverController
   /// Create a observation notification result.
   @override
   GridViewOnceObserveNotificationResult
-      innerCreateOnceObserveNotificationResult({
+  innerCreateOnceObserveNotificationResult({
     required ObserverWidgetObserveResultType resultType,
     required ObserverHandleContextsResultModel<GridViewObserveModel>?
-        resultModel,
+    resultModel,
   }) {
     return GridViewOnceObserveNotificationResult(
       type: resultType,

@@ -4,7 +4,7 @@
  * @Date: 2023-08-12 16:01:29
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
 
 class ObserverHandleContextsResultModel<M extends ObserveModel> {

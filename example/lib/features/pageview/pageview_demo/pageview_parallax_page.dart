@@ -4,12 +4,12 @@
  * @Date: 2024-08-26 21:30:59
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
 class PageViewParallaxPage extends StatefulWidget {
-  const PageViewParallaxPage({Key? key}) : super(key: key);
+  const PageViewParallaxPage({super.key});
 
   @override
   State<PageViewParallaxPage> createState() => _PageViewParallaxPageState();
@@ -18,21 +18,24 @@ class PageViewParallaxPage extends StatefulWidget {
 class _PageViewParallaxPageState extends State<PageViewParallaxPage> {
   late PageController pageController;
 
-  List<String> pageItemBgPicList = [
-    '11898897',
-    '26653530',
-    '12974784',
-    '943459',
-    '4424178',
-    '20433037',
-    '4424137',
-    '4955810',
-    '4424137',
-    '18847956',
-  ]
-      .map((id) =>
-          'https://images.pexels.com/photos/$id/pexels-photo-$id.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')
-      .toList();
+  List<String> pageItemBgPicList =
+      [
+            '11898897',
+            '26653530',
+            '12974784',
+            '943459',
+            '4424178',
+            '20433037',
+            '4424137',
+            '4955810',
+            '4424137',
+            '18847956',
+          ]
+          .map(
+            (id) =>
+                'https://images.pexels.com/photos/$id/pexels-photo-$id.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+          )
+          .toList();
 
   int get pageItemCount => pageItemBgPicList.length;
 
@@ -43,16 +46,10 @@ class _PageViewParallaxPageState extends State<PageViewParallaxPage> {
   @override
   void initState() {
     super.initState();
-    pageController = PageController(
-      initialPage: 4,
-      viewportFraction: 0.9,
-    );
-    pageItemBgPicAlignmentXList = List.generate(
-      pageItemCount,
-      (index) {
-        return ValueNotifier<double>(0);
-      },
-    );
+    pageController = PageController(initialPage: 4, viewportFraction: 0.9);
+    pageItemBgPicAlignmentXList = List.generate(pageItemCount, (index) {
+      return ValueNotifier<double>(0);
+    });
 
     Future.delayed(const Duration(milliseconds: 100)).then((_) {
       observerController.dispatchOnceObserve();
@@ -75,24 +72,17 @@ class _PageViewParallaxPageState extends State<PageViewParallaxPage> {
       appBar: AppBar(
         title: const Text(
           "PageView - Parallax",
-          style: TextStyle(
-            color: Colors.white,
-          ),
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.black87,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
       ),
-      body: Center(
-        child: _buildPageView(),
-      ),
+      body: Center(child: _buildPageView()),
     );
   }
 
@@ -106,7 +96,6 @@ class _PageViewParallaxPageState extends State<PageViewParallaxPage> {
     );
     resultWidget = ListViewObserver(
       controller: observerController,
-      child: resultWidget,
       triggerOnObserveType: ObserverTriggerOnObserveType.directly,
       onObserve: (resultModel) {
         final displayingChildModelList = resultModel.displayingChildModelList;
@@ -130,10 +119,12 @@ class _PageViewParallaxPageState extends State<PageViewParallaxPage> {
       customTargetRenderSliverType: (renderObj) {
         return renderObj is RenderSliverFillViewport;
       },
+      child: resultWidget,
     );
 
     resultWidget = SizedBox(
-      height: (MediaQuery.sizeOf(context).height -
+      height:
+          (MediaQuery.sizeOf(context).height -
               MediaQuery.paddingOf(context).top -
               kToolbarHeight) *
           0.8,

@@ -4,7 +4,7 @@
  * @Date: 2025-08-03 22:01:50
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 
@@ -15,13 +15,12 @@ mixin DetailStateForListView {
 
   ScrollController scrollController = ScrollController();
 
-  late ListObserverController observerController = ListObserverController(
-    controller: scrollController,
-  )
-    ..observeIntervalForScrolling = const Duration(milliseconds: 50)
-    // Since there are modules loaded asynchronously, which will cause the
-    // cache to be offset inaccurately, so it is set to false here
-    ..cacheJumpIndexOffset = false;
+  late ListObserverController observerController =
+      ListObserverController(controller: scrollController)
+        ..observeIntervalForScrolling = const Duration(milliseconds: 50)
+        // Since there are modules loaded asynchronously, which will cause the
+        // cache to be offset inaccurately, so it is set to false here
+        ..cacheJumpIndexOffset = false;
 
   late ChatScrollObserver keepPositionObserver = ChatScrollObserver(
     observerController,
