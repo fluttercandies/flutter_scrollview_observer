@@ -3,13 +3,13 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
 import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class GridViewFixedHeightDemoPage extends StatefulWidget {
-  const GridViewFixedHeightDemoPage({Key? key}) : super(key: key);
+  const GridViewFixedHeightDemoPage({super.key});
 
   @override
   State<GridViewFixedHeightDemoPage> createState() =>
@@ -29,8 +29,9 @@ class _GridViewFixedHeightDemoPageState
 
   List<int> _hitIndexs = [0, 1];
 
-  ScrollController scrollController =
-      ScrollController(initialScrollOffset: _leadingPadding);
+  ScrollController scrollController = ScrollController(
+    initialScrollOffset: _leadingPadding,
+  );
 
   late GridObserverController observerController;
 
@@ -41,14 +42,12 @@ class _GridViewFixedHeightDemoPageState
     observerController = GridObserverController(controller: scrollController);
 
     // Trigger an observation manually
-    ambiguate(WidgetsBinding.instance)?.endOfFrame.then(
-      (_) {
-        if (mounted) {
-          // After layout
-          observerController.dispatchOnceObserve();
-        }
-      },
-    );
+    ambiguate(WidgetsBinding.instance)?.endOfFrame.then((_) {
+      if (mounted) {
+        // After layout
+        observerController.dispatchOnceObserve();
+      }
+    });
   }
 
   @override
@@ -70,7 +69,8 @@ class _GridViewFixedHeightDemoPageState
           });
 
           debugPrint(
-              'firstGroupChildList -- ${model.firstGroupChildList.map((e) => e.index)}');
+            'firstGroupChildList -- ${model.firstGroupChildList.map((e) => e.index)}',
+          );
           debugPrint('displaying -- ${model.displayingChildIndexList}');
         },
         child: _buildGridView(),
@@ -78,10 +78,7 @@ class _GridViewFixedHeightDemoPageState
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.airline_stops_outlined),
         onPressed: () {
-          SnackBarUtil.showSnackBar(
-            context: context,
-            text: 'Jump to item 21',
-          );
+          SnackBarUtil.showSnackBar(context: context, text: 'Jump to item 21');
           observerController.jumpTo(
             index: 21,
             padding: _padding,
@@ -104,9 +101,7 @@ class _GridViewFixedHeightDemoPageState
       itemBuilder: (context, index) {
         return Container(
           color: (_hitIndexs.contains(index)) ? Colors.red : Colors.blue[100],
-          child: Center(
-            child: Text('index -- $index'),
-          ),
+          child: Center(child: Text('index -- $index')),
         );
       },
       itemCount: 50,

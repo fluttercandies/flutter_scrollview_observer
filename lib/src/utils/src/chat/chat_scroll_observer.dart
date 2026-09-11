@@ -4,7 +4,7 @@
  * @Date: 2022-09-27 23:01:58
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
@@ -60,7 +60,8 @@ class ChatScrollObserver {
   /// This callback will be called when handling in [ClampingScrollPhysics]'s
   /// [adjustPositionForNewDimensions].
   @Deprecated(
-      'It will be removed in version 2, please use [onHandlePositionResultCallback] instead')
+    'It will be removed in version 2, please use [onHandlePositionResultCallback] instead',
+  )
   void Function(ChatScrollObserverHandlePositionType)? onHandlePositionCallback;
 
   /// The result callback for processing chat location.
@@ -68,7 +69,7 @@ class ChatScrollObserver {
   /// This callback will be called when handling in [ClampingScrollPhysics]'s
   /// [adjustPositionForNewDimensions].
   void Function(ChatScrollObserverHandlePositionResultModel)?
-      onHandlePositionResultCallback;
+  onHandlePositionResultCallback;
 
   /// The mode of processing.
   ChatScrollObserverHandleMode innerMode = ChatScrollObserverHandleMode.normal;
@@ -116,10 +117,12 @@ class ChatScrollObserver {
     ChatScrollObserverRefIndexType refIndexType =
         ChatScrollObserverRefIndexType.relativeIndexStartFromCacheExtent,
     @Deprecated(
-        'It will be removed in version 2, please use [refItemIndex] instead')
+      'It will be removed in version 2, please use [refItemIndex] instead',
+    )
     int refItemRelativeIndex = 0,
     @Deprecated(
-        'It will be removed in version 2, please use [refItemIndexAfterUpdate] instead')
+      'It will be removed in version 2, please use [refItemIndexAfterUpdate] instead',
+    )
     int refItemRelativeIndexAfterUpdate = 0,
     int refItemIndex = 0,
     int refItemIndexAfterUpdate = 0,
@@ -135,18 +138,18 @@ class ChatScrollObserver {
       observeSwitchShrinkWrap();
     }
 
-    int _innerRefItemIndex;
-    int _innerRefItemIndexAfterUpdate;
-    double _innerRefItemLayoutOffset;
+    int innerRefItemIndex;
+    int innerRefItemIndexAfterUpdate;
+    double innerRefItemLayoutOffset;
     switch (mode) {
       case ChatScrollObserverHandleMode.normal:
         final firstItemModel = observerController.observeFirstItem(
           sliverContext: sliverContext,
         );
         if (firstItemModel == null) return;
-        _innerRefItemIndex = firstItemModel.index;
-        _innerRefItemIndexAfterUpdate = _innerRefItemIndex + changeCount;
-        _innerRefItemLayoutOffset = firstItemModel.layoutOffset;
+        innerRefItemIndex = firstItemModel.index;
+        innerRefItemIndexAfterUpdate = innerRefItemIndex + changeCount;
+        innerRefItemLayoutOffset = firstItemModel.layoutOffset;
         break;
       case ChatScrollObserverHandleMode.generative:
         final firstItemModel = observerController.observeFirstItem(
@@ -159,15 +162,16 @@ class ChatScrollObserver {
           index: index,
         );
         if (model == null) return;
-        _innerRefItemIndex = index;
-        _innerRefItemIndexAfterUpdate = index;
-        _innerRefItemLayoutOffset = model.layoutOffset;
+        innerRefItemIndex = index;
+        innerRefItemIndexAfterUpdate = index;
+        innerRefItemLayoutOffset = model.layoutOffset;
         break;
       case ChatScrollObserverHandleMode.specified:
         // Prioritize the values ​​of [refItemIndex] and [refItemIndexAfterUpdate]
-        int _refItemIndex =
-            refItemIndex != 0 ? refItemIndex : refItemRelativeIndex;
-        int _refItemIndexAfterUpdate = refItemIndexAfterUpdate != 0
+        int refItemIndex0 = refItemIndex != 0
+            ? refItemIndex
+            : refItemRelativeIndex;
+        int refItemIndexAfterUpdate0 = refItemIndexAfterUpdate != 0
             ? refItemIndexAfterUpdate
             : refItemRelativeIndexAfterUpdate;
 
@@ -177,16 +181,16 @@ class ChatScrollObserver {
               sliverContext: sliverContext,
             );
             if (firstItemModel == null) return;
-            int index = firstItemModel.index + _refItemIndex;
+            int index = firstItemModel.index + refItemIndex0;
             final model = observerController.observeItem(
               sliverContext: sliverContext,
               index: index,
             );
             if (model == null) return;
-            _innerRefItemIndex = index;
-            _innerRefItemIndexAfterUpdate =
-                firstItemModel.index + _refItemIndexAfterUpdate;
-            _innerRefItemLayoutOffset = model.layoutOffset;
+            innerRefItemIndex = index;
+            innerRefItemIndexAfterUpdate =
+                firstItemModel.index + refItemIndexAfterUpdate0;
+            innerRefItemLayoutOffset = model.layoutOffset;
             break;
           case ChatScrollObserverRefIndexType.relativeIndexStartFromDisplaying:
             final observeResult = await observerController.dispatchOnceObserve(
@@ -194,36 +198,37 @@ class ChatScrollObserver {
               isDependObserveCallback: false,
             );
             if (!observeResult.isSuccess) return;
+            if (sliverContext != null && !sliverContext.mounted) return;
             final currentFirstDisplayingChildIndex =
                 observeResult.observeResult?.firstChild?.index ?? 0;
-            int index = currentFirstDisplayingChildIndex + _refItemIndex;
+            int index = currentFirstDisplayingChildIndex + refItemIndex0;
             final model = observerController.observeItem(
               sliverContext: sliverContext,
               index: index,
             );
             if (model == null) return;
-            _innerRefItemIndex = index;
-            _innerRefItemIndexAfterUpdate =
-                currentFirstDisplayingChildIndex + _refItemIndexAfterUpdate;
-            _innerRefItemLayoutOffset = model.layoutOffset;
+            innerRefItemIndex = index;
+            innerRefItemIndexAfterUpdate =
+                currentFirstDisplayingChildIndex + refItemIndexAfterUpdate0;
+            innerRefItemLayoutOffset = model.layoutOffset;
             break;
           case ChatScrollObserverRefIndexType.itemIndex:
             final model = observerController.observeItem(
               sliverContext: sliverContext,
-              index: _refItemIndex,
+              index: refItemIndex0,
             );
             if (model == null) return;
-            _innerRefItemIndex = _refItemIndex;
-            _innerRefItemIndexAfterUpdate = _refItemIndexAfterUpdate;
-            _innerRefItemLayoutOffset = model.layoutOffset;
+            innerRefItemIndex = refItemIndex0;
+            innerRefItemIndexAfterUpdate = refItemIndexAfterUpdate0;
+            innerRefItemLayoutOffset = model.layoutOffset;
             break;
         }
     }
     // Record value.
     innerIsNeedFixedPosition = true;
-    innerRefItemIndex = _innerRefItemIndex;
-    innerRefItemIndexAfterUpdate = _innerRefItemIndexAfterUpdate;
-    innerRefItemLayoutOffset = _innerRefItemLayoutOffset;
+    this.innerRefItemIndex = innerRefItemIndex;
+    this.innerRefItemIndexAfterUpdate = innerRefItemIndexAfterUpdate;
+    this.innerRefItemLayoutOffset = innerRefItemLayoutOffset;
     this.customAdjustPosition = customAdjustPosition;
     this.customAdjustPositionDelta = customAdjustPositionDelta;
 
@@ -239,7 +244,7 @@ class ChatScrollObserver {
     // Related issue
     // https://github.com/fluttercandies/flutter_scrollview_observer/issues/64
     final ctx = observerController.fetchSliverContext();
-    if (ctx == null) return;
+    if (ctx == null || !ctx.mounted) return;
     final obj = ObserverUtils.findRenderObject(ctx);
     if (obj == null) return;
     final viewport = ObserverUtils.findViewport(obj);

@@ -4,7 +4,7 @@
  * @Date: 2026-02-24 22:35:11
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get/get.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/header/nested_scrollview_tab_bar_view_demo_header.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/logic/nested_scrollview_tab_bar_view_demo_logic.dart';
@@ -23,7 +23,8 @@ class _NestedScrollviewTabBarViewDemoTab3ViewState
     extends State<NestedScrollviewTabBarViewDemoTab3View>
     with
         NestedScrollviewTabBarViewDemoLogicConsumerMixin<
-            NestedScrollviewTabBarViewDemoTab3View> {
+          NestedScrollviewTabBarViewDemoTab3View
+        > {
   NestedScrollViewTabBarViewDemoState get state => logic.state;
 
   @override
@@ -47,24 +48,20 @@ class _NestedScrollviewTabBarViewDemoTab3ViewState
 
   Widget _buildSliverList() {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (ctx, index) {
-          logic.updateNestedScrollUtilBodySliverContextsIfNeed(
-            oldCtx: state.tab3SliverListCtx,
-            newCtx: ctx,
-            toRecordCtx: () {
-              state.tab3SliverListCtx = ctx;
-            },
-          );
+      delegate: SliverChildBuilderDelegate((ctx, index) {
+        logic.updateNestedScrollUtilBodySliverContextsIfNeed(
+          oldCtx: state.tab3SliverListCtx,
+          newCtx: ctx,
+          toRecordCtx: () {
+            state.tab3SliverListCtx = ctx;
+          },
+        );
 
-          return ListTile(
-            tileColor:
-                state.hitIndexForTab3ListCtx == index ? Colors.red : null,
-            title: Text("Tab 3 - List Item $index"),
-          );
-        },
-        childCount: 10,
-      ),
+        return ListTile(
+          tileColor: state.hitIndexForTab3ListCtx == index ? Colors.red : null,
+          title: Text("Tab 3 - List Item $index"),
+        );
+      }, childCount: 10),
     );
   }
 
@@ -76,26 +73,23 @@ class _NestedScrollviewTabBarViewDemoTab3ViewState
         crossAxisSpacing: 10.0,
         childAspectRatio: 2.0,
       ),
-      delegate: SliverChildBuilderDelegate(
-        (ctx, index) {
-          logic.updateNestedScrollUtilBodySliverContextsIfNeed(
-            oldCtx: state.tab3SliverGridCtx,
-            newCtx: ctx,
-            toRecordCtx: () {
-              state.tab3SliverGridCtx = ctx;
-            },
-          );
+      delegate: SliverChildBuilderDelegate((ctx, index) {
+        logic.updateNestedScrollUtilBodySliverContextsIfNeed(
+          oldCtx: state.tab3SliverGridCtx,
+          newCtx: ctx,
+          toRecordCtx: () {
+            state.tab3SliverGridCtx = ctx;
+          },
+        );
 
-          return Container(
-            color: state.hitIndexesForTab3Grid.contains(index)
-                ? Colors.green
-                : Colors.green[100],
-            alignment: Alignment.center,
-            child: Text('Tab 3 - Grid Item $index'),
-          );
-        },
-        childCount: 20,
-      ),
+        return Container(
+          color: state.hitIndexesForTab3Grid.contains(index)
+              ? Colors.green
+              : Colors.green[100],
+          alignment: Alignment.center,
+          child: Text('Tab 3 - Grid Item $index'),
+        );
+      }, childCount: 20),
     );
     resultWidget = SliverPadding(
       padding: const EdgeInsets.all(8),

@@ -4,16 +4,16 @@
  * @Date: 2026-02-23 22:19:39
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:getx_helper/getx_helper.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/logic/nested_scrollview_tab_bar_view_demo_logic.dart';
 
-typedef NestedScrollviewTabBarViewDemoLogicPutMixin<W extends StatefulWidget>
-    = GetxLogicPutStateMixin<NestedScrollViewTabBarViewDemoLogic, W>;
+typedef NestedScrollviewTabBarViewDemoLogicPutMixin<W extends StatefulWidget> =
+    GetxLogicPutStateMixin<NestedScrollViewTabBarViewDemoLogic, W>;
 
 typedef NestedScrollviewTabBarViewDemoLogicConsumerMixin<
-        W extends StatefulWidget>
-    = GetxLogicConsumerStateMixin<NestedScrollViewTabBarViewDemoLogic, W>;
+  W extends StatefulWidget
+> = GetxLogicConsumerStateMixin<NestedScrollViewTabBarViewDemoLogic, W>;
 
 enum NestedScrollviewTabBarViewDemoUpdateType {
   scrollTypeSwitch,
@@ -30,9 +30,7 @@ enum NestedScrollviewTabBarViewDemoTabType {
   tab2(title: "Grid"),
   tab3(title: "List+Grid");
 
-  const NestedScrollviewTabBarViewDemoTabType({
-    required this.title,
-  });
+  const NestedScrollviewTabBarViewDemoTabType({required this.title});
 
   final String title;
 }

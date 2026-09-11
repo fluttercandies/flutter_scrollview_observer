@@ -62,25 +62,25 @@ mixin ObserveDisplayingChildModelMixin on ObserveDisplayingChildModel {
   /// The visible size of the child widget in the main axis.
   double get visibleMainAxisSize {
     if (paintExtent == 0) return 0;
-    double _visibleMainAxisSize = mainAxisSize;
+    double visibleMainAxisSize = mainAxisSize;
     final currentChildLayoutOffset = layoutOffset;
     final scrollOffset = sliver.constraints.scrollOffset;
     final leadingScrollViewOffset = scrollOffset + overlap;
     if (leadingScrollViewOffset > currentChildLayoutOffset) {
       // The child widget is blocked by the leading direction side of viewport.
-      _visibleMainAxisSize =
+      visibleMainAxisSize =
           mainAxisSize - (leadingScrollViewOffset - currentChildLayoutOffset);
     } else if (scrollOffset + paintExtent >
         currentChildLayoutOffset + mainAxisSize) {
       // The child widget is being fully displayed.
-      _visibleMainAxisSize = mainAxisSize;
+      visibleMainAxisSize = mainAxisSize;
     } else {
       // The child widget is blocked by the trailing direction side of viewport.
-      _visibleMainAxisSize =
+      visibleMainAxisSize =
           scrollOffset + paintExtent - currentChildLayoutOffset;
     }
-    _visibleMainAxisSize = _visibleMainAxisSize.clamp(0, mainAxisSize);
-    return _visibleMainAxisSize;
+    visibleMainAxisSize = visibleMainAxisSize.clamp(0, mainAxisSize);
+    return visibleMainAxisSize;
   }
 
   /// The visible fraction of the child widget on the corresponding sliver.

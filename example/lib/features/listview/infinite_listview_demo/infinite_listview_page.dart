@@ -6,11 +6,11 @@
 
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
 class InfiniteListViewPage extends StatefulWidget {
-  const InfiniteListViewPage({Key? key}) : super(key: key);
+  const InfiniteListViewPage({super.key});
 
   @override
   State<InfiniteListViewPage> createState() => _InfiniteListViewPageState();
@@ -42,7 +42,7 @@ class _InfiniteListViewPageState extends State<InfiniteListViewPage> {
 
   late ChatScrollObserver chatObserver;
 
-  handleLoadMoreForHeader() async {
+  Future<void> handleLoadMoreForHeader() async {
     if (isLoadingForHeader) return; // loading
     isLoadingForHeader = true;
     int initIndex = 0;
@@ -69,7 +69,7 @@ class _InfiniteListViewPageState extends State<InfiniteListViewPage> {
     isLoadingForHeader = false;
   }
 
-  handleLoadMoreForFooter() async {
+  Future<void> handleLoadMoreForFooter() async {
     if (isLoadingForFooter) return; // loading
     isLoadingForFooter = true;
     int initIndex = 0;
@@ -81,9 +81,7 @@ class _InfiniteListViewPageState extends State<InfiniteListViewPage> {
       dataSource.addAll(
         List.generate(generateCount, (index) => index + initIndex + 1),
       );
-      itemHeights.addAll(
-        List.generate(generateCount, (_) => randomItemHeight),
-      );
+      itemHeights.addAll(List.generate(generateCount, (_) => randomItemHeight));
     });
     isLoadingForFooter = false;
   }
@@ -115,7 +113,8 @@ class _InfiniteListViewPageState extends State<InfiniteListViewPage> {
         child: _buildListView(),
         onObserve: (result) {
           debugPrint(
-              'displaying -- ${result.displayingChildIndexList.map((i) => dataSource[i])}');
+            'displaying -- ${result.displayingChildIndexList.map((i) => dataSource[i])}',
+          );
 
           if (result.firstChild?.index == 0) {
             final firstChildLeadingMarginToViewport =
@@ -161,18 +160,13 @@ class _InfiniteListViewPageState extends State<InfiniteListViewPage> {
       child: Center(
         child: Text(
           "index -- ${dataSource[index]}",
-          style: const TextStyle(
-            color: Colors.black,
-          ),
+          style: const TextStyle(color: Colors.black),
         ),
       ),
     );
   }
 
   Widget _buildSeparatorView() {
-    return Container(
-      color: Colors.white,
-      width: 5,
-    );
+    return Container(color: Colors.white, width: 5);
   }
 }

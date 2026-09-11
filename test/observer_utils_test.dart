@@ -4,7 +4,7 @@
  * @Date: 2024-05-20 22:19:27
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
@@ -20,10 +20,7 @@ void main() {
       child: ListView.separated(
         controller: scrollController,
         itemBuilder: (ctx, index) {
-          return const SizedBox(
-            width: double.infinity,
-            height: 80,
-          );
+          return const SizedBox(width: double.infinity, height: 80);
         },
         separatorBuilder: (ctx, index) {
           return const SizedBox(height: 10);
@@ -32,9 +29,9 @@ void main() {
       ),
     );
     widget = ListViewObserver(
-      child: widget,
       controller: observerController,
       onObserve: (resultModel) => observeModel = resultModel,
+      child: widget,
     );
     await tester.pumpWidget(widget);
 

@@ -4,7 +4,7 @@
  * @Date: 2023-09-16 19:41:33
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
@@ -14,14 +14,11 @@ class MultiSliverDemoModel {
   final String tag;
   final List<String> value;
 
-  const MultiSliverDemoModel({
-    required this.tag,
-    required this.value,
-  });
+  const MultiSliverDemoModel({required this.tag, required this.value});
 }
 
 class MultiSliverDemoPage extends StatefulWidget {
-  const MultiSliverDemoPage({Key? key}) : super(key: key);
+  const MultiSliverDemoPage({super.key});
 
   @override
   State<MultiSliverDemoPage> createState() => _MultiSliverDemoPageState();
@@ -73,9 +70,7 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
   }
 
   /// To observe sliver items and handle scrollTo.
-  Widget _buildSliverItemObserver({
-    required Widget child,
-  }) {
+  Widget _buildSliverItemObserver({required Widget child}) {
     return SliverViewObserver(
       controller: sliverItemObserverController,
       sliverContexts: () => itemSliverIndexCtxMap.values.toList(),
@@ -84,12 +79,9 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
   }
 
   /// To observe which sliver is currently the first.
-  Widget _buildSliverObserver({
-    required Widget child,
-  }) {
+  Widget _buildSliverObserver({required Widget child}) {
     return SliverViewObserver(
       // controller: sliverObserverController,
-      child: child,
       sliverContexts: () => sliverIndexCtxMap.values.toList(),
       triggerOnObserveType: ObserverTriggerOnObserveType.directly,
       dynamicLeadingOffset: () {
@@ -112,7 +104,7 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
           // If the sliver is not visible, continue.
           final visible =
               (ctx.findRenderObject() as RenderSliver).geometry?.visible ??
-                  false;
+              false;
           if (!visible) continue;
           currentTabIndex = sectionIndex;
           break;
@@ -120,6 +112,8 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
         if (currentTabIndex == null) return;
         updateTabBarIndex(currentTabIndex);
       },
+      // controller: sliverObserverController,
+      child: child,
     );
   }
 
@@ -187,9 +181,7 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
                         border: Border.all(width: 0.5),
                         color: value == index ? Colors.amber : Colors.white,
                       ),
-                      child: Text(
-                        modelList[index].tag,
-                      ),
+                      child: Text(modelList[index].tag),
                     );
                   },
                 ),
@@ -209,27 +201,20 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
         color: Colors.white,
         padding: const EdgeInsets.only(left: 12),
         alignment: Alignment.centerLeft,
-        child: Text(
-          modelList[mainIndex].tag,
-        ),
+        child: Text(modelList[mainIndex].tag),
       ),
       sliver: SliverFixedExtentList(
         itemExtent: 120,
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            // Save the context of SliverList.
-            itemSliverIndexCtxMap[mainIndex] = context;
-            return Container(
-              padding: const EdgeInsets.only(left: 12),
-              color: RandomTool.color(),
-              alignment: Alignment.centerLeft,
-              child: Text(
-                modelList[mainIndex].value[index],
-              ),
-            );
-          },
-          childCount: modelList[mainIndex].value.length,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          // Save the context of SliverList.
+          itemSliverIndexCtxMap[mainIndex] = context;
+          return Container(
+            padding: const EdgeInsets.only(left: 12),
+            color: RandomTool.color(),
+            alignment: Alignment.centerLeft,
+            child: Text(modelList[mainIndex].value[index]),
+          );
+        }, childCount: modelList[mainIndex].value.length),
       ),
     );
     resultWidget = SliverObserveContext(
@@ -242,7 +227,7 @@ class _MultiSliverDemoPageState extends State<MultiSliverDemoPage> {
     return resultWidget;
   }
 
-  updateTabBarIndex(int index) {
+  void updateTabBarIndex(int index) {
     if (index == tabCurrentSelectedIndex.value) return;
     tabCurrentSelectedIndex.value = index;
   }

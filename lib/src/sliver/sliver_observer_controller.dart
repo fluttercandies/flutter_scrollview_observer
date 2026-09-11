@@ -3,7 +3,7 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/observer_controller.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
@@ -14,15 +14,14 @@ class SliverObserverController extends ObserverController
         ObserverControllerForInfo,
         ObserverControllerForScroll,
         ObserverControllerForNotification<
-            ObserveModel,
-            SliverObserverHandleContextsResultModel<ObserveModel>,
-            ScrollViewOnceObserveNotificationResult> {
+          ObserveModel,
+          SliverObserverHandleContextsResultModel<ObserveModel>,
+          ScrollViewOnceObserveNotificationResult
+        > {
   /// Whether to forbid the onObserveViewport callback.
   bool isForbidObserveViewportCallback = false;
 
-  SliverObserverController({
-    ScrollController? controller,
-  }) : super(controller: controller);
+  SliverObserverController({super.controller});
 
   /// Dispatch a [ScrollViewOnceObserveNotification]
   Future<ScrollViewOnceObserveNotificationResult> dispatchOnceObserve({
@@ -42,7 +41,7 @@ class SliverObserverController extends ObserverController
   /// Create a observation notification result.
   @override
   ScrollViewOnceObserveNotificationResult
-      innerCreateOnceObserveNotificationResult({
+  innerCreateOnceObserveNotificationResult({
     required ObserverWidgetObserveResultType resultType,
     required SliverObserverHandleContextsResultModel<ObserveModel>? resultModel,
   }) {

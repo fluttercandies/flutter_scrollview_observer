@@ -6,14 +6,14 @@
 
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/helper/chat_data_helper.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/model/chat_model.dart';
 import 'package:scrollview_observer_example/features/scene/chat_demo/widget/chat_item_widget.dart';
 
 class ChatGPTPage extends StatefulWidget {
-  const ChatGPTPage({Key? key}) : super(key: key);
+  const ChatGPTPage({super.key});
 
   @override
   State<ChatGPTPage> createState() => _ChatGPTPageState();
@@ -75,7 +75,7 @@ class _ChatGPTPageState extends State<ChatGPTPage> {
               insertGenerativeMsg();
             },
             icon: const Icon(Icons.add_comment),
-          )
+          ),
         ],
       ),
       body: _buildBody(),
@@ -162,10 +162,7 @@ class _ChatGPTPageState extends State<ChatGPTPage> {
       controller: observerController,
       child: resultWidget,
     );
-    resultWidget = Align(
-      child: resultWidget,
-      alignment: Alignment.topCenter,
-    );
+    resultWidget = Align(alignment: Alignment.topCenter, child: resultWidget);
     return resultWidget;
   }
 
@@ -175,16 +172,14 @@ class _ChatGPTPageState extends State<ChatGPTPage> {
         .toList();
   }
 
-  _addMessage({
-    required bool isOwn,
-  }) {
+  void _addMessage({required bool isOwn}) {
     chatObserver.standby(changeCount: 1);
     setState(() {
       chatModels.insert(0, ChatDataHelper.createChatModel(isOwn: isOwn));
     });
   }
 
-  insertGenerativeMsg() {
+  void insertGenerativeMsg() {
     stopMsgUpdateStream();
     _addMessage(isOwn: false);
     int count = 0;
@@ -226,7 +221,7 @@ class _ChatGPTPageState extends State<ChatGPTPage> {
     });
   }
 
-  stopMsgUpdateStream() {
+  void stopMsgUpdateStream() {
     timer?.cancel();
     timer = null;
   }

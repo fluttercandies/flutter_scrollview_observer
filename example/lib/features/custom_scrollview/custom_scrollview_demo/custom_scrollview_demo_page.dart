@@ -3,13 +3,13 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
 import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class CustomScrollViewDemoPage extends StatefulWidget {
-  const CustomScrollViewDemoPage({Key? key}) : super(key: key);
+  const CustomScrollViewDemoPage({super.key});
 
   @override
   State<CustomScrollViewDemoPage> createState() =>
@@ -35,9 +35,7 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
 
     // Trigger an observation manually
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((timeStamp) {
-      observerController.dispatchOnceObserve(
-        sliverContext: _sliverListCtx!,
-      );
+      observerController.dispatchOnceObserve(sliverContext: _sliverListCtx!);
     });
   }
 
@@ -55,10 +53,7 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
         controller: observerController,
         child: _buildScrollView(),
         sliverContexts: () {
-          return [
-            if (_sliverListCtx != null) _sliverListCtx!,
-            if (_sliverGridCtx != null) _sliverGridCtx!,
-          ];
+          return [?_sliverListCtx, ?_sliverGridCtx];
         },
         onObserveAll: (resultMap) {
           final model1 = resultMap[_sliverListCtx];
@@ -80,8 +75,9 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
             debugPrint('2 visible -- ${model2.visible}');
             debugPrint('2 displaying -- ${model2.displayingChildIndexList}');
             setState(() {
-              _hitIndexsForGrid =
-                  model2.firstGroupChildList.map((e) => e.index).toList();
+              _hitIndexsForGrid = model2.firstGroupChildList
+                  .map((e) => e.index)
+                  .toList();
             });
           }
         },
@@ -131,10 +127,7 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
     return CustomScrollView(
       controller: scrollController,
       // scrollDirection: Axis.horizontal,
-      slivers: [
-        _buildSliverListView(),
-        _buildSliverGridView(),
-      ],
+      slivers: [_buildSliverListView(), _buildSliverGridView()],
     );
   }
 
@@ -162,25 +155,21 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
     //   itemExtent: 100,
     // );
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (ctx, index) {
-          _sliverListCtx ??= ctx;
-          return Container(
-            height: (index % 2 == 0) ? 80 : 50,
-            color: _hitIndexForCtx1 == index ? Colors.red : Colors.black12,
-            child: Center(
-              child: Text(
-                "index -- $index",
-                style: TextStyle(
-                  color:
-                      _hitIndexForCtx1 == index ? Colors.white : Colors.black,
-                ),
+      delegate: SliverChildBuilderDelegate((ctx, index) {
+        _sliverListCtx ??= ctx;
+        return Container(
+          height: (index % 2 == 0) ? 80 : 50,
+          color: _hitIndexForCtx1 == index ? Colors.red : Colors.black12,
+          child: Center(
+            child: Text(
+              "index -- $index",
+              style: TextStyle(
+                color: _hitIndexForCtx1 == index ? Colors.white : Colors.black,
               ),
             ),
-          );
-        },
-        childCount: 30,
-      ),
+          ),
+        );
+      }, childCount: 30),
     );
   }
 
@@ -192,20 +181,15 @@ class _CustomScrollViewDemoPageState extends State<CustomScrollViewDemoPage> {
         crossAxisSpacing: 10.0,
         childAspectRatio: 2.0,
       ),
-      delegate: SliverChildBuilderDelegate(
-        (BuildContext context, int index) {
-          _sliverGridCtx ??= context;
-          return Container(
-            color: (_hitIndexsForGrid.contains(index))
-                ? Colors.green
-                : Colors.blue[100],
-            child: Center(
-              child: Text('index -- $index'),
-            ),
-          );
-        },
-        childCount: 150,
-      ),
+      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+        _sliverGridCtx ??= context;
+        return Container(
+          color: (_hitIndexsForGrid.contains(index))
+              ? Colors.green
+              : Colors.blue[100],
+          child: Center(child: Text('index -- $index')),
+        );
+      }, childCount: 150),
     );
   }
 }

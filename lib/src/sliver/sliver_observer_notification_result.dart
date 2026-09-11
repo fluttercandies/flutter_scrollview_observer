@@ -6,22 +6,23 @@
 
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
 import 'package:scrollview_observer/src/common/observer_notification_result.dart';
-import 'package:scrollview_observer/src/common/typedefs.dart';
 import 'package:scrollview_observer/src/sliver/models/sliver_observer_observe_result_model.dart';
 import 'package:scrollview_observer/src/sliver/models/sliver_viewport_observe_model.dart';
 
 class ScrollViewOnceObserveNotificationResult
-    extends CommonOnceObserveNotificationResult<ObserveModel,
-        SliverObserverHandleContextsResultModel<ObserveModel>> {
+    extends
+        CommonOnceObserveNotificationResult<
+          ObserveModel,
+          SliverObserverHandleContextsResultModel<ObserveModel>
+        > {
   ScrollViewOnceObserveNotificationResult({
-    required ObserverWidgetObserveResultType type,
+    required super.type,
     required SliverObserverHandleContextsResultModel<ObserveModel>
-        observeResult,
+    observeResult,
   }) : super(
-          type: type,
-          observeResult: observeResult.changeResultModel,
-          observeAllResult: observeResult.changeResultMap,
-        ) {
+         observeResult: observeResult.changeResultModel,
+         observeAllResult: observeResult.changeResultMap,
+       ) {
     observeViewportResultModel = observeResult.observeViewportResultModel;
   }
 

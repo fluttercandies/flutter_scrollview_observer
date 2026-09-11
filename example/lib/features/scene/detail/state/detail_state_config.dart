@@ -4,7 +4,7 @@
  * @Date: 2025-08-05 22:42:42
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 
 mixin DetailStateForConfig {
@@ -15,12 +15,7 @@ mixin DetailStateForConfig {
   List<DropdownMenuEntry<DetailModuleType>> get configDefaultAnchorEntries {
     List<DropdownMenuEntry<DetailModuleType>> entries = [];
     for (final moduleType in DetailModuleType.values) {
-      entries.add(
-        DropdownMenuEntry(
-          value: moduleType,
-          label: moduleType.name,
-        ),
-      );
+      entries.add(DropdownMenuEntry(value: moduleType, label: moduleType.name));
     }
     return entries;
   }
@@ -29,15 +24,10 @@ mixin DetailStateForConfig {
       DetailRefreshIndicatorType.none;
 
   List<DropdownMenuEntry<DetailRefreshIndicatorType>>
-      get configRefreshIndicatorEntries {
+  get configRefreshIndicatorEntries {
     List<DropdownMenuEntry<DetailRefreshIndicatorType>> entries = [];
     for (final moduleType in DetailRefreshIndicatorType.values) {
-      entries.add(
-        DropdownMenuEntry(
-          value: moduleType,
-          label: moduleType.name,
-        ),
-      );
+      entries.add(DropdownMenuEntry(value: moduleType, label: moduleType.name));
     }
     return entries;
   }

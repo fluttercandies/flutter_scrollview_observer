@@ -4,7 +4,7 @@
  * @Date: 2025-08-02 21:30:01
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 import 'package:scrollview_observer_example/features/scene/detail/widget/detail_list_item_wrapper.dart';
 
@@ -58,10 +58,7 @@ class _DetailListModule4State extends State<DetailListModule4>
       ],
     );
     resultWidget = Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 8,
-      ),
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -83,20 +80,14 @@ class _DetailListModule4State extends State<DetailListModule4>
   Widget _buildItemSubtitle(int index) {
     return Text(
       'Software Engineer - Company ${index + 1}',
-      style: const TextStyle(
-        color: Colors.grey,
-        fontSize: 14,
-      ),
+      style: const TextStyle(color: Colors.grey, fontSize: 14),
     );
   }
 
   Widget _buildItemTitle(int index) {
     return Text(
       'User Name ${index + 1}',
-      style: const TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-      ),
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
     );
   }
 
@@ -104,18 +95,11 @@ class _DetailListModule4State extends State<DetailListModule4>
     return CircleAvatar(
       radius: 30,
       backgroundColor: Colors.blue.shade100,
-      child: Icon(
-        Icons.person,
-        size: 30,
-        color: Colors.blue.shade800,
-      ),
+      child: Icon(Icons.person, size: 30, color: Colors.blue.shade800),
     );
   }
 
   Widget _buildItemArrow() {
-    return Icon(
-      Icons.arrow_forward_ios,
-      color: Colors.grey.shade400,
-    );
+    return Icon(Icons.arrow_forward_ios, color: Colors.grey.shade400);
   }
 }

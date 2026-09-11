@@ -6,11 +6,11 @@
 
 import 'dart:collection';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:scrollview_observer/src/common/observer_typedef.dart';
 
-class SliverObserverListenerEntry
+base class SliverObserverListenerEntry
     extends LinkedListEntry<SliverObserverListenerEntry> {
   SliverObserverListenerEntry({
     required this.context,

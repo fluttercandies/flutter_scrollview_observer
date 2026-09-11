@@ -3,12 +3,12 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
 
 class SliverGridViewDemoPage extends StatefulWidget {
-  const SliverGridViewDemoPage({Key? key}) : super(key: key);
+  const SliverGridViewDemoPage({super.key});
 
   @override
   State<SliverGridViewDemoPage> createState() => _SliverGridViewDemoPageState();
@@ -37,33 +37,34 @@ class _SliverGridViewDemoPageState extends State<SliverGridViewDemoPage> {
       appBar: AppBar(title: const Text("GridView")),
       body: GridViewObserver(
         sliverGridContexts: () {
-          return [
-            if (_sliverGridViewContext1 != null) _sliverGridViewContext1!,
-            if (_sliverGridViewContext2 != null) _sliverGridViewContext2!
-          ];
+          return [?_sliverGridViewContext1, ?_sliverGridViewContext2];
         },
         onObserveAll: (resultMap) {
           final model1 = resultMap[_sliverGridViewContext1];
           if (model1 != null && model1.visible) {
             setState(() {
-              _hitIndexs1 =
-                  model1.firstGroupChildList.map((e) => e.index).toList();
+              _hitIndexs1 = model1.firstGroupChildList
+                  .map((e) => e.index)
+                  .toList();
             });
 
             debugPrint(
-                '1 -- firstGroupChildList -- ${model1.firstGroupChildList.map((e) => e.index)}');
+              '1 -- firstGroupChildList -- ${model1.firstGroupChildList.map((e) => e.index)}',
+            );
             debugPrint('1 -- displaying -- ${model1.displayingChildIndexList}');
           }
 
           final model2 = resultMap[_sliverGridViewContext2];
           if (model2 != null && model2.visible) {
             setState(() {
-              _hitIndexs2 =
-                  model2.firstGroupChildList.map((e) => e.index).toList();
+              _hitIndexs2 = model2.firstGroupChildList
+                  .map((e) => e.index)
+                  .toList();
             });
 
             debugPrint(
-                '2 -- firstGroupChildList -- ${model2.firstGroupChildList.map((e) => e.index)}');
+              '2 -- firstGroupChildList -- ${model2.firstGroupChildList.map((e) => e.index)}',
+            );
             debugPrint('2 -- displaying -- ${model2.displayingChildIndexList}');
           }
         },
@@ -74,30 +75,21 @@ class _SliverGridViewDemoPageState extends State<SliverGridViewDemoPage> {
 
   Widget _buildGridView() {
     return CustomScrollView(
-      slivers: [
-        _buildSliverGridView1(),
-        _buildSliverGridView2(),
-      ],
+      slivers: [_buildSliverGridView1(), _buildSliverGridView2()],
     );
   }
 
   Widget _buildSliverGridView1() {
     return SliverGrid(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          if (_sliverGridViewContext1 != context) {
-            _sliverGridViewContext1 = context;
-          }
-          return Container(
-            color:
-                (_hitIndexs1.contains(index)) ? Colors.red : Colors.blue[100],
-            child: Center(
-              child: Text('index -- $index'),
-            ),
-          );
-        },
-        childCount: 50,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        if (_sliverGridViewContext1 != context) {
+          _sliverGridViewContext1 = context;
+        }
+        return Container(
+          color: (_hitIndexs1.contains(index)) ? Colors.red : Colors.blue[100],
+          child: Center(child: Text('index -- $index')),
+        );
+      }, childCount: 50),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 2,
@@ -108,21 +100,15 @@ class _SliverGridViewDemoPageState extends State<SliverGridViewDemoPage> {
 
   Widget _buildSliverGridView2() {
     return SliverGrid(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          if (_sliverGridViewContext2 != context) {
-            _sliverGridViewContext2 = context;
-          }
-          return Container(
-            color:
-                (_hitIndexs2.contains(index)) ? Colors.red : Colors.blue[100],
-            child: Center(
-              child: Text('index -- $index'),
-            ),
-          );
-        },
-        childCount: 50,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        if (_sliverGridViewContext2 != context) {
+          _sliverGridViewContext2 = context;
+        }
+        return Container(
+          color: (_hitIndexs2.contains(index)) ? Colors.red : Colors.blue[100],
+          child: Center(child: Text('index -- $index')),
+        );
+      }, childCount: 50),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 140.0,
         childAspectRatio: 0.6,

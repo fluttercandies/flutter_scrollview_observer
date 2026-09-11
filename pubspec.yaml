@@ -1,17 +1,18 @@
 name: scrollview_observer
 description: A widget for observing data related to the child widgets being displayed in a ScrollView.
-version: 1.27.1
+version: 2.0.0
 homepage: https://github.com/fluttercandies/flutter_scrollview_observer
 
 environment:
-  sdk: ">=2.19.0 <4.0.0"
-  flutter: '>=3.7.0'
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
 
 dependencies:
   flutter:
     sdk: flutter
+  material_ui: ^1.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^1.0.0
+  flutter_lints: ^6.0.0

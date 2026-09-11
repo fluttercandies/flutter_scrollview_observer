@@ -5,13 +5,13 @@
  */
 // ignore: implementation_imports
 import 'package:extended_list/src/rendering/sliver_list.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:loading_more_list/loading_more_list.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class ListViewCustomDemoPage extends StatefulWidget {
-  const ListViewCustomDemoPage({Key? key}) : super(key: key);
+  const ListViewCustomDemoPage({super.key});
 
   @override
   State<ListViewCustomDemoPage> createState() => _ListViewCustomDemoPageState();
@@ -24,9 +24,7 @@ class _ListViewCustomDemoPageState extends State<ListViewCustomDemoPage> {
 
   @override
   void initState() {
-    observerController = ListObserverController(
-      controller: scrollController,
-    );
+    observerController = ListObserverController(controller: scrollController);
     super.initState();
   }
 
@@ -35,7 +33,6 @@ class _ListViewCustomDemoPageState extends State<ListViewCustomDemoPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Custom')),
       body: ListViewObserver(
-        child: _buildListView(),
         controller: observerController,
         customTargetRenderSliverType: (renderObj) {
           // Here you tell the package what type of RenderObject it needs to observe.
@@ -52,18 +49,13 @@ class _ListViewCustomDemoPageState extends State<ListViewCustomDemoPage> {
           debugPrint('firstChild.index -- ${resultModel.firstChild?.index}');
           debugPrint('displaying -- ${resultModel.displayingChildIndexList}');
         },
+        child: _buildListView(),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.airline_stops_sharp),
         onPressed: () {
-          SnackBarUtil.showSnackBar(
-            context: context,
-            text: 'Jump to row 10',
-          );
-          observerController.jumpTo(
-            index: 10,
-            isFixedHeight: true,
-          );
+          SnackBarUtil.showSnackBar(context: context, text: 'Jump to row 10');
+          observerController.jumpTo(index: 10, isFixedHeight: true);
         },
       ),
     );
@@ -79,9 +71,7 @@ class _ListViewCustomDemoPageState extends State<ListViewCustomDemoPage> {
                   observerController.sliverContexts.first != context)) {
             observerController.reattach();
           }
-          return ListTile(
-            title: Text('index - $index'),
-          );
+          return ListTile(title: Text('index - $index'));
         },
         sourceList: SourceList(),
       ),

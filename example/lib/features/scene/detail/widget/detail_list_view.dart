@@ -5,7 +5,7 @@
  */
 
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 import 'package:scrollview_observer_example/features/scene/detail/logic/detail_logic_list_view.dart';
@@ -56,19 +56,17 @@ class _DetailListViewState extends State<DetailListView>
     return resultWidget;
   }
 
-  Widget _buildListView({
-    ScrollPhysics? physics,
-  }) {
-    ScrollPhysics _physics = ChatObserverClampingScrollPhysics(
+  Widget _buildListView({ScrollPhysics? physics}) {
+    ScrollPhysics resultPhysics = ChatObserverClampingScrollPhysics(
       observer: state.keepPositionObserver,
     );
     if (physics != null) {
-      _physics = physics.applyTo(_physics);
+      resultPhysics = physics.applyTo(resultPhysics);
     }
 
     Widget resultWidget = ListView.separated(
       controller: state.scrollController,
-      physics: _physics,
+      physics: resultPhysics,
       itemBuilder: (context, index) {
         switch (moduleTypes[index]) {
           case DetailModuleType.module1:
@@ -90,10 +88,7 @@ class _DetailListViewState extends State<DetailListView>
         }
       },
       separatorBuilder: (context, index) {
-        return Container(
-          color: Colors.black12,
-          height: 1,
-        );
+        return Container(color: Colors.black12, height: 1);
       },
       itemCount: moduleTypes.length,
       // Set a large enough cacheExtent to ensure that the keep position

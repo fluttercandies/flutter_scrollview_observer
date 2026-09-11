@@ -1,17 +1,13 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 
 class SliverObserveContext extends SliverPadding {
   final void Function(BuildContext) onObserve;
   const SliverObserveContext({
-    Key? key,
+    super.key,
     Widget? child,
     required this.onObserve,
-  }) : super(
-          key: key,
-          padding: EdgeInsets.zero,
-          sliver: child,
-        );
+  }) : super(padding: EdgeInsets.zero, sliver: child);
 
   @override
   RenderSliverPadding createRenderObject(BuildContext context) {
@@ -24,10 +20,10 @@ class SliverObserveContextToBoxAdapter extends SliverToBoxAdapter {
   final void Function(BuildContext) onObserve;
 
   const SliverObserveContextToBoxAdapter({
-    Key? key,
-    required Widget? child,
+    super.key,
+    required super.child,
     required this.onObserve,
-  }) : super(key: key, child: child);
+  });
 
   @override
   RenderSliverToBoxAdapter createRenderObject(BuildContext context) {

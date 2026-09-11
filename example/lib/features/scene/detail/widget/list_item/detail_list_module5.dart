@@ -4,7 +4,7 @@
  * @Date: 2025-08-02 21:32:26
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 import 'package:scrollview_observer_example/features/scene/detail/widget/detail_list_item_wrapper.dart';
 
@@ -94,9 +94,6 @@ class _DetailListModule5State extends State<DetailListModule5>
   }
 
   Widget _getTrailingWidget(int index) {
-    return Switch(
-      value: index % 2 == 0,
-      onChanged: (_) {},
-    );
+    return Switch(value: index % 2 == 0, onChanged: (_) {});
   }
 }

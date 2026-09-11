@@ -4,13 +4,14 @@
  * @Date: 2022-08-21 00:53:44
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
 import 'package:scrollview_observer/src/gridview/models/gridview_observe_displaying_child_model.dart';
 import 'package:scrollview_observer/src/gridview/models/gridview_observe_model.dart';
 import 'package:scrollview_observer/src/listview/models/listview_observe_model.dart';
 import 'package:scrollview_observer/src/utils/src/log.dart';
+
 import 'dart:math' as math;
 
 class ObserverUtils {
@@ -85,17 +86,19 @@ class ObserverUtils {
         return currentTabIndex;
       }
       var curIndex = indexes[currentTabIndex];
-      final firstGroupIndexList =
-          firstGroupChildList.map((e) => e.index).toList();
+      final firstGroupIndexList = firstGroupChildList
+          .map((e) => e.index)
+          .toList();
       final minOffset = mainChildModel.layoutOffset;
       final maxOffset =
           mainChildModel.layoutOffset + mainChildModel.mainAxisSize;
-      final displayingChildModelList =
-          observeModel.displayingChildModelList.where((e) {
-        return !firstGroupIndexList.contains(e.index) &&
-            e.layoutOffset >= minOffset &&
-            e.layoutOffset <= maxOffset;
-      }).toList();
+      final displayingChildModelList = observeModel.displayingChildModelList
+          .where((e) {
+            return !firstGroupIndexList.contains(e.index) &&
+                e.layoutOffset >= minOffset &&
+                e.layoutOffset <= maxOffset;
+          })
+          .toList();
       // If the indexes of all the children currently being displayed are
       // greater than curIndex, keep using currentTabIndex.
       // Otherwise, using targetTabIndex.
@@ -316,9 +319,11 @@ class ObserverUtils {
       // It throws an exception when getting renderObject of inactive element.
       return context?.findRenderObject();
     } catch (e) {
-      Log.warning('Cannot get renderObject of inactive element.\n'
-          'Please call the reattach method of ObserverController to re-record '
-          'BuildContext.');
+      Log.warning(
+        'Cannot get renderObject of inactive element.\n'
+        'Please call the reattach method of ObserverController to re-record '
+        'BuildContext.',
+      );
       return null;
     }
   }
@@ -374,17 +379,15 @@ class ObserverUtils {
   }
 
   /// Safely obtain [RenderSliver.constraints].
-  static SliverConstraints? sliverConstraints(
-    RenderSliver sliver,
-  ) {
-    SliverConstraints? _constraints;
+  static SliverConstraints? sliverConstraints(RenderSliver sliver) {
+    SliverConstraints? constraints;
     try {
-      _constraints = sliver.constraints;
+      constraints = sliver.constraints;
     } catch (e) {
       Log.warning(
         'A RenderObject does not have any constraints before it has been laid out.',
       );
     }
-    return _constraints;
+    return constraints;
   }
 }

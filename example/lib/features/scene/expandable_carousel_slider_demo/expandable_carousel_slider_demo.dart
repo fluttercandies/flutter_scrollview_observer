@@ -4,7 +4,7 @@
  * @Date: 2024-11-25 20:15:18
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:carousel_slider/carousel_slider.dart';
@@ -14,7 +14,7 @@ import 'package:collection/collection.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
 class ExpandableCarouselSliderDemo extends StatefulWidget {
-  const ExpandableCarouselSliderDemo({Key? key}) : super(key: key);
+  const ExpandableCarouselSliderDemo({super.key});
 
   @override
   State<ExpandableCarouselSliderDemo> createState() =>
@@ -64,9 +64,7 @@ class _ExpandableCarouselSliderDemoState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Expandable Carousel Slider'),
-      ),
+      appBar: AppBar(title: const Text('Expandable Carousel Slider')),
       body: Column(
         children: [
           _buildCarousel(),
@@ -88,9 +86,7 @@ class _ExpandableCarouselSliderDemoState
       ),
       child: const Text(
         'I am an indicator',
-        style: TextStyle(
-          color: Colors.white,
-        ),
+        style: TextStyle(color: Colors.white),
       ),
     );
   }
@@ -115,7 +111,6 @@ class _ExpandableCarouselSliderDemoState
 
     resultWidget = ListViewObserver(
       controller: observerController,
-      child: resultWidget,
       triggerOnObserveType: ObserverTriggerOnObserveType.directly,
       customTargetRenderSliverType: (renderObj) {
         return renderObj is RenderSliverFillViewport;
@@ -149,9 +144,11 @@ class _ExpandableCarouselSliderDemoState
         final progress =
             (firstChildLeadingMarginToViewport.abs() / viewportMainAxisExtent)
                 .clamp(0.0, 1.0);
-        carouselHeight.value = firstChildHeight -
+        carouselHeight.value =
+            firstChildHeight -
             ((firstChildHeight - secondChildHeight) * progress);
       },
+      child: resultWidget,
     );
     return resultWidget;
   }
@@ -159,11 +156,11 @@ class _ExpandableCarouselSliderDemoState
 
 class CarouselItem extends StatelessWidget {
   const CarouselItem({
-    Key? key,
+    super.key,
     required this.index,
     required this.height,
     required this.imgId,
-  }) : super(key: key);
+  });
 
   final int index;
   final double height;
@@ -180,11 +177,11 @@ class CarouselItem extends StatelessWidget {
           child: Container(
             width: double.infinity,
             height: height,
+            color: index % 2 == 0 ? Colors.red : Colors.amber,
             child: Image.network(
               // 'https://picsum.photos/${MediaQuery.sizeOf(context).width.toInt()}/${height.toInt()}?random=$index',
               'https://images.unsplash.com/$imgId?auto=format&fit=crop&w=${MediaQuery.sizeOf(context).width.toInt()}&h=${height.toInt()}&q=100',
             ),
-            color: index % 2 == 0 ? Colors.red : Colors.amber,
           ),
         ),
       ],

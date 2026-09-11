@@ -3,12 +3,12 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
 
 class ListViewDynamicOffsetPage extends StatefulWidget {
-  const ListViewDynamicOffsetPage({Key? key}) : super(key: key);
+  const ListViewDynamicOffsetPage({super.key});
 
   @override
   State<ListViewDynamicOffsetPage> createState() =>
@@ -58,9 +58,7 @@ class _ListViewDynamicOffsetPageState extends State<ListViewDynamicOffsetPage> {
           ListViewObserver(
             child: _buildListView(),
             sliverListContexts: () {
-              return [
-                if (_sliverListViewContext != null) _sliverListViewContext!
-              ];
+              return [?_sliverListViewContext];
             },
             dynamicLeadingOffset: () {
               if (_navBgAlpha < 1) {
@@ -85,10 +83,7 @@ class _ListViewDynamicOffsetPageState extends State<ListViewDynamicOffsetPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SafeArea(
-                  bottom: false,
-                  child: _buildNavContentWidget(context),
-                )
+                SafeArea(bottom: false, child: _buildNavContentWidget(context)),
               ],
             ),
           ),
@@ -130,10 +125,7 @@ class _ListViewDynamicOffsetPageState extends State<ListViewDynamicOffsetPage> {
   }
 
   Container _buildSeparatorView() {
-    return Container(
-      color: Colors.white,
-      height: 5,
-    );
+    return Container(color: Colors.white, height: 5);
   }
 
   Widget _buildNavContentWidget(BuildContext context) {
@@ -172,17 +164,17 @@ class _ListViewDynamicOffsetPageState extends State<ListViewDynamicOffsetPage> {
 
   void _pageDidScroll() {
     final offset = _pageController.offset;
-    double _newNavBgAlpha = 0;
+    double newNavBgAlpha = 0;
     if (offset < 0) {
-      _newNavBgAlpha = 0;
+      newNavBgAlpha = 0;
     } else if (offset >= _navContentHeight) {
-      _newNavBgAlpha = 1;
+      newNavBgAlpha = 1;
     } else {
-      _newNavBgAlpha = offset / _navContentHeight;
+      newNavBgAlpha = offset / _navContentHeight;
     }
-    if (_navBgAlpha != _newNavBgAlpha) {
+    if (_navBgAlpha != newNavBgAlpha) {
       setState(() {
-        _navBgAlpha = _newNavBgAlpha;
+        _navBgAlpha = newNavBgAlpha;
         _isShowNavTitle = _navBgAlpha > .5;
       });
     }

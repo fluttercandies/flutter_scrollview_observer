@@ -3,11 +3,11 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
 class AnchorListPage extends StatefulWidget {
-  const AnchorListPage({Key? key}) : super(key: key);
+  const AnchorListPage({super.key});
 
   @override
   State<AnchorListPage> createState() => _AnchorListPageState();
@@ -90,18 +90,13 @@ class _AnchorListPageState extends State<AnchorListPage>
       child: Center(
         child: Text(
           "index -- $index",
-          style: const TextStyle(
-            color: Colors.black,
-          ),
+          style: const TextStyle(color: Colors.black),
         ),
       ),
     );
   }
 
   Container _buildSeparatorView() {
-    return Container(
-      color: Colors.white,
-      height: 5,
-    );
+    return Container(color: Colors.white, height: 5);
   }
 }

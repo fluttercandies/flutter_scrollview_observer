@@ -3,7 +3,7 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2023-05-13 10:33:00
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'package:scrollview_observer/src/common/models/observe_displaying_child_model_mixin.dart';
 import 'package:scrollview_observer/src/utils/src/chat/chat_scroll_observer.dart';

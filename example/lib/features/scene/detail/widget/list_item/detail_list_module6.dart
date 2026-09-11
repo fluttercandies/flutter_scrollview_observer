@@ -4,7 +4,7 @@
  * @Date: 2025-08-02 21:32:31
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get/get.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 import 'package:scrollview_observer_example/features/scene/detail/logic/detail_logic.dart';
@@ -49,10 +49,7 @@ class _DetailListModule6State extends State<DetailListModule6>
         return _buildCardItem(index);
       },
     );
-    resultWidget = SizedBox(
-      height: 220,
-      child: resultWidget,
-    );
+    resultWidget = SizedBox(height: 220, child: resultWidget);
     return resultWidget;
   }
 
@@ -71,21 +68,13 @@ class _DetailListModule6State extends State<DetailListModule6>
         ),
       ],
     );
-    resultWidget = SizedBox(
-      width: 180,
-      child: resultWidget,
-    );
+    resultWidget = SizedBox(width: 180, child: resultWidget);
     resultWidget = Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: resultWidget,
     );
-    resultWidget = Padding(
-      padding: EdgeInsets.zero,
-      child: resultWidget,
-    );
+    resultWidget = Padding(padding: EdgeInsets.zero, child: resultWidget);
     return resultWidget;
   }
 
@@ -95,9 +84,7 @@ class _DetailListModule6State extends State<DetailListModule6>
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.blueGrey.shade100,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(12),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
       ),
     );
   }
@@ -105,10 +92,7 @@ class _DetailListModule6State extends State<DetailListModule6>
   Widget _buildCardItemSubtitle(int index) {
     Widget resultWidget = Text(
       'Description for item ${index + 1}.',
-      style: const TextStyle(
-        color: Colors.grey,
-        fontSize: 12,
-      ),
+      style: const TextStyle(color: Colors.grey, fontSize: 12),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
     );
@@ -122,10 +106,7 @@ class _DetailListModule6State extends State<DetailListModule6>
   Widget _buildCardItemTitle(int index) {
     Widget resultWidget = Text(
       'Title ${index + 1}',
-      style: const TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-      ),
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );

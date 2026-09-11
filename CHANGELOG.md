@@ -1,3 +1,21 @@
+## 2.0.0
+- Breaking Changes
+  - Require Dart SDK `^3.13.0` and Flutter `>=3.47.0`.
+  - Migrate from `package:flutter/material.dart` to `package:material_ui` and add it as a dependency.
+- ObserverController
+  - Fix local variable shadowing errors of `controller` reported by the analyzer.
+  - Guard `BuildContext` usage across async gaps with `mounted` checks.
+- ObserverWidget
+  - Fix local variable shadowing error of `scopeContext` reported by the analyzer.
+  - Guard `BuildContext` usage across async gaps with `mounted` checks.
+- ChatScrollObserver
+  - Fix self-assignment of `innerRefItemIndex`, `innerRefItemIndexAfterUpdate` and `innerRefItemLayoutOffset` in `standby`.
+  - Guard `BuildContext` usage across async gaps with `mounted` checks.
+- Others
+  - Upgrade `flutter_lints` to `^6.0.0` and resolve all analyzer issues in the package and example.
+  - Adopt super parameters, `base` class modifiers and remove leading underscores from local identifiers.
+  - Replace the outdated counter smoke test of the example with a home page smoke test.
+
 ## 1.27.1
 - ObserverController
   - Correct the scrolling clamped by an outdated `scrollExtent` by @LinXunFeng in [#150](https://github.com/fluttercandies/flutter_scrollview_observer/issues/150).

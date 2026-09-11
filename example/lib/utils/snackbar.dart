@@ -4,10 +4,10 @@
  * @Date: 2023-10-29 12:44:03
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class SnackBarUtil {
-  static showSnackBar({
+  static void showSnackBar({
     required BuildContext context,
     required String text,
   }) {

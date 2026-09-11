@@ -3,17 +3,14 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2023-06-08 22:03:17
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/features/scene/video_auto_play_list/widgets/video_widget.dart';
 import 'package:scrollview_observer_example/features/scene/waterfall_flow_demo/waterfall_flow_type.dart';
 
 class WaterfallFlowSwipeView extends StatefulWidget {
   final WaterFlowHitType hitType;
 
-  const WaterfallFlowSwipeView({
-    Key? key,
-    required this.hitType,
-  }) : super(key: key);
+  const WaterfallFlowSwipeView({super.key, required this.hitType});
 
   @override
   State<WaterfallFlowSwipeView> createState() => _WaterfallFlowSwipeViewState();

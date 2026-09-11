@@ -4,24 +4,18 @@
  * @Date: 2023-10-28 10:19:23
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class AzListContactModel {
   final String section;
   final List<String> names;
 
-  AzListContactModel({
-    required this.section,
-    required this.names,
-  });
+  AzListContactModel({required this.section, required this.names});
 }
 
 class AzListCursorInfoModel {
   final String title;
   final Offset offset;
 
-  AzListCursorInfoModel({
-    required this.title,
-    required this.offset,
-  });
+  AzListCursorInfoModel({required this.title, required this.offset});
 }

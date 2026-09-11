@@ -3,7 +3,7 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2023-05-14 16:22:36
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/scene/waterfall_flow_demo/waterfall_flow_grid_item_view.dart';
 import 'package:scrollview_observer_example/features/scene/waterfall_flow_demo/waterfall_flow_swipe_view.dart';
@@ -11,7 +11,7 @@ import 'package:scrollview_observer_example/features/scene/waterfall_flow_demo/w
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 class WaterfallFlowPage extends StatefulWidget {
-  const WaterfallFlowPage({Key? key}) : super(key: key);
+  const WaterfallFlowPage({super.key});
 
   @override
   State<WaterfallFlowPage> createState() => WaterfallFlowPageState();
@@ -35,7 +35,6 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Waterfall Flow')),
       body: SliverViewObserver(
-        child: _buildBody(),
         leadingOffset: observeOffset,
         scrollNotificationPredicate: defaultScrollNotificationPredicate,
         autoTriggerObserveTypes: const [
@@ -44,8 +43,8 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
         triggerOnObserveType: ObserverTriggerOnObserveType.directly,
         extendedHandleObserve: (context) {
           // An extension of the original observation logic.
-          final _obj = ObserverUtils.findRenderObject(context);
-          if (_obj is RenderSliverWaterfallFlow) {
+          final obj = ObserverUtils.findRenderObject(context);
+          if (obj is RenderSliverWaterfallFlow) {
             return ObserverCore.handleGridObserve(
               context: context,
               fetchLeadingOffset: () => observeOffset,
@@ -65,11 +64,7 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
         //   return null;
         // },
         sliverContexts: () {
-          return [
-            if (grid1Context != null) grid1Context!,
-            if (swipeContext != null) swipeContext!,
-            if (grid2Context != null) grid2Context!,
-          ];
+          return [?grid1Context, ?swipeContext, ?grid2Context];
         },
         onObserveViewport: (result) {
           firstChildCtxInViewport = result.firstChild.sliverContext;
@@ -110,6 +105,7 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
             handleGridHitIndex(firstIndexList);
           }
         },
+        child: _buildBody(),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.swipe),
@@ -122,7 +118,7 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
     );
   }
 
-  handleGridHitIndex(List<int> firstIndexList) {
+  void handleGridHitIndex(List<int> firstIndexList) {
     if (firstIndexList.isEmpty) return;
     // debugPrint('gridContext displaying -- $firstIndexList');
     int targetIndex = firstIndexList.indexOf(hitIndex);
@@ -184,35 +180,29 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
     );
   }
 
-  Widget _buildGridView({
-    bool isFirst = false,
-    required int childCount,
-  }) {
+  Widget _buildGridView({bool isFirst = false, required int childCount}) {
     return SliverWaterfallFlow(
       gridDelegate: const SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 15,
         crossAxisSpacing: 10,
       ),
-      delegate: SliverChildBuilderDelegate(
-        (BuildContext context, int index) {
-          WaterFlowHitType selfType;
-          if (isFirst) {
-            if (grid1Context != context) grid1Context = context;
-            selfType = WaterFlowHitType.firstGrid;
-          } else {
-            if (grid2Context != context) grid2Context = context;
-            selfType = WaterFlowHitType.secondGrid;
-          }
-          return WaterfallFlowGridItemView(
-            selfIndex: index,
-            selfType: selfType,
-            hitIndex: hitIndex,
-            hitType: hitType,
-          );
-        },
-        childCount: childCount,
-      ),
+      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+        WaterFlowHitType selfType;
+        if (isFirst) {
+          if (grid1Context != context) grid1Context = context;
+          selfType = WaterFlowHitType.firstGrid;
+        } else {
+          if (grid2Context != context) grid2Context = context;
+          selfType = WaterFlowHitType.secondGrid;
+        }
+        return WaterfallFlowGridItemView(
+          selfIndex: index,
+          selfType: selfType,
+          hitIndex: hitIndex,
+          hitType: hitType,
+        );
+      }, childCount: childCount),
     );
   }
 
@@ -230,8 +220,6 @@ class WaterfallFlowPageState extends State<WaterfallFlowPage> {
   }
 
   Widget _buildSeparator(double size) {
-    return SliverToBoxAdapter(
-      child: Container(height: size),
-    );
+    return SliverToBoxAdapter(child: Container(height: size));
   }
 }

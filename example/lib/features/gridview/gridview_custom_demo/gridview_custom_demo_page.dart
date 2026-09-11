@@ -5,13 +5,13 @@
  */
 // ignore: implementation_imports
 import 'package:extended_list/src/rendering/sliver_grid.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:loading_more_list/loading_more_list.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class GridViewCustomDemoPage extends StatefulWidget {
-  const GridViewCustomDemoPage({Key? key}) : super(key: key);
+  const GridViewCustomDemoPage({super.key});
 
   @override
   State<GridViewCustomDemoPage> createState() => _GridViewCustomDemoPageState();
@@ -24,9 +24,7 @@ class _GridViewCustomDemoPageState extends State<GridViewCustomDemoPage> {
 
   @override
   void initState() {
-    observerController = GridObserverController(
-      controller: scrollController,
-    );
+    observerController = GridObserverController(controller: scrollController);
     super.initState();
   }
 
@@ -35,7 +33,6 @@ class _GridViewCustomDemoPageState extends State<GridViewCustomDemoPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Custom')),
       body: GridViewObserver(
-        child: _buildGridView(),
         controller: observerController,
         customTargetRenderSliverType: (renderObj) {
           // Here you tell the package what type of RenderObject it needs to observe.
@@ -50,20 +47,17 @@ class _GridViewCustomDemoPageState extends State<GridViewCustomDemoPage> {
         // },
         onObserve: (resultModel) {
           debugPrint(
-              'firstChild.index -- ${resultModel.firstGroupChildList.map((e) => e.index)}');
+            'firstChild.index -- ${resultModel.firstGroupChildList.map((e) => e.index)}',
+          );
           debugPrint('displaying -- ${resultModel.displayingChildIndexList}');
         },
+        child: _buildGridView(),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.airline_stops_sharp),
         onPressed: () {
-          SnackBarUtil.showSnackBar(
-            context: context,
-            text: 'Jump to item 10',
-          );
-          observerController.jumpTo(
-            index: 10,
-          );
+          SnackBarUtil.showSnackBar(context: context, text: 'Jump to item 10');
+          observerController.jumpTo(index: 10);
         },
       ),
     );
@@ -81,9 +75,7 @@ class _GridViewCustomDemoPageState extends State<GridViewCustomDemoPage> {
           }
           return Container(
             color: Colors.cyan,
-            child: ListTile(
-              title: Text('index - $index'),
-            ),
+            child: ListTile(title: Text('index - $index')),
           );
         },
         gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(

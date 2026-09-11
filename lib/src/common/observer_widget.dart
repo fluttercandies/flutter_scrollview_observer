@@ -8,7 +8,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
@@ -23,8 +23,12 @@ import 'package:scrollview_observer/src/utils/src/log.dart';
 
 import 'models/observe_model.dart';
 
-class ObserverWidget<C extends ObserverController, M extends ObserveModel,
-    N extends ScrollViewOnceObserveNotification> extends StatefulWidget {
+class ObserverWidget<
+  C extends ObserverController,
+  M extends ObserveModel,
+  N extends ScrollViewOnceObserveNotification
+>
+    extends StatefulWidget {
   /// The subtree below this widget.
   final Widget child;
 
@@ -97,7 +101,7 @@ class ObserverWidget<C extends ObserverController, M extends ObserveModel,
   final bool cancelOnceObserveNotificationBubbling;
 
   const ObserverWidget({
-    Key? key,
+    super.key,
     required this.child,
     this.tag,
     this.sliverController,
@@ -114,8 +118,7 @@ class ObserverWidget<C extends ObserverController, M extends ObserveModel,
     this.customHandleObserve,
     this.customTargetRenderSliverType,
     this.cancelOnceObserveNotificationBubbling = true,
-  })  : assert(toNextOverPercent > 0 && toNextOverPercent <= 1),
-        super(key: key);
+  }) : assert(toNextOverPercent > 0 && toNextOverPercent <= 1);
 
   @override
   State<ObserverWidget> createState() =>
@@ -137,19 +140,17 @@ class ObserverWidget<C extends ObserverController, M extends ObserveModel,
   /// * [ObserverWidget.of], which is similar to this method, but asserts if no
   ///   [ObserverWidget] instance is found.
   static ObserverWidgetState<C, M, N, T>? maybeOf<
-      C extends ObserverController,
-      M extends ObserveModel,
-      N extends ScrollViewOnceObserveNotification,
-      T extends ObserverWidget<C, M, N>>(
-    BuildContext context, {
-    String? tag,
-  }) {
-    BuildContext? _ctx;
+    C extends ObserverController,
+    M extends ObserveModel,
+    N extends ScrollViewOnceObserveNotification,
+    T extends ObserverWidget<C, M, N>
+  >(BuildContext context, {String? tag}) {
+    BuildContext? ctx;
     if (tag != null) {
       final tagManager = ObserverWidgetTagManager.maybeOf(context);
-      _ctx = tagManager?.context(tag);
+      ctx = tagManager?.context(tag);
     }
-    return (_ctx ?? context)
+    return (ctx ?? context)
         .dependOnInheritedWidgetOfExactType<ObserverWidgetScope<C, M, N, T>>()
         ?.observerWidgetState;
   }
@@ -171,17 +172,12 @@ class ObserverWidget<C extends ObserverController, M extends ObserveModel,
   /// * [ObserverWidget.maybeOf], which is similar to this method, but returns
   ///   null if no [ObserverWidget] instance is found.
   static ObserverWidgetState<C, M, N, T> of<
-      C extends ObserverController,
-      M extends ObserveModel,
-      N extends ScrollViewOnceObserveNotification,
-      T extends ObserverWidget<C, M, N>>(
-    BuildContext context, {
-    String? tag,
-  }) {
-    final observerState = maybeOf<C, M, N, T>(
-      context,
-      tag: tag,
-    );
+    C extends ObserverController,
+    M extends ObserveModel,
+    N extends ScrollViewOnceObserveNotification,
+    T extends ObserverWidget<C, M, N>
+  >(BuildContext context, {String? tag}) {
+    final observerState = maybeOf<C, M, N, T>(context, tag: tag);
     assert(() {
       if (observerState == null) {
         throw FlutterError(
@@ -202,10 +198,12 @@ class ObserverWidget<C extends ObserverController, M extends ObserveModel,
 }
 
 class ObserverWidgetState<
-    C extends ObserverController,
-    M extends ObserveModel,
-    N extends ScrollViewOnceObserveNotification,
-    T extends ObserverWidget<C, M, N>> extends State<T> {
+  C extends ObserverController,
+  M extends ObserveModel,
+  N extends ScrollViewOnceObserveNotification,
+  T extends ObserverWidget<C, M, N>
+>
+    extends State<T> {
   /// Target sliver [BuildContext]
   List<BuildContext> targetSliverContexts = [];
 
@@ -218,7 +216,7 @@ class ObserverWidgetState<
       [
         ObserverAutoTriggerObserveType.scrollStart,
         ObserverAutoTriggerObserveType.scrollUpdate,
-        ObserverAutoTriggerObserveType.scrollEnd
+        ObserverAutoTriggerObserveType.scrollEnd,
       ];
 
   /// Mapping [ObserverAutoTriggerObserveType] to [ScrollNotification].
@@ -301,9 +299,9 @@ class ObserverWidgetState<
     // Placed at the deepest level for convenient subsequent operations using
     // its context.
     Widget resultWidget = ObserverWidgetScope<C, M, N, T>(
-      child: widget.child,
       observerWidgetState: this,
       onCreateElement: _handleScopeContext,
+      child: widget.child,
     );
     resultWidget = NotificationListener<N>(
       onNotification: (notification) {
@@ -331,8 +329,9 @@ class ObserverWidgetState<
           // If the notification.runtimeType is not in the list of
           // innerAutoTriggerObserveScrollNotifications that can trigger
           // observation, the notification will be ignored.
-          if (innerAutoTriggerObserveScrollNotifications
-              .contains(notification.runtimeType)) {
+          if (innerAutoTriggerObserveScrollNotifications.contains(
+            notification.runtimeType,
+          )) {
             final isIgnoreInnerCanHandleObserve =
                 ScrollUpdateNotification != notification.runtimeType;
             WidgetsBinding.instance.endOfFrame.then((_) {
@@ -370,9 +369,7 @@ class ObserverWidgetState<
     // When nesting multiple ObserverWidgets, ensure that only one
     // ObserverWidgetTagManager is at the top.
     if (ObserverWidgetTagManager.maybeOf(context) == null) {
-      resultWidget = ObserverWidgetTagManager(
-        child: resultWidget,
-      );
+      resultWidget = ObserverWidgetTagManager(child: resultWidget);
     }
     return resultWidget;
   }
@@ -406,11 +403,11 @@ class ObserverWidgetState<
       if (sliverListContexts != null) {
         ctxs = sliverListContexts();
       } else {
-        List<BuildContext> _ctxs = [];
+        List<BuildContext> ctxs0 = [];
         void visitor(Element element) {
           if (isTargetSliverContextType(element.renderObject)) {
             /// Find the target sliver context
-            _ctxs.add(element);
+            ctxs0.add(element);
             return;
           }
           element.visitChildren(visitor);
@@ -426,7 +423,7 @@ class ObserverWidgetState<
           );
         }
 
-        ctxs = _ctxs;
+        ctxs = ctxs0;
       }
     }
     return ctxs;
@@ -560,7 +557,7 @@ class ObserverWidgetState<
     final tag = widget.tag ?? '';
     if (tag.isEmpty) return;
     await WidgetsBinding.instance.endOfFrame;
-    assert(ctx.mounted);
+    if (!ctx.mounted) return;
     final tagManager = ObserverWidgetTagManager.maybeOf(ctx);
     tagManager?.set(tag, ctx);
   }
@@ -574,13 +571,12 @@ class ObserverWidgetState<
     // ObserverWidgetTagManager.
     await (innerCheckTagChangeEndOfFrame ?? WidgetsBinding.instance.endOfFrame);
     if (!mounted) return;
-    final _scopeContext = scopeContext;
-    if (_scopeContext == null) return;
-    assert(_scopeContext.mounted);
-    final tagManager = ObserverWidgetTagManager.maybeOf(_scopeContext);
+    final scopeContext = this.scopeContext;
+    if (scopeContext == null || !scopeContext.mounted) return;
+    final tagManager = ObserverWidgetTagManager.maybeOf(scopeContext);
     tagManager?.remove(oldTag);
     if (tag.isNotEmpty) {
-      tagManager?.set(tag, _scopeContext);
+      tagManager?.set(tag, scopeContext);
     }
   }
 
@@ -596,11 +592,13 @@ class ObserverWidgetState<
       onObserve != null || onObserveAll != null,
       'At least one callback must be provided.',
     );
-    innerListeners?.add(ObserverListenerEntry<M>(
-      context: context,
-      onObserve: onObserve,
-      onObserveAll: onObserveAll,
-    ));
+    innerListeners?.add(
+      ObserverListenerEntry<M>(
+        context: context,
+        onObserve: onObserve,
+        onObserveAll: onObserveAll,
+      ),
+    );
   }
 
   /// Remove the specified [OnObserveCallback] and [OnObserveAllCallback].
@@ -614,9 +612,9 @@ class ObserverWidgetState<
       onObserve != null || onObserveAll != null,
       'At least one callback must be provided.',
     );
-    final _listeners = innerListeners;
-    if (_listeners == null) return;
-    for (final ObserverListenerEntry<M> entry in _listeners) {
+    final listeners = innerListeners;
+    if (listeners == null) return;
+    for (final ObserverListenerEntry<M> entry in listeners) {
       if (entry.context == context &&
           entry.onObserve == onObserve &&
           entry.onObserveAll == onObserveAll) {
@@ -626,15 +624,13 @@ class ObserverWidgetState<
     }
   }
 
-  void _notifyListeners(
-    Map<BuildContext, M> changeResultMap,
-  ) {
+  void _notifyListeners(Map<BuildContext, M> changeResultMap) {
     if (changeResultMap.isEmpty) return;
-    final _listeners = innerListeners;
-    if (_listeners == null || _listeners.isEmpty) return;
+    final listeners = innerListeners;
+    if (listeners == null || listeners.isEmpty) return;
 
     final List<ObserverListenerEntry<M>> localListeners =
-        List<ObserverListenerEntry<M>>.of(_listeners);
+        List<ObserverListenerEntry<M>>.of(listeners);
     for (final ObserverListenerEntry<M> entry in localListeners) {
       try {
         if (entry.list != null) {
@@ -643,30 +639,33 @@ class ObserverWidgetState<
           if (entry.onObserve != null) {
             // If sliverContext is not specified, the first one in
             // targetSliverContexts is taken.
-            BuildContext? _sliverContext = entry.context;
-            if (_sliverContext == null && targetSliverContexts.isNotEmpty) {
-              _sliverContext = targetSliverContexts.first;
+            BuildContext? sliverContext = entry.context;
+            if (sliverContext == null && targetSliverContexts.isNotEmpty) {
+              sliverContext = targetSliverContexts.first;
             }
-            final result = changeResultMap[_sliverContext];
+            final result = changeResultMap[sliverContext];
             if (result == null) continue;
             entry.onObserve?.call(result);
           }
         }
       } catch (exception, stack) {
-        FlutterError.reportError(FlutterErrorDetails(
-          exception: exception,
-          stack: stack,
-          library: 'scrollview_observer',
-          context:
-              ErrorDescription('while dispatching result for $runtimeType'),
-          informationCollector: () => <DiagnosticsNode>[
-            DiagnosticsProperty<ObserverWidgetState>(
-              'The $runtimeType sending result was',
-              this,
-              style: DiagnosticsTreeStyle.errorProperty,
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: exception,
+            stack: stack,
+            library: 'scrollview_observer',
+            context: ErrorDescription(
+              'while dispatching result for $runtimeType',
             ),
-          ],
-        ));
+            informationCollector: () => <DiagnosticsNode>[
+              DiagnosticsProperty<ObserverWidgetState>(
+                'The $runtimeType sending result was',
+                this,
+                style: DiagnosticsTreeStyle.errorProperty,
+              ),
+            ],
+          ),
+        );
       }
     }
   }

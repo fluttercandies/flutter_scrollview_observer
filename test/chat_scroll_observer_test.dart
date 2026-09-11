@@ -3,7 +3,7 @@
  * @Repo: https://github.com/fluttercandies/flutter_scrollview_observer
  * @Date: 2023-11-25 19:04:30
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 
@@ -11,8 +11,9 @@ void main() {
   // Regression test for https://github.com/fluttercandies/flutter_scrollview_observer/issues/64.
   testWidgets('Keeping position', (tester) async {
     final scrollController = ScrollController();
-    final observerController =
-        ListObserverController(controller: scrollController);
+    final observerController = ListObserverController(
+      controller: scrollController,
+    );
     final chatScrollObserver = ChatScrollObserver(observerController)
       ..fixedPositionOffset = -1;
 
@@ -40,12 +41,14 @@ void main() {
     scrollController.dispose();
   });
 
-  testWidgets('Keeping position with ChatScrollObserverHandleMode.specified',
-      (tester) async {
+  testWidgets('Keeping position with ChatScrollObserverHandleMode.specified', (
+    tester,
+  ) async {
     GlobalKey<ChatListViewState> key = GlobalKey();
     final scrollController = ScrollController();
-    final observerController =
-        ListObserverController(controller: scrollController);
+    final observerController = ListObserverController(
+      controller: scrollController,
+    );
     final chatScrollObserver = ChatScrollObserver(observerController)
       ..fixedPositionOffset = -1;
     const firstDisplayingChildIndex = 2;
@@ -58,13 +61,8 @@ void main() {
     );
     await tester.pumpWidget(widget);
 
-    updateData({
-      int index = 0,
-    }) {
-      key.currentState?.updateData(
-        index: index,
-        needSetState: true,
-      );
+    updateData({int index = 0}) {
+      key.currentState?.updateData(index: index, needSetState: true);
     }
 
     observerController.jumpTo(index: firstDisplayingChildIndex);
@@ -90,10 +88,7 @@ void main() {
       refItemIndexAfterUpdate: 1,
     );
     expect(chatScrollObserver.refItemIndex, firstItemIndex + 1);
-    expect(
-      chatScrollObserver.refItemIndexAfterUpdate,
-      firstItemIndex + 1,
-    );
+    expect(chatScrollObserver.refItemIndexAfterUpdate, firstItemIndex + 1);
     updateData();
     await tester.pumpAndSettle();
     result = await observerController.dispatchOnceObserve(
@@ -168,101 +163,89 @@ void main() {
   });
 
   testWidgets(
-      'Keeping position with ChatScrollObserverHandleMode.specified when item changes by itself',
-      (tester) async {
-    GlobalKey<ChatListViewState> key = GlobalKey();
-    final scrollController = ScrollController();
-    final observerController = ListObserverController(
-      controller: scrollController,
-    );
-    final chatScrollObserver = ChatScrollObserver(observerController)
-      ..fixedPositionOffset = -1;
-    const observeItemSelfIndex = 0;
-
-    Widget widget = ChatListView(
-      key: key,
-      scrollController: scrollController,
-      observerController: observerController,
-      chatScrollObserver: chatScrollObserver,
-      itemBuilder: (context, index) {
-        final dataList = key.currentState?.dataList ?? [];
-        return Text(
-          dataList[index],
-          maxLines: 999,
-        );
-      },
-      dataList: ['initData' * 500],
-    );
-    await tester.pumpWidget(widget);
-
-    void updateData({
-      int index = 0,
-    }) {
-      key.currentState?.updateData(
-        index: index,
-        needSetState: true,
+    'Keeping position with ChatScrollObserverHandleMode.specified when item changes by itself',
+    (tester) async {
+      GlobalKey<ChatListViewState> key = GlobalKey();
+      final scrollController = ScrollController();
+      final observerController = ListObserverController(
+        controller: scrollController,
       );
-    }
+      final chatScrollObserver = ChatScrollObserver(observerController)
+        ..fixedPositionOffset = -1;
+      const observeItemSelfIndex = 0;
 
-    await tester.pumpAndSettle();
-    var result = await observerController.dispatchOnceObserve(
-      isDependObserveCallback: false,
-      isForce: true,
-    );
-    expectSync(
-      result.observeResult?.firstChild?.index ?? 0,
-      observeItemSelfIndex,
-    );
-    expectSync(
-      result.observeResult?.firstChild?.mainAxisSize,
-      greaterThanOrEqualTo(
-        result.observeResult?.viewport.paintBounds.height ?? 0,
-      ),
-    );
-    final previousTrailingMarginToViewport =
-        result.observeResult?.firstChild?.trailingMarginToViewport;
+      Widget widget = ChatListView(
+        key: key,
+        scrollController: scrollController,
+        observerController: observerController,
+        chatScrollObserver: chatScrollObserver,
+        itemBuilder: (context, index) {
+          final dataList = key.currentState?.dataList ?? [];
+          return Text(dataList[index], maxLines: 999);
+        },
+        dataList: ['initData' * 500],
+      );
+      await tester.pumpWidget(widget);
 
-    // itemIndex
-    await chatScrollObserver.standby(
-      mode: ChatScrollObserverHandleMode.specified,
-      refIndexType: ChatScrollObserverRefIndexType.itemIndex,
-      refItemIndex: observeItemSelfIndex,
-      refItemIndexAfterUpdate: observeItemSelfIndex,
-      customAdjustPositionDelta: (model) {
-        return model.newPosition.extentAfter - model.oldPosition.extentAfter;
-      },
-    );
+      void updateData({int index = 0}) {
+        key.currentState?.updateData(index: index, needSetState: true);
+      }
 
-    updateData();
-    await tester.pumpAndSettle();
-    result = await observerController.dispatchOnceObserve(
-      isDependObserveCallback: false,
-      isForce: true,
-    );
+      await tester.pumpAndSettle();
+      var result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+        isForce: true,
+      );
+      expectSync(
+        result.observeResult?.firstChild?.index ?? 0,
+        observeItemSelfIndex,
+      );
+      expectSync(
+        result.observeResult?.firstChild?.mainAxisSize,
+        greaterThanOrEqualTo(
+          result.observeResult?.viewport.paintBounds.height ?? 0,
+        ),
+      );
+      final previousTrailingMarginToViewport =
+          result.observeResult?.firstChild?.trailingMarginToViewport;
 
-    expect(chatScrollObserver.refItemIndex, observeItemSelfIndex);
-    expect(
-      chatScrollObserver.refItemIndexAfterUpdate,
-      observeItemSelfIndex,
-    );
-    result = await observerController.dispatchOnceObserve(
-      isDependObserveCallback: false,
-      isForce: true,
-    );
-    expectSync(
-      result.observeResult?.firstChild?.index,
-      observeItemSelfIndex,
-    );
-    expectSync(
-      result.observeResult?.firstChild?.trailingMarginToViewport,
-      previousTrailingMarginToViewport,
-    );
+      // itemIndex
+      await chatScrollObserver.standby(
+        mode: ChatScrollObserverHandleMode.specified,
+        refIndexType: ChatScrollObserverRefIndexType.itemIndex,
+        refItemIndex: observeItemSelfIndex,
+        refItemIndexAfterUpdate: observeItemSelfIndex,
+        customAdjustPositionDelta: (model) {
+          return model.newPosition.extentAfter - model.oldPosition.extentAfter;
+        },
+      );
 
-    scrollController.dispose();
-  });
+      updateData();
+      await tester.pumpAndSettle();
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+        isForce: true,
+      );
 
-  testWidgets('Keeping position with customAdjustPositionDelta',
-      (tester) async {
+      expect(chatScrollObserver.refItemIndex, observeItemSelfIndex);
+      expect(chatScrollObserver.refItemIndexAfterUpdate, observeItemSelfIndex);
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+        isForce: true,
+      );
+      expectSync(result.observeResult?.firstChild?.index, observeItemSelfIndex);
+      expectSync(
+        result.observeResult?.firstChild?.trailingMarginToViewport,
+        previousTrailingMarginToViewport,
+      );
+
+      scrollController.dispose();
+    },
+  );
+
+  testWidgets('Keeping position with customAdjustPositionDelta', (
+    tester,
+  ) async {
     GlobalKey<ChatListViewState> key = GlobalKey();
     final scrollController = ScrollController();
     final observerController = ListObserverController(
@@ -309,10 +292,7 @@ void main() {
     expect(observeResult?.firstChild?.leadingMarginToViewport, 0);
 
     // Check adjustPosition.
-    key.currentState?.updateData(
-      index: 1,
-      needSetState: true,
-    );
+    key.currentState?.updateData(index: 1, needSetState: true);
     double? adjustPosition;
     await chatScrollObserver.standby(
       mode: ChatScrollObserverHandleMode.specified,
@@ -447,10 +427,7 @@ void main() {
     expect(lastModel?.trailingMarginToViewport, 0);
     expect(onHandlePositionResultModel, isNull);
 
-    chatListViewState?.updateData(
-      index: lastIndex,
-      needSetState: true,
-    );
+    chatListViewState?.updateData(index: lastIndex, needSetState: true);
     await chatScrollObserver.standby(
       customAdjustPosition: (model) {
         final delta =
@@ -500,9 +477,7 @@ void main() {
     observeSwitchShrinkWrapCount = 0;
 
     // Test with isNeedObserveSwitchShrinkWrap = false
-    await chatScrollObserver.standby(
-      isNeedObserveSwitchShrinkWrap: false,
-    );
+    await chatScrollObserver.standby(isNeedObserveSwitchShrinkWrap: false);
     expect(observeSwitchShrinkWrapCount, 0);
 
     // Test with isNeedObserveSwitchShrinkWrap = true (default)
@@ -528,9 +503,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final testContext = tester.element(find.byType(ListView));
-    await chatScrollObserver.standby(
-      sliverContext: testContext,
-    );
+    await chatScrollObserver.standby(sliverContext: testContext);
 
     // Verify it is recorded
     expect(chatScrollObserver.innerSliverContext, testContext);
@@ -560,9 +533,9 @@ class MockListObserverController extends ListObserverController {
 
 class TestChatScrollObserver extends ChatScrollObserver {
   TestChatScrollObserver(
-    ListObserverController observerController, {
+    super.observerController, {
     required this.onObserveSwitchShrinkWrap,
-  }) : super(observerController);
+  });
 
   final VoidCallback onObserveSwitchShrinkWrap;
 
@@ -575,14 +548,14 @@ class TestChatScrollObserver extends ChatScrollObserver {
 
 class ChatListView extends StatefulWidget {
   const ChatListView({
-    Key? key,
+    super.key,
     required this.scrollController,
     required this.observerController,
     required this.chatScrollObserver,
     this.onReceiveScrollNotification,
     this.itemBuilder,
     this.dataList,
-  }) : super(key: key);
+  });
 
   final ScrollController scrollController;
   final ListObserverController observerController;
@@ -596,13 +569,11 @@ class ChatListView extends StatefulWidget {
 }
 
 class ChatListViewState extends State<ChatListView> {
-  late List<String> dataList = widget.dataList ??
+  late List<String> dataList =
+      widget.dataList ??
       List.generate(100, (index) => index.toString()).toList();
 
-  void initData({
-    required List<String> dataList,
-    bool needSetState = true,
-  }) {
+  void initData({required List<String> dataList, bool needSetState = true}) {
     this.dataList = dataList;
     if (needSetState) {
       setState(() {});
@@ -662,7 +633,8 @@ class ChatListViewState extends State<ChatListView> {
           observer: widget.chatScrollObserver,
         ),
         controller: widget.scrollController,
-        itemBuilder: widget.itemBuilder ??
+        itemBuilder:
+            widget.itemBuilder ??
             (context, index) {
               return SizedBox(
                 height: 100,

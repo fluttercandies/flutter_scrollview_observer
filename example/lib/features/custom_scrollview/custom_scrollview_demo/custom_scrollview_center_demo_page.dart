@@ -4,12 +4,12 @@
  * @Date: 2024-03-11 21:08:23
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class CustomScrollViewCenterDemoPage extends StatefulWidget {
-  const CustomScrollViewCenterDemoPage({Key? key}) : super(key: key);
+  const CustomScrollViewCenterDemoPage({super.key});
 
   @override
   State<CustomScrollViewCenterDemoPage> createState() =>
@@ -49,10 +49,10 @@ class _CustomScrollViewCenterDemoPageState
         child: _buildScrollView(),
         sliverContexts: () {
           return [
-            if (_sliverListCtx1 != null) _sliverListCtx1!,
-            if (_sliverListCtx2 != null) _sliverListCtx2!,
-            if (_sliverListCtx3 != null) _sliverListCtx3!,
-            if (_sliverListCtx4 != null) _sliverListCtx4!,
+            ?_sliverListCtx1,
+            ?_sliverListCtx2,
+            ?_sliverListCtx3,
+            ?_sliverListCtx4,
           ];
         },
         onObserveAll: (resultMap) {
@@ -203,23 +203,20 @@ class _CustomScrollViewCenterDemoPageState
     Function(BuildContext)? onBuild,
   }) {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (ctx, index) {
-          onBuild?.call(ctx);
-          final int itemIndex = index ~/ 2;
-          return Container(
-            height: (itemIndex % 2 == 0) ? 80 : 50,
-            color: color,
-            child: Center(
-              child: Text(
-                "index -- $index",
-                style: const TextStyle(color: Colors.white),
-              ),
+      delegate: SliverChildBuilderDelegate((ctx, index) {
+        onBuild?.call(ctx);
+        final int itemIndex = index ~/ 2;
+        return Container(
+          height: (itemIndex % 2 == 0) ? 80 : 50,
+          color: color,
+          child: Center(
+            child: Text(
+              "index -- $index",
+              style: const TextStyle(color: Colors.white),
             ),
-          );
-        },
-        childCount: 100,
-      ),
+          ),
+        );
+      }, childCount: 100),
     );
   }
 }

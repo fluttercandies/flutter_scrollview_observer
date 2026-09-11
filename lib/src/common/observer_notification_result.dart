@@ -4,13 +4,15 @@
  * @Date: 2023-08-12 20:09:46
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
 import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
 
-class CommonOnceObserveNotificationResult<M extends ObserveModel,
-    R extends ObserverHandleContextsResultModel<M>> {
+class CommonOnceObserveNotificationResult<
+  M extends ObserveModel,
+  R extends ObserverHandleContextsResultModel<M>
+> {
   bool get isSuccess => ObserverWidgetObserveResultType.success == type;
 
   /// Observation result type.

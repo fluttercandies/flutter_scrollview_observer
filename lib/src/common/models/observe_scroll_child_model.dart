@@ -10,8 +10,5 @@ class ObserveScrollChildModel {
   /// The layout offset of child widget.
   double layoutOffset;
 
-  ObserveScrollChildModel({
-    required this.size,
-    required this.layoutOffset,
-  });
+  ObserveScrollChildModel({required this.size, required this.layoutOffset});
 }

@@ -4,7 +4,7 @@
  * @Date: 2022-08-08 00:20:03
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/common/route/route.dart';
 
 class HomePage extends StatelessWidget {

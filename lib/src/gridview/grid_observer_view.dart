@@ -3,99 +3,82 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:scrollview_observer/src/common/observer_widget.dart';
-import 'package:scrollview_observer/src/common/observer_typedef.dart';
 import 'package:scrollview_observer/src/notification.dart';
 import 'package:scrollview_observer/src/observer_core.dart';
 
 import 'grid_observer_controller.dart';
 import 'models/gridview_observe_model.dart';
 
-class GridViewObserver extends ObserverWidget<GridObserverController,
-    GridViewObserveModel, GridViewOnceObserveNotification> {
+class GridViewObserver
+    extends
+        ObserverWidget<
+          GridObserverController,
+          GridViewObserveModel,
+          GridViewOnceObserveNotification
+        > {
   /// The callback of getting all sliverGrid's buildContext.
   final List<BuildContext> Function()? sliverGridContexts;
 
   final GridObserverController? controller;
 
   const GridViewObserver({
-    Key? key,
-    required Widget child,
-    String? tag,
+    super.key,
+    required super.child,
+    super.tag,
     this.sliverGridContexts,
     this.controller,
-    OnObserveAllCallback<GridViewObserveModel>? onObserveAll,
-    OnObserveCallback<GridViewObserveModel>? onObserve,
-    double leadingOffset = 0,
-    double Function()? dynamicLeadingOffset,
-    double toNextOverPercent = 1,
-    ScrollNotificationPredicate? scrollNotificationPredicate,
-    List<ObserverAutoTriggerObserveType>? autoTriggerObserveTypes,
-    ObserverTriggerOnObserveType triggerOnObserveType =
-        ObserverTriggerOnObserveType.displayingItemsChange,
-    GridViewObserveModel? Function(BuildContext context)? customHandleObserve,
-    bool Function(RenderObject?)? customTargetRenderSliverType,
-    bool cancelOnceObserveNotificationBubbling = true,
-  }) : super(
-          key: key,
-          child: child,
-          tag: tag,
-          sliverContexts: sliverGridContexts,
-          sliverController: controller,
-          onObserveAll: onObserveAll,
-          onObserve: onObserve,
-          leadingOffset: leadingOffset,
-          dynamicLeadingOffset: dynamicLeadingOffset,
-          toNextOverPercent: toNextOverPercent,
-          scrollNotificationPredicate: scrollNotificationPredicate,
-          autoTriggerObserveTypes: autoTriggerObserveTypes,
-          triggerOnObserveType: triggerOnObserveType,
-          customHandleObserve: customHandleObserve,
-          customTargetRenderSliverType: customTargetRenderSliverType,
-          cancelOnceObserveNotificationBubbling:
-              cancelOnceObserveNotificationBubbling,
-        );
+    super.onObserveAll,
+    super.onObserve,
+    super.leadingOffset,
+    super.dynamicLeadingOffset,
+    super.toNextOverPercent,
+    super.scrollNotificationPredicate,
+    super.autoTriggerObserveTypes,
+    super.triggerOnObserveType,
+    super.customHandleObserve,
+    super.customTargetRenderSliverType,
+    super.cancelOnceObserveNotificationBubbling,
+  }) : super(sliverContexts: sliverGridContexts, sliverController: controller);
 
   @override
   State<GridViewObserver> createState() => GridViewObserverState();
 
-  static GridViewObserverState? maybeOf(
-    BuildContext context, {
-    String? tag,
-  }) {
-    final _state = ObserverWidget.maybeOf<
-        GridObserverController,
-        GridViewObserveModel,
-        GridViewOnceObserveNotification,
-        GridViewObserver>(
-      context,
-      tag: tag,
-    );
-    if (_state is! GridViewObserverState) return null;
-    return _state;
+  static GridViewObserverState? maybeOf(BuildContext context, {String? tag}) {
+    final state =
+        ObserverWidget.maybeOf<
+          GridObserverController,
+          GridViewObserveModel,
+          GridViewOnceObserveNotification,
+          GridViewObserver
+        >(context, tag: tag);
+    if (state is! GridViewObserverState) return null;
+    return state;
   }
 
-  static GridViewObserverState of(
-    BuildContext context, {
-    String? tag,
-  }) {
-    final _state = ObserverWidget.of<
-        GridObserverController,
-        GridViewObserveModel,
-        GridViewOnceObserveNotification,
-        GridViewObserver>(
-      context,
-      tag: tag,
-    );
-    return _state as GridViewObserverState;
+  static GridViewObserverState of(BuildContext context, {String? tag}) {
+    final state =
+        ObserverWidget.of<
+          GridObserverController,
+          GridViewObserveModel,
+          GridViewOnceObserveNotification,
+          GridViewObserver
+        >(context, tag: tag);
+    return state as GridViewObserverState;
   }
 }
 
-class GridViewObserverState extends ObserverWidgetState<GridObserverController,
-    GridViewObserveModel, GridViewOnceObserveNotification, GridViewObserver> {
+class GridViewObserverState
+    extends
+        ObserverWidgetState<
+          GridObserverController,
+          GridViewObserveModel,
+          GridViewOnceObserveNotification,
+          GridViewObserver
+        > {
   @override
   GridViewObserveModel? handleObserve(BuildContext ctx) {
     if (widget.customHandleObserve != null) {

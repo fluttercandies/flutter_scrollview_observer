@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/observer_widget_tag_manager.dart';
@@ -27,9 +27,7 @@ void main() {
           }
           return Container(
             color: Colors.blue[100],
-            child: Center(
-              child: Text('index -- $index'),
-            ),
+            child: Center(child: Text('index -- $index')),
           );
         },
         itemCount: itemCount,
@@ -42,12 +40,10 @@ void main() {
     final gridObserverController = GridObserverController(
       controller: scrollController,
     );
-    Widget widget = getGridView(
-      scrollController: scrollController,
-    );
+    Widget widget = getGridView(scrollController: scrollController);
     widget = GridViewObserver(
-      child: widget,
       controller: gridObserverController,
+      child: widget,
     );
     await tester.pumpWidget(widget);
     expect(gridObserverController.sliverContexts.length, 1);
@@ -79,12 +75,12 @@ void main() {
       },
     );
     widget = GridViewObserver(
-      child: widget,
       controller: observerController,
       scrollNotificationPredicate: defaultScrollNotificationPredicate,
       onObserve: (result) {
         isCalledOnObserve = true;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
 
@@ -117,16 +113,14 @@ void main() {
       controller: scrollController,
     );
 
-    Widget widget = getGridView(
-      scrollController: scrollController,
-    );
+    Widget widget = getGridView(scrollController: scrollController);
     GridViewObserveModel? observeResult;
     widget = GridViewObserver(
-      child: widget,
       controller: gridObserverController,
       onObserve: (result) {
         observeResult = result;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
 
@@ -134,8 +128,9 @@ void main() {
     gridObserverController.jumpTo(index: targetItemIndex);
     await tester.pumpAndSettle();
     expect(
-      (observeResult?.firstGroupChildList.map((e) => e.index) ?? [])
-          .contains(targetItemIndex),
+      (observeResult?.firstGroupChildList.map((e) => e.index) ?? []).contains(
+        targetItemIndex,
+      ),
       true,
     );
 
@@ -147,8 +142,9 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(
-      (observeResult?.firstGroupChildList.map((e) => e.index) ?? [])
-          .contains(targetItemIndex),
+      (observeResult?.firstGroupChildList.map((e) => e.index) ?? []).contains(
+        targetItemIndex,
+      ),
       true,
     );
 
@@ -162,13 +158,8 @@ void main() {
         controller: scrollController,
       )..cacheJumpIndexOffset = false;
 
-      Widget widget = getGridView(
-        scrollController: scrollController,
-      );
-      widget = GridViewObserver(
-        child: widget,
-        controller: observerController,
-      );
+      Widget widget = getGridView(scrollController: scrollController);
+      widget = GridViewObserver(controller: observerController, child: widget);
       await tester.pumpWidget(widget);
 
       observerController.jumpTo(index: 30);
@@ -185,13 +176,8 @@ void main() {
         controller: scrollController,
       );
 
-      Widget widget = getGridView(
-        scrollController: scrollController,
-      );
-      widget = GridViewObserver(
-        child: widget,
-        controller: observerController,
-      );
+      Widget widget = getGridView(scrollController: scrollController);
+      widget = GridViewObserver(controller: observerController, child: widget);
       await tester.pumpWidget(widget);
 
       final ctx = observerController.fetchSliverContext();
@@ -259,20 +245,19 @@ void main() {
 
       var itemCount = 20;
       late StateSetter setStateFn;
-      Widget widget = StatefulBuilder(builder: (context, setState) {
-        setStateFn = setState;
-        return getGridViewWithItemCount(
-          scrollController: scrollController,
-          itemCount: itemCount,
-          itemExtent: itemExtent,
-          crossAxisCount: crossAxisCount,
-          spacing: spacing,
-        );
-      });
-      widget = GridViewObserver(
-        child: widget,
-        controller: observerController,
+      Widget widget = StatefulBuilder(
+        builder: (context, setState) {
+          setStateFn = setState;
+          return getGridViewWithItemCount(
+            scrollController: scrollController,
+            itemCount: itemCount,
+            itemExtent: itemExtent,
+            crossAxisCount: crossAxisCount,
+            spacing: spacing,
+          );
+        },
       );
+      widget = GridViewObserver(controller: observerController, child: widget);
       await tester.pumpWidget(widget);
       await tester.pumpAndSettle();
 
@@ -305,43 +290,32 @@ void main() {
       controller: scrollController,
     );
 
-    Widget widget = getGridView(
-      scrollController: scrollController,
-    );
+    Widget widget = getGridView(scrollController: scrollController);
     GridViewObserveModel? observeResult;
     widget = GridViewObserver(
-      child: widget,
       controller: observerController,
       onObserve: (result) {
         observeResult = result;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
 
     int targetItemIndex = 30;
-    observerController.jumpTo(
-      index: targetItemIndex,
-      alignment: 0,
-    );
+    observerController.jumpTo(index: targetItemIndex, alignment: 0);
     await tester.pumpAndSettle();
     var firstGroupChildList = observeResult?.firstGroupChildList ?? [];
     expect(firstGroupChildList, isNotEmpty);
     expect(firstGroupChildList.first.index, targetItemIndex);
     expect(firstGroupChildList.first.displayPercentage, 1);
 
-    observerController.jumpTo(
-      index: targetItemIndex,
-      alignment: 0.5,
-    );
+    observerController.jumpTo(index: targetItemIndex, alignment: 0.5);
     await tester.pumpAndSettle();
     firstGroupChildList = observeResult?.firstGroupChildList ?? [];
     expect(firstGroupChildList.first.index, targetItemIndex);
     expect(firstGroupChildList.first.displayPercentage, 0.5);
 
-    observerController.jumpTo(
-      index: targetItemIndex,
-      alignment: 1,
-    );
+    observerController.jumpTo(index: targetItemIndex, alignment: 1);
     await tester.pumpAndSettle();
     firstGroupChildList = observeResult?.firstGroupChildList ?? [];
     expect(firstGroupChildList.first.index, targetItemIndex + 2);
@@ -356,11 +330,8 @@ void main() {
     )..observeIntervalForScrolling = const Duration(milliseconds: 500);
     int observeCount = 0;
 
-    Widget widget = getGridView(
-      scrollController: scrollController,
-    );
+    Widget widget = getGridView(scrollController: scrollController);
     widget = GridViewObserver(
-      child: widget,
       controller: observerController,
       autoTriggerObserveTypes: const [
         ObserverAutoTriggerObserveType.scrollStart,
@@ -371,6 +342,7 @@ void main() {
       onObserve: (result) {
         observeCount++;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
     final finder = find.byWidget(widget);
@@ -399,20 +371,19 @@ void main() {
 
   testWidgets('Check isForbidObserveCallback', (tester) async {
     final scrollController = ScrollController();
-    final observerController =
-        GridObserverController(controller: scrollController);
-
-    Widget widget = getGridView(
-      scrollController: scrollController,
+    final observerController = GridObserverController(
+      controller: scrollController,
     );
+
+    Widget widget = getGridView(scrollController: scrollController);
 
     bool isCalledOnObserve = false;
     widget = GridViewObserver(
-      child: widget,
       controller: observerController,
       onObserve: (result) {
         isCalledOnObserve = true;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
 
@@ -437,21 +408,17 @@ void main() {
       controller: scrollController,
     );
 
-    Widget widget = getGridView(
-      scrollController: scrollController,
-    );
+    Widget widget = getGridView(scrollController: scrollController);
     GridViewObserveModel? observeResult;
     widget = GridViewObserver(
-      child: widget,
       controller: observerController,
       onObserve: (result) {
         observeResult = result;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
-    await observerController.dispatchOnceObserve(
-      isForce: true,
-    );
+    await observerController.dispatchOnceObserve(isForce: true);
     expect(observeResult, isNotNull);
     var firstGroupChildList = observeResult?.firstGroupChildList ?? [];
     expect(firstGroupChildList, isNotEmpty);
@@ -465,10 +432,7 @@ void main() {
     );
 
     int targetItemIndex = 30;
-    observerController.jumpTo(
-      index: targetItemIndex,
-      alignment: 0,
-    );
+    observerController.jumpTo(index: targetItemIndex, alignment: 0);
     await tester.pumpAndSettle();
     firstGroupChildList = observeResult?.firstGroupChildList ?? [];
     expect(firstGroupChildList, isNotEmpty);
@@ -484,92 +448,76 @@ void main() {
     scrollController.dispose();
   });
 
-  group(
-    'ObserverScrollNotification',
-    () {
-      late ScrollController scrollController;
-      late GridObserverController observerController;
-      late Widget widget;
+  group('ObserverScrollNotification', () {
+    late ScrollController scrollController;
+    late GridObserverController observerController;
+    late Widget widget;
 
-      int indexOfStartNoti = -1;
-      int indexOfInterruptionNoti = -1;
-      int indexOfDecisionNoti = -1;
-      int indexOfEndNoti = -1;
+    int indexOfStartNoti = -1;
+    int indexOfInterruptionNoti = -1;
+    int indexOfDecisionNoti = -1;
+    int indexOfEndNoti = -1;
 
-      resetAll({
-        bool isFixedHeight = false,
-      }) {
-        indexOfStartNoti = -1;
-        indexOfInterruptionNoti = -1;
-        indexOfDecisionNoti = -1;
-        indexOfEndNoti = -1;
-        scrollController = ScrollController();
-        observerController =
-            GridObserverController(controller: scrollController);
+    resetAll({bool isFixedHeight = false}) {
+      indexOfStartNoti = -1;
+      indexOfInterruptionNoti = -1;
+      indexOfDecisionNoti = -1;
+      indexOfEndNoti = -1;
+      scrollController = ScrollController();
+      observerController = GridObserverController(controller: scrollController);
 
-        widget = getGridView(
-          scrollController: scrollController,
-          itemCount: 100,
-        );
+      widget = getGridView(scrollController: scrollController, itemCount: 100);
 
-        widget = GridViewObserver(
-          child: widget,
-          controller: observerController,
-        );
-        int count = 0;
-        widget = NotificationListener<ObserverScrollNotification>(
-          child: widget,
-          onNotification: (notification) {
-            if (notification is ObserverScrollStartNotification) {
-              indexOfStartNoti = count;
-            } else if (notification is ObserverScrollInterruptionNotification) {
-              indexOfInterruptionNoti = count;
-            } else if (notification is ObserverScrollDecisionNotification) {
-              indexOfDecisionNoti = count;
-            } else if (notification is ObserverScrollEndNotification) {
-              indexOfEndNoti = count;
-            }
-            count += 1;
-            return true;
-          },
-        );
-      }
-
-      tearDown(() {
-        scrollController.dispose();
-      });
-
-      testWidgets(
-        'Notification sequence in normal scenarios',
-        (tester) async {
-          resetAll();
-          await tester.pumpWidget(widget);
-          observerController.jumpTo(index: 10);
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          expect(indexOfStartNoti, 0);
-          expect(indexOfInterruptionNoti, -1);
-          expect(indexOfDecisionNoti, 1);
-          expect(indexOfEndNoti, 2);
+      widget = GridViewObserver(controller: observerController, child: widget);
+      int count = 0;
+      widget = NotificationListener<ObserverScrollNotification>(
+        child: widget,
+        onNotification: (notification) {
+          if (notification is ObserverScrollStartNotification) {
+            indexOfStartNoti = count;
+          } else if (notification is ObserverScrollInterruptionNotification) {
+            indexOfInterruptionNoti = count;
+          } else if (notification is ObserverScrollDecisionNotification) {
+            indexOfDecisionNoti = count;
+          } else if (notification is ObserverScrollEndNotification) {
+            indexOfEndNoti = count;
+          }
+          count += 1;
+          return true;
         },
       );
+    }
 
-      testWidgets(
-        'Notification sequence when using incorrect index',
-        (tester) async {
-          resetAll();
-          await tester.pumpWidget(widget);
-          observerController.jumpTo(index: 101);
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          expect(indexOfStartNoti, 0);
-          expect(indexOfInterruptionNoti, 1);
-          expect(indexOfDecisionNoti, -1);
-          expect(indexOfEndNoti, -1);
-        },
-      );
-    },
-  );
+    tearDown(() {
+      scrollController.dispose();
+    });
+
+    testWidgets('Notification sequence in normal scenarios', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+      observerController.jumpTo(index: 10);
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      expect(indexOfStartNoti, 0);
+      expect(indexOfInterruptionNoti, -1);
+      expect(indexOfDecisionNoti, 1);
+      expect(indexOfEndNoti, 2);
+    });
+
+    testWidgets('Notification sequence when using incorrect index', (
+      tester,
+    ) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+      observerController.jumpTo(index: 101);
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      expect(indexOfStartNoti, 0);
+      expect(indexOfInterruptionNoti, 1);
+      expect(indexOfDecisionNoti, -1);
+      expect(indexOfEndNoti, -1);
+    });
+  });
 
   group('dispatchOnceObserve', () {
     late ScrollController scrollController;
@@ -582,90 +530,64 @@ void main() {
 
     resetAll() {
       scrollController = ScrollController();
-      observerController = GridObserverController(
-        controller: scrollController,
-      );
-      widget = getGridView(
-        scrollController: scrollController,
-        itemCount: 100,
-      );
-      widget = GridViewObserver(
-        child: widget,
-        controller: observerController,
-      );
+      observerController = GridObserverController(controller: scrollController);
+      widget = getGridView(scrollController: scrollController, itemCount: 100);
+      widget = GridViewObserver(controller: observerController, child: widget);
     }
 
-    testWidgets(
-      'Check observeResult',
-      (tester) async {
-        resetAll();
-        await tester.pumpWidget(widget);
-        var result = await observerController.dispatchOnceObserve();
-        expect(result.isSuccess, isFalse);
+    testWidgets('Check observeResult', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+      var result = await observerController.dispatchOnceObserve();
+      expect(result.isSuccess, isFalse);
 
-        result = await observerController.dispatchOnceObserve(
-          isDependObserveCallback: false,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(result.observeResult, isNotNull);
-        expect(
-          result.observeResult?.displayingChildIndexList ?? [],
-          isNotEmpty,
-        );
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(result.observeResult, isNotNull);
+      expect(result.observeResult?.displayingChildIndexList ?? [], isNotEmpty);
 
-        result = await observerController.dispatchOnceObserve(
-          isDependObserveCallback: false,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(
-          result.observeResult?.displayingChildIndexList ?? [],
-          isEmpty,
-        );
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(result.observeResult?.displayingChildIndexList ?? [], isEmpty);
 
-        result = await observerController.dispatchOnceObserve(
-          isDependObserveCallback: false,
-          isForce: true,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(
-          result.observeResult?.displayingChildIndexList ?? [],
-          isNotEmpty,
-        );
-      },
-    );
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+        isForce: true,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(result.observeResult?.displayingChildIndexList ?? [], isNotEmpty);
+    });
 
-    testWidgets(
-      'Check observeAllResult',
-      (tester) async {
-        resetAll();
-        await tester.pumpWidget(widget);
-        var result = await observerController.dispatchOnceObserve();
-        expect(result.isSuccess, isFalse);
+    testWidgets('Check observeAllResult', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+      var result = await observerController.dispatchOnceObserve();
+      expect(result.isSuccess, isFalse);
 
-        result = await observerController.dispatchOnceObserve(
-          isDependObserveCallback: false,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(result.observeAllResult.values.length, 1);
-        expect(
-          result.observeAllResult.values.first,
-          result.observeResult,
-        );
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(result.observeAllResult.values.length, 1);
+      expect(result.observeAllResult.values.first, result.observeResult);
 
-        result = await observerController.dispatchOnceObserve(
-          isDependObserveCallback: false,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(result.observeAllResult, isEmpty);
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(result.observeAllResult, isEmpty);
 
-        result = await observerController.dispatchOnceObserve(
-          isDependObserveCallback: false,
-          isForce: true,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(result.observeAllResult, isNotEmpty);
-      },
-    );
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+        isForce: true,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(result.observeAllResult, isNotEmpty);
+    });
   });
 
   group('ObserverListener', () {
@@ -682,9 +604,7 @@ void main() {
       scrollController.dispose();
     });
 
-    resetAll({
-      bool isResetTag = false,
-    }) {
+    resetAll({bool isResetTag = false}) {
       if (isResetTag) {
         tag1 = tag1 * 2;
         tag2 = tag2 * 2;
@@ -706,29 +626,25 @@ void main() {
         itemCount: 100,
         itemBuilder: (context, index) {
           if (index == 3) {
-            return const Center(
-              child: Icon(Icons.abc),
-            );
+            return const Center(child: Icon(Icons.abc));
           }
           return Container(
             color: Colors.blue,
-            child: Center(
-              child: Text('index -- $index'),
-            ),
+            child: Center(child: Text('index -- $index')),
           );
         },
       );
       widget = GridViewObserver(
         key: key2,
         tag: tag2,
-        child: widget,
         controller: observerController2,
+        child: widget,
       );
       widget = GridViewObserver(
         key: key1,
         tag: tag1,
-        child: widget,
         controller: observerController1,
+        child: widget,
       );
     }
 
@@ -750,9 +666,7 @@ void main() {
       resetAll(isResetTag: true);
       await tester.pumpWidget(widget);
 
-      tagManager = ObserverWidgetTagManager.maybeOf(
-        tester.element(itemFinder),
-      );
+      tagManager = ObserverWidgetTagManager.maybeOf(tester.element(itemFinder));
       tagMap = Map.from(tagManager?.tagMap ?? {});
       Set<String> newTags = {tag1, tag2};
       expect(tags != newTags, isTrue);
@@ -771,15 +685,11 @@ void main() {
         cbResult = result;
       }
 
-      onObserveAllCallback(
-        Map<BuildContext, GridViewObserveModel> resultMap,
-      ) {
+      onObserveAllCallback(Map<BuildContext, GridViewObserveModel> resultMap) {
         cbAllResult = resultMap;
       }
 
-      final observerState = GridViewObserver.of(
-        tester.element(itemFinder),
-      );
+      final observerState = GridViewObserver.of(tester.element(itemFinder));
       expect(observerState, isNotNull);
 
       final observerStateByTag2 = GridViewObserver.of(
@@ -830,15 +740,11 @@ void main() {
         cbResult = result;
       }
 
-      onObserveAllCallback(
-        Map<BuildContext, GridViewObserveModel> resultMap,
-      ) {
+      onObserveAllCallback(Map<BuildContext, GridViewObserveModel> resultMap) {
         cbAllResult = resultMap;
       }
 
-      observerState = GridViewObserver.maybeOf(
-        tester.element(itemFinder),
-      );
+      observerState = GridViewObserver.maybeOf(tester.element(itemFinder));
       expect(observerState, isNotNull);
 
       final observerStateByTag2 = GridViewObserver.maybeOf(
@@ -873,50 +779,43 @@ void main() {
     });
 
     testWidgets(
-        'innerTagChangeCount should not increase when tag remains unchanged',
-        (tester) async {
-      const String tag = 'tag1';
-      scrollController = ScrollController();
-      Widget gridView = getGridView(scrollController: scrollController);
+      'innerTagChangeCount should not increase when tag remains unchanged',
+      (tester) async {
+        const String tag = 'tag1';
+        scrollController = ScrollController();
+        Widget gridView = getGridView(scrollController: scrollController);
 
-      widget = GridViewObserver(
-        tag: tag,
-        child: gridView,
-      );
+        widget = GridViewObserver(tag: tag, child: gridView);
 
-      await tester.pumpWidget(widget);
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(widget);
+        await tester.pumpAndSettle();
 
-      // Get ObserverWidgetState
-      final itemFinder = find.byType(GridViewObserver);
-      final observerState = tester.state<GridViewObserverState>(itemFinder);
-      expect(observerState, isNotNull);
+        // Get ObserverWidgetState
+        final itemFinder = find.byType(GridViewObserver);
+        final observerState = tester.state<GridViewObserverState>(itemFinder);
+        expect(observerState, isNotNull);
 
-      // Record initial tagChangeCount
-      final initialTagChangeCount = observerState.innerTagChangeCount;
+        // Record initial tagChangeCount
+        final initialTagChangeCount = observerState.innerTagChangeCount;
 
-      // Refresh widget but keep tag unchanged
-      widget = GridViewObserver(
-        tag: tag,
-        child: gridView,
-      );
-      await tester.pumpWidget(widget);
-      await tester.pumpAndSettle();
+        // Refresh widget but keep tag unchanged
+        widget = GridViewObserver(tag: tag, child: gridView);
+        await tester.pumpWidget(widget);
+        await tester.pumpAndSettle();
 
-      // Verify that tagChangeCount has not increased
-      expect(observerState.innerTagChangeCount, initialTagChangeCount);
-      expect(observerState.innerTagChangeCount, 0);
-    });
+        // Verify that tagChangeCount has not increased
+        expect(observerState.innerTagChangeCount, initialTagChangeCount);
+        expect(observerState.innerTagChangeCount, 0);
+      },
+    );
 
-    testWidgets('No exception in _checkTagChange during refresh and dispose',
-        (tester) async {
+    testWidgets('No exception in _checkTagChange during refresh and dispose', (
+      tester,
+    ) async {
       // Regression test for https://github.com/fluttercandies/flutter_scrollview_observer/issues/143
       scrollController = ScrollController();
       Widget gridView = getGridView(scrollController: scrollController);
-      widget = GridViewObserver(
-        tag: 'tag1',
-        child: gridView,
-      );
+      widget = GridViewObserver(tag: 'tag1', child: gridView);
       await tester.pumpWidget(widget);
 
       // Get ObserverWidgetState
@@ -927,10 +826,7 @@ void main() {
       final completer = Completer<void>();
       observerState.innerCheckTagChangeEndOfFrame = completer.future;
 
-      widget = GridViewObserver(
-        tag: 'tag2',
-        child: gridView,
-      );
+      widget = GridViewObserver(tag: 'tag2', child: gridView);
       await tester.pumpWidget(widget);
 
       // Dispose widget before endOfFrame completes
@@ -946,8 +842,9 @@ void main() {
   });
 
   group('cancelOnceObserveNotificationBubbling', () {
-    testWidgets('cancelOnceObserveNotificationBubbling is true (default)',
-        (tester) async {
+    testWidgets('cancelOnceObserveNotificationBubbling is true (default)', (
+      tester,
+    ) async {
       final scrollController = ScrollController();
       final observerController = GridObserverController(
         controller: scrollController,
@@ -984,8 +881,9 @@ void main() {
       scrollController.dispose();
     });
 
-    testWidgets('cancelOnceObserveNotificationBubbling is false',
-        (tester) async {
+    testWidgets('cancelOnceObserveNotificationBubbling is false', (
+      tester,
+    ) async {
       final scrollController = ScrollController();
       final observerController = GridObserverController(
         controller: scrollController,

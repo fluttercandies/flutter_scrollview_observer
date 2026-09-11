@@ -3,13 +3,13 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
 import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class HorizontalGridViewDemoPage extends StatefulWidget {
-  const HorizontalGridViewDemoPage({Key? key}) : super(key: key);
+  const HorizontalGridViewDemoPage({super.key});
 
   @override
   State<HorizontalGridViewDemoPage> createState() =>
@@ -28,8 +28,9 @@ class _HorizontalGridViewDemoPageState
 
   List<int> _hitIndexs = [];
 
-  ScrollController scrollController =
-      ScrollController(initialScrollOffset: _leadingPadding);
+  ScrollController scrollController = ScrollController(
+    initialScrollOffset: _leadingPadding,
+  );
 
   late GridObserverController observerController;
 
@@ -61,7 +62,7 @@ class _HorizontalGridViewDemoPageState
       body: GridViewObserver(
         controller: observerController,
         sliverGridContexts: () {
-          return [if (_sliverGridViewContext != null) _sliverGridViewContext!];
+          return [?_sliverGridViewContext];
         },
         autoTriggerObserveTypes: const [
           ObserverAutoTriggerObserveType.scrollEnd,
@@ -77,7 +78,8 @@ class _HorizontalGridViewDemoPageState
           });
 
           debugPrint(
-              'firstGroupChildList -- ${model.firstGroupChildList.map((e) => e.index)}');
+            'firstGroupChildList -- ${model.firstGroupChildList.map((e) => e.index)}',
+          );
           debugPrint('displaying -- ${model.displayingChildIndexList}');
         },
         child: _buildGridView(),
@@ -128,9 +130,7 @@ class _HorizontalGridViewDemoPageState
         }
         return Container(
           color: (_hitIndexs.contains(index)) ? Colors.red : Colors.blue[100],
-          child: Center(
-            child: Text('index -- $index'),
-          ),
+          child: Center(child: Text('index -- $index')),
         );
       },
       itemCount: 100,

@@ -4,14 +4,10 @@
  * @Date: 2022-10-31 15:40:04
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class ChatUnreadTipView extends StatelessWidget {
-  ChatUnreadTipView({
-    Key? key,
-    required this.unreadMsgCount,
-    this.onTap,
-  }) : super(key: key);
+  ChatUnreadTipView({super.key, required this.unreadMsgCount, this.onTap});
 
   final int unreadMsgCount;
 
@@ -24,11 +20,7 @@ class ChatUnreadTipView extends StatelessWidget {
     if (unreadMsgCount == 0) return const SizedBox.shrink();
     Widget resultWidget = Stack(
       children: [
-        const Icon(
-          Icons.mode_comment,
-          size: 50,
-          color: Colors.white,
-        ),
+        const Icon(Icons.mode_comment, size: 50, color: Colors.white),
         Container(
           margin: const EdgeInsets.only(top: 12),
           width: 50,
@@ -45,10 +37,7 @@ class ChatUnreadTipView extends StatelessWidget {
         ),
       ],
     );
-    resultWidget = GestureDetector(
-      child: resultWidget,
-      onTap: onTap,
-    );
+    resultWidget = GestureDetector(onTap: onTap, child: resultWidget);
     return resultWidget;
   }
 }

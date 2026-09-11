@@ -11,15 +11,10 @@ class ListViewObserveDisplayingChildModel extends ObserveDisplayingChildModel
     with ObserveDisplayingChildModelMixin {
   ListViewObserveDisplayingChildModel({
     required this.sliverList,
-    required RenderViewportBase viewport,
-    required int index,
-    required RenderBox renderObject,
-  }) : super(
-          sliver: sliverList,
-          viewport: viewport,
-          index: index,
-          renderObject: renderObject,
-        );
+    required super.viewport,
+    required super.index,
+    required super.renderObject,
+  }) : super(sliver: sliverList);
 
   /// The target sliverList.
   /// It would be [RenderSliverList] or [RenderSliverFixedExtentList].

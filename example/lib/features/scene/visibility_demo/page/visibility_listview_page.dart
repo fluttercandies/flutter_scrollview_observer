@@ -4,12 +4,12 @@
  * @Date: 2023-08-25 23:14:20
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/scene/visibility_demo/mixin/visibility_exposure_mixin.dart';
 
 class VisibilityListViewPage extends StatefulWidget {
-  const VisibilityListViewPage({Key? key}) : super(key: key);
+  const VisibilityListViewPage({super.key});
 
   @override
   State<VisibilityListViewPage> createState() => _VisibilityListViewPageState();
@@ -26,7 +26,6 @@ class _VisibilityListViewPageState extends State<VisibilityListViewPage>
     return Scaffold(
       appBar: AppBar(title: const Text("Visibility ListView")),
       body: ListViewObserver(
-        child: _buildListView(),
         triggerOnObserveType: ObserverTriggerOnObserveType.directly,
         controller: observerController,
         onObserve: (resultModel) {
@@ -49,6 +48,7 @@ class _VisibilityListViewPageState extends State<VisibilityListViewPage>
             },
           );
         },
+        child: _buildListView(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -79,23 +79,18 @@ class _VisibilityListViewPageState extends State<VisibilityListViewPage>
       color: needExpose
           ? Colors.red
           : isEven
-              ? Colors.orange[300]
-              : Colors.black12,
+          ? Colors.orange[300]
+          : Colors.black12,
       child: Center(
         child: Text(
           "index -- $index",
-          style: TextStyle(
-            color: needExpose ? Colors.white : Colors.black,
-          ),
+          style: TextStyle(color: needExpose ? Colors.white : Colors.black),
         ),
       ),
     );
   }
 
   Container _buildSeparatorView() {
-    return Container(
-      color: Colors.white,
-      height: 5,
-    );
+    return Container(color: Colors.white, height: 5);
   }
 }

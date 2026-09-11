@@ -9,7 +9,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/scene/azlist_demo/azlist_cursor.dart';
@@ -18,7 +18,7 @@ import 'package:scrollview_observer_example/features/scene/azlist_demo/azlist_mo
 import 'package:scrollview_observer_example/features/scene/azlist_demo/azlist_index_bar.dart';
 
 class AzListPage extends StatefulWidget {
-  const AzListPage({Key? key}) : super(key: key);
+  const AzListPage({super.key});
 
   @override
   State<AzListPage> createState() => _AzListPageState();
@@ -43,7 +43,7 @@ class _AzListPageState extends State<AzListPage> {
 
   Map<int, BuildContext> sliverContextMap = {};
 
-  generateContactData() {
+  void generateContactData() {
     final a = const Utf8Codec().encode("A").first;
     final z = const Utf8Codec().encode("Z").first;
     int pointer = a;
@@ -97,12 +97,7 @@ class _AzListPageState extends State<AzListPage> {
             ),
           ),
           _buildCursor(),
-          Positioned(
-            top: 0,
-            bottom: 0,
-            right: 0,
-            child: _buildIndexBar(),
-          ),
+          Positioned(top: 0, bottom: 0, right: 0, child: _buildIndexBar()),
         ],
       ),
     );
@@ -128,28 +123,25 @@ class _AzListPageState extends State<AzListPage> {
   Widget _buildCursor() {
     return ValueListenableBuilder<AzListCursorInfoModel?>(
       valueListenable: cursorInfo,
-      builder: (
-        BuildContext context,
-        AzListCursorInfoModel? value,
-        Widget? child,
-      ) {
-        Widget resultWidget = Container();
-        double top = 0;
-        double right = indexBarWidth + 8;
-        if (value == null) {
-          resultWidget = const SizedBox.shrink();
-        } else {
-          double titleSize = 80;
-          top = value.offset.dy - titleSize * 0.5;
-          resultWidget = AzListCursor(size: titleSize, title: value.title);
-        }
-        resultWidget = Positioned(
-          top: top,
-          right: right,
-          child: resultWidget,
-        );
-        return resultWidget;
-      },
+      builder:
+          (BuildContext context, AzListCursorInfoModel? value, Widget? child) {
+            Widget resultWidget = Container();
+            double top = 0;
+            double right = indexBarWidth + 8;
+            if (value == null) {
+              resultWidget = const SizedBox.shrink();
+            } else {
+              double titleSize = 80;
+              top = value.offset.dy - titleSize * 0.5;
+              resultWidget = AzListCursor(size: titleSize, title: value.title);
+            }
+            resultWidget = Positioned(
+              top: top,
+              right: right,
+              child: resultWidget,
+            );
+            return resultWidget;
+          },
     );
   }
 
@@ -168,10 +160,7 @@ class _AzListPageState extends State<AzListPage> {
           );
           final sliverContext = sliverContextMap[index];
           if (sliverContext == null) return;
-          observerController.jumpTo(
-            index: 0,
-            sliverContext: sliverContext,
-          );
+          observerController.jumpTo(index: 0, sliverContext: sliverContext);
         },
         onSelectionEnd: () {
           cursorInfo.value = null;
@@ -180,23 +169,17 @@ class _AzListPageState extends State<AzListPage> {
     );
   }
 
-  Widget _buildSliver({
-    required int index,
-    required AzListContactModel model,
-  }) {
+  Widget _buildSliver({required int index, required AzListContactModel model}) {
     final names = model.names;
     if (names.isEmpty) return const SliverToBoxAdapter();
     Widget resultWidget = isShowListMode
         ? SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, itemIndex) {
-                if (sliverContextMap[index] == null) {
-                  sliverContextMap[index] = context;
-                }
-                return AzListItemView(name: names[itemIndex]);
-              },
-              childCount: names.length,
-            ),
+            delegate: SliverChildBuilderDelegate((context, itemIndex) {
+              if (sliverContextMap[index] == null) {
+                sliverContextMap[index] = context;
+              }
+              return AzListItemView(name: names[itemIndex]);
+            }, childCount: names.length),
           )
         : SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -205,18 +188,18 @@ class _AzListPageState extends State<AzListPage> {
               crossAxisSpacing: 10.0,
               childAspectRatio: 2.0,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int itemIndex) {
-                if (sliverContextMap[index] == null) {
-                  sliverContextMap[index] = context;
-                }
-                return AzListItemView(
-                  name: names[itemIndex],
-                  isShowSeparator: false,
-                );
-              },
-              childCount: names.length,
-            ),
+            delegate: SliverChildBuilderDelegate((
+              BuildContext context,
+              int itemIndex,
+            ) {
+              if (sliverContextMap[index] == null) {
+                sliverContextMap[index] = context;
+              }
+              return AzListItemView(
+                name: names[itemIndex],
+                isShowSeparator: false,
+              );
+            }, childCount: names.length),
           );
     resultWidget = SliverStickyHeader(
       header: Container(

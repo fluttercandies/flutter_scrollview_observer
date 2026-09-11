@@ -3,12 +3,12 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-07-03 15:46:45
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/features/scene/video_auto_play_list/widgets/video_widget.dart';
 
 class VideoListAutoPlayPage extends StatefulWidget {
-  const VideoListAutoPlayPage({Key? key}) : super(key: key);
+  const VideoListAutoPlayPage({super.key});
 
   @override
   State<VideoListAutoPlayPage> createState() => _VideoListAutoPlayPageState();
@@ -24,9 +24,8 @@ class _VideoListAutoPlayPageState extends State<VideoListAutoPlayPage> {
     return Scaffold(
       appBar: AppBar(title: const Text("Video Auto Play")),
       body: ListViewObserver(
-        child: _buildListView(),
         sliverListContexts: () {
-          return [if (_ctx1 != null) _ctx1!];
+          return [?_ctx1];
         },
         onObserveAll: (resultMap) {
           final model = resultMap[_ctx1];
@@ -38,6 +37,7 @@ class _VideoListAutoPlayPageState extends State<VideoListAutoPlayPage> {
           }
         },
         leadingOffset: 200,
+        child: _buildListView(),
       ),
     );
   }
@@ -59,9 +59,7 @@ class _VideoListAutoPlayPageState extends State<VideoListAutoPlayPage> {
     return SizedBox(
       height: 300,
       child: _hitIndex == index
-          ? const VideoWidget(
-              url: 'https://www.w3schools.com/html/movie.mp4',
-            )
+          ? const VideoWidget(url: 'https://www.w3schools.com/html/movie.mp4')
           : Container(
               color: Colors.blue[100],
               child: const Center(child: Text('placeholder')),
@@ -70,9 +68,6 @@ class _VideoListAutoPlayPageState extends State<VideoListAutoPlayPage> {
   }
 
   Container _buildSeparatorView() {
-    return Container(
-      color: Colors.white,
-      height: 8,
-    );
+    return Container(color: Colors.white, height: 8);
   }
 }

@@ -4,7 +4,7 @@
  * @Date: 2025-08-02 21:32:21
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get/get.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 import 'package:scrollview_observer_example/features/scene/detail/logic/detail_logic.dart';
@@ -94,10 +94,7 @@ class _DetailListModule3State extends State<DetailListModule3>
   Widget _buildItemTitle(int index) {
     return Text(
       titles[index],
-      style: const TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.bold,
-      ),
+      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
       textAlign: TextAlign.center,
     );
   }

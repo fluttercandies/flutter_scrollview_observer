@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/observer_widget_tag_manager.dart';
@@ -31,12 +31,11 @@ void main() {
           }
           return SizedBox(
             height: height,
-            child: Center(
-              child: Text("index -- $index"),
-            ),
+            child: Center(child: Text("index -- $index")),
           );
         },
-        separatorBuilder: separatorBuilder ??
+        separatorBuilder:
+            separatorBuilder ??
             (ctx, index) {
               return const SizedBox(height: 10);
             },
@@ -61,9 +60,7 @@ void main() {
         itemBuilder: (ctx, index) {
           return SizedBox(
             height: height,
-            child: Center(
-              child: Text("index -- $index"),
-            ),
+            child: Center(child: Text("index -- $index")),
           );
         },
         itemExtent: useItemExtentBuilder ? null : height,
@@ -84,13 +81,8 @@ void main() {
     final observerController = ListObserverController(
       controller: scrollController,
     );
-    Widget widget = getListView(
-      scrollController: scrollController,
-    );
-    widget = ListViewObserver(
-      child: widget,
-      controller: observerController,
-    );
+    Widget widget = getListView(scrollController: scrollController);
+    widget = ListViewObserver(controller: observerController, child: widget);
     await tester.pumpWidget(widget);
     expect(observerController.sliverContexts.length, 1);
     scrollController.dispose();
@@ -124,12 +116,12 @@ void main() {
       },
     );
     widget = ListViewObserver(
-      child: widget,
       controller: observerController,
       scrollNotificationPredicate: defaultScrollNotificationPredicate,
       onObserve: (result) {
         isCalledOnObserve = true;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
 
@@ -172,18 +164,19 @@ void main() {
     );
     int? lastItemIndex;
     widget = ListViewObserver(
-      child: widget,
       controller: observerController,
       triggerOnObserveType: ObserverTriggerOnObserveType.directly,
       onObserve: (result) {
         lastItemIndex = result.displayingChildModelList.last.index;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
 
     var result = await observerController.dispatchOnceObserve();
-    final offset = result.observeResult?.viewport.offset
-        as ScrollPositionWithSingleContext;
+    final offset =
+        result.observeResult?.viewport.offset
+            as ScrollPositionWithSingleContext;
     final maxScrollExtent = offset.maxScrollExtent;
     scrollController.animateTo(
       maxScrollExtent * 1000,
@@ -205,16 +198,14 @@ void main() {
         controller: scrollController,
       );
 
-      Widget widget = getListView(
-        scrollController: scrollController,
-      );
+      Widget widget = getListView(scrollController: scrollController);
       ListViewObserveModel? observeResult;
       widget = ListViewObserver(
-        child: widget,
         controller: observerController,
         onObserve: (result) {
           observeResult = result;
         },
+        child: widget,
       );
       await tester.pumpWidget(widget);
 
@@ -249,19 +240,16 @@ void main() {
       );
       ListViewObserveModel? observeResult;
       widget = ListViewObserver(
-        child: widget,
         controller: observerController,
         onObserve: (result) {
           observeResult = result;
         },
+        child: widget,
       );
       await tester.pumpWidget(widget);
 
       int targeItemIndex = 30;
-      observerController.jumpTo(
-        index: targeItemIndex,
-        isFixedHeight: true,
-      );
+      observerController.jumpTo(index: targeItemIndex, isFixedHeight: true);
       await tester.pumpAndSettle();
       await tester.pump(observerController.observeIntervalForScrolling);
       expect(observeResult?.firstChild?.index, targeItemIndex);
@@ -282,8 +270,9 @@ void main() {
 
     testWidgets('Fixed height with itemExtentBuilder', (tester) async {
       final scrollController = ScrollController();
-      final observerController =
-          ListObserverController(controller: scrollController);
+      final observerController = ListObserverController(
+        controller: scrollController,
+      );
 
       Widget widget = getFixedHeightListView(
         scrollController: scrollController,
@@ -291,19 +280,16 @@ void main() {
       );
       ListViewObserveModel? observeResult;
       widget = ListViewObserver(
-        child: widget,
         controller: observerController,
         onObserve: (result) {
           observeResult = result;
         },
+        child: widget,
       );
       await tester.pumpWidget(widget);
 
       int targeItemIndex = 30;
-      observerController.jumpTo(
-        index: targeItemIndex,
-        isFixedHeight: true,
-      );
+      observerController.jumpTo(index: targeItemIndex, isFixedHeight: true);
       await tester.pumpAndSettle();
       await tester.pump(observerController.observeIntervalForScrolling);
       expect(observeResult?.firstChild?.index, targeItemIndex);
@@ -324,51 +310,45 @@ void main() {
 
     // Regression test for https://github.com/fluttercandies/flutter_scrollview_observer/issues/123
     testWidgets(
-        'No exception when ListViewObserverState is disposed during scrolling',
-        (tester) async {
-      final scrollController = ScrollController();
-      final observerController = ListObserverController(
-        controller: scrollController,
-      );
+      'No exception when ListViewObserverState is disposed during scrolling',
+      (tester) async {
+        final scrollController = ScrollController();
+        final observerController = ListObserverController(
+          controller: scrollController,
+        );
 
-      Widget widget = getListView(
-        scrollController: scrollController,
-      );
-      widget = ListViewObserver(
-        child: widget,
-        controller: observerController,
-        onObserve: (_) {},
-      );
-      await tester.pumpWidget(widget);
+        Widget widget = getListView(scrollController: scrollController);
+        widget = ListViewObserver(
+          controller: observerController,
+          onObserve: (_) {},
+          child: widget,
+        );
+        await tester.pumpWidget(widget);
 
-      observerController.animateTo(
-        index: 10,
-        duration: const Duration(seconds: 3),
-        curve: Curves.easeInOut,
-      );
+        observerController.animateTo(
+          index: 10,
+          duration: const Duration(seconds: 3),
+          curve: Curves.easeInOut,
+        );
 
-      await tester.pump();
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pumpWidget(Container());
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pumpWidget(Container());
 
-      scrollController.dispose();
-    });
+        scrollController.dispose();
+      },
+    );
   });
 
   group('Cache index offset', () {
     testWidgets('Property cacheJumpIndexOffset', (tester) async {
       final scrollController = ScrollController();
-      final observerController =
-          ListObserverController(controller: scrollController)
-            ..cacheJumpIndexOffset = false;
+      final observerController = ListObserverController(
+        controller: scrollController,
+      )..cacheJumpIndexOffset = false;
 
-      Widget widget = getListView(
-        scrollController: scrollController,
-      );
-      widget = ListViewObserver(
-        child: widget,
-        controller: observerController,
-      );
+      Widget widget = getListView(scrollController: scrollController);
+      widget = ListViewObserver(controller: observerController, child: widget);
       await tester.pumpWidget(widget);
 
       observerController.jumpTo(index: 30);
@@ -381,16 +361,12 @@ void main() {
 
     testWidgets('Method clearScrollIndexCache', (tester) async {
       final scrollController = ScrollController();
-      final observerController =
-          ListObserverController(controller: scrollController);
+      final observerController = ListObserverController(
+        controller: scrollController,
+      );
 
-      Widget widget = getListView(
-        scrollController: scrollController,
-      );
-      widget = ListViewObserver(
-        child: widget,
-        controller: observerController,
-      );
+      Widget widget = getListView(scrollController: scrollController);
+      widget = ListViewObserver(controller: observerController, child: widget);
       await tester.pumpWidget(widget);
 
       final ctx = observerController.fetchSliverContext();
@@ -422,9 +398,9 @@ void main() {
     // Building the same widget for the same index on purpose, so that no
     // existing child needs to be laid out again after the rebuild.
     Widget buildItem(BuildContext ctx, int index) => const SizedBox(
-          height: itemHeight,
-          child: Center(child: Text('item')),
-        );
+      height: itemHeight,
+      child: Center(child: Text('item')),
+    );
 
     Future<void> testJumpToTheLastIndex(
       WidgetTester tester, {
@@ -442,29 +418,28 @@ void main() {
 
       var itemCount = 20;
       late StateSetter setStateFn;
-      Widget widget = StatefulBuilder(builder: (context, setState) {
-        setStateFn = setState;
-        return Directionality(
-          textDirection: TextDirection.ltr,
-          child: isSeparated
-              ? ListView.separated(
-                  controller: scrollController,
-                  itemBuilder: buildItem,
-                  separatorBuilder: (ctx, index) =>
-                      const SizedBox(height: separatorHeight),
-                  itemCount: itemCount,
-                )
-              : ListView.builder(
-                  controller: scrollController,
-                  itemBuilder: buildItem,
-                  itemCount: itemCount,
-                ),
-        );
-      });
-      widget = ListViewObserver(
-        child: widget,
-        controller: observerController,
+      Widget widget = StatefulBuilder(
+        builder: (context, setState) {
+          setStateFn = setState;
+          return Directionality(
+            textDirection: TextDirection.ltr,
+            child: isSeparated
+                ? ListView.separated(
+                    controller: scrollController,
+                    itemBuilder: buildItem,
+                    separatorBuilder: (ctx, index) =>
+                        const SizedBox(height: separatorHeight),
+                    itemCount: itemCount,
+                  )
+                : ListView.builder(
+                    controller: scrollController,
+                    itemBuilder: buildItem,
+                    itemCount: itemCount,
+                  ),
+          );
+        },
       );
+      widget = ListViewObserver(controller: observerController, child: widget);
       await tester.pumpWidget(widget);
       await tester.pumpAndSettle();
 
@@ -510,24 +485,19 @@ void main() {
       controller: scrollController,
     );
 
-    Widget widget = getListView(
-      scrollController: scrollController,
-    );
+    Widget widget = getListView(scrollController: scrollController);
     ListViewObserveModel? observeResult;
     widget = ListViewObserver(
-      child: widget,
       controller: observerController,
       onObserve: (result) {
         observeResult = result;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
 
     int targetItemIndex = 30;
-    observerController.jumpTo(
-      index: targetItemIndex,
-      alignment: 0,
-    );
+    observerController.jumpTo(index: targetItemIndex, alignment: 0);
     await tester.pumpAndSettle();
     await tester.pump(observerController.observeIntervalForScrolling);
     var firstChild = observeResult?.firstChild;
@@ -535,20 +505,14 @@ void main() {
     expect(firstChild?.index, targetItemIndex);
     expect(firstChild?.displayPercentage, 1);
 
-    observerController.jumpTo(
-      index: targetItemIndex,
-      alignment: 0.5,
-    );
+    observerController.jumpTo(index: targetItemIndex, alignment: 0.5);
     await tester.pumpAndSettle();
     await tester.pump(observerController.observeIntervalForScrolling);
     firstChild = observeResult?.firstChild;
     expect(firstChild?.index, targetItemIndex);
     expect(firstChild?.displayPercentage, 0.5);
 
-    observerController.jumpTo(
-      index: targetItemIndex,
-      alignment: 1,
-    );
+    observerController.jumpTo(index: targetItemIndex, alignment: 1);
     await tester.pumpAndSettle();
     await tester.pump(observerController.observeIntervalForScrolling);
     firstChild = observeResult?.firstChild;
@@ -564,11 +528,8 @@ void main() {
     )..observeIntervalForScrolling = const Duration(milliseconds: 500);
     int observeCount = 0;
 
-    Widget widget = getListView(
-      scrollController: scrollController,
-    );
+    Widget widget = getListView(scrollController: scrollController);
     widget = ListViewObserver(
-      child: widget,
       controller: observerController,
       autoTriggerObserveTypes: const [
         ObserverAutoTriggerObserveType.scrollStart,
@@ -579,6 +540,7 @@ void main() {
       onObserve: (result) {
         observeCount++;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
     final finder = find.byWidget(widget);
@@ -607,20 +569,19 @@ void main() {
 
   testWidgets('Check isForbidObserveCallback', (tester) async {
     final scrollController = ScrollController();
-    final observerController =
-        ListObserverController(controller: scrollController);
-
-    Widget widget = getListView(
-      scrollController: scrollController,
+    final observerController = ListObserverController(
+      controller: scrollController,
     );
+
+    Widget widget = getListView(scrollController: scrollController);
 
     bool isCalledOnObserve = false;
     widget = ListViewObserver(
-      child: widget,
       controller: observerController,
       onObserve: (result) {
         isCalledOnObserve = true;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
 
@@ -645,21 +606,17 @@ void main() {
       controller: scrollController,
     );
 
-    Widget widget = getListView(
-      scrollController: scrollController,
-    );
+    Widget widget = getListView(scrollController: scrollController);
     ListViewObserveModel? observeResult;
     widget = ListViewObserver(
-      child: widget,
       controller: observerController,
       onObserve: (result) {
         observeResult = result;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
-    await observerController.dispatchOnceObserve(
-      isForce: true,
-    );
+    await observerController.dispatchOnceObserve(isForce: true);
     expect(observeResult, isNotNull);
     expect(observeResult?.firstChild?.index, 0);
     expect(
@@ -671,10 +628,7 @@ void main() {
     );
 
     int targetItemIndex = 30;
-    observerController.jumpTo(
-      index: targetItemIndex,
-      alignment: 0,
-    );
+    observerController.jumpTo(index: targetItemIndex, alignment: 0);
     await tester.pumpAndSettle();
     await tester.pump(observerController.observeIntervalForScrolling);
     expect(observeResult?.firstChild?.index, targetItemIndex);
@@ -689,123 +643,109 @@ void main() {
     scrollController.dispose();
   });
 
-  group(
-    'ObserverScrollNotification',
-    () {
-      late ScrollController scrollController;
-      late ListObserverController observerController;
-      late Widget widget;
+  group('ObserverScrollNotification', () {
+    late ScrollController scrollController;
+    late ListObserverController observerController;
+    late Widget widget;
 
-      int indexOfStartNoti = -1;
-      int indexOfInterruptionNoti = -1;
-      int indexOfDecisionNoti = -1;
-      int indexOfEndNoti = -1;
+    int indexOfStartNoti = -1;
+    int indexOfInterruptionNoti = -1;
+    int indexOfDecisionNoti = -1;
+    int indexOfEndNoti = -1;
 
-      resetAll({
-        bool isFixedHeight = false,
-      }) {
-        indexOfStartNoti = -1;
-        indexOfInterruptionNoti = -1;
-        indexOfDecisionNoti = -1;
-        indexOfEndNoti = -1;
-        scrollController = ScrollController();
-        observerController = ListObserverController(
-          controller: scrollController,
-        );
+    resetAll({bool isFixedHeight = false}) {
+      indexOfStartNoti = -1;
+      indexOfInterruptionNoti = -1;
+      indexOfDecisionNoti = -1;
+      indexOfEndNoti = -1;
+      scrollController = ScrollController();
+      observerController = ListObserverController(controller: scrollController);
 
-        widget = getListView(
-          scrollController: scrollController,
-          itemCount: 100,
-          isFixedHeight: isFixedHeight,
-        );
-
-        widget = ListViewObserver(
-          child: widget,
-          controller: observerController,
-        );
-        int count = 0;
-        widget = NotificationListener<ObserverScrollNotification>(
-          child: widget,
-          onNotification: (notification) {
-            if (notification is ObserverScrollStartNotification) {
-              indexOfStartNoti = count;
-            } else if (notification is ObserverScrollInterruptionNotification) {
-              indexOfInterruptionNoti = count;
-            } else if (notification is ObserverScrollDecisionNotification) {
-              indexOfDecisionNoti = count;
-            } else if (notification is ObserverScrollEndNotification) {
-              indexOfEndNoti = count;
-            }
-            count += 1;
-            return true;
-          },
-        );
-      }
-
-      tearDown(() {
-        scrollController.dispose();
-      });
-
-      testWidgets(
-        'Notification sequence in normal scenarios',
-        (tester) async {
-          resetAll();
-          await tester.pumpWidget(widget);
-          observerController.jumpTo(index: 10);
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          expect(indexOfStartNoti, 0);
-          expect(indexOfInterruptionNoti, -1);
-          expect(indexOfDecisionNoti, 1);
-          expect(indexOfEndNoti, 2);
-        },
+      widget = getListView(
+        scrollController: scrollController,
+        itemCount: 100,
+        isFixedHeight: isFixedHeight,
       );
 
-      testWidgets(
-        'Notification sequence in normal scenarios with fixed item height',
-        (tester) async {
-          resetAll(isFixedHeight: true);
-          await tester.pumpWidget(widget);
-          observerController.jumpTo(index: 10);
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          expect(indexOfStartNoti, 0);
-          expect(indexOfInterruptionNoti, -1);
-          expect(indexOfDecisionNoti, 1);
-          expect(indexOfEndNoti, 2);
+      widget = ListViewObserver(controller: observerController, child: widget);
+      int count = 0;
+      widget = NotificationListener<ObserverScrollNotification>(
+        child: widget,
+        onNotification: (notification) {
+          if (notification is ObserverScrollStartNotification) {
+            indexOfStartNoti = count;
+          } else if (notification is ObserverScrollInterruptionNotification) {
+            indexOfInterruptionNoti = count;
+          } else if (notification is ObserverScrollDecisionNotification) {
+            indexOfDecisionNoti = count;
+          } else if (notification is ObserverScrollEndNotification) {
+            indexOfEndNoti = count;
+          }
+          count += 1;
+          return true;
         },
       );
+    }
 
-      testWidgets(
-        'Notification sequence when using incorrect index',
-        (tester) async {
-          resetAll();
-          await tester.pumpWidget(widget);
-          observerController.jumpTo(index: 101);
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          expect(indexOfStartNoti, 0);
-          expect(indexOfInterruptionNoti, 1);
-          expect(indexOfDecisionNoti, -1);
-          expect(indexOfEndNoti, -1);
-        },
-      );
+    tearDown(() {
+      scrollController.dispose();
+    });
 
-      testWidgets(
-        'Notification sequence when using incorrect index with fixed item height',
-        (tester) async {
-          resetAll(isFixedHeight: true);
-          await tester.pumpWidget(widget);
-          observerController.jumpTo(index: 101);
-          await tester.pumpAndSettle();
-          expect(indexOfStartNoti, 0);
-          expect(indexOfInterruptionNoti, 1);
-          expect(indexOfDecisionNoti, -1);
-          expect(indexOfEndNoti, -1);
-        },
-      );
-    },
-  );
+    testWidgets('Notification sequence in normal scenarios', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+      observerController.jumpTo(index: 10);
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      expect(indexOfStartNoti, 0);
+      expect(indexOfInterruptionNoti, -1);
+      expect(indexOfDecisionNoti, 1);
+      expect(indexOfEndNoti, 2);
+    });
+
+    testWidgets(
+      'Notification sequence in normal scenarios with fixed item height',
+      (tester) async {
+        resetAll(isFixedHeight: true);
+        await tester.pumpWidget(widget);
+        observerController.jumpTo(index: 10);
+        await tester.pumpAndSettle();
+        await tester.pump(observerController.observeIntervalForScrolling);
+        expect(indexOfStartNoti, 0);
+        expect(indexOfInterruptionNoti, -1);
+        expect(indexOfDecisionNoti, 1);
+        expect(indexOfEndNoti, 2);
+      },
+    );
+
+    testWidgets('Notification sequence when using incorrect index', (
+      tester,
+    ) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+      observerController.jumpTo(index: 101);
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      expect(indexOfStartNoti, 0);
+      expect(indexOfInterruptionNoti, 1);
+      expect(indexOfDecisionNoti, -1);
+      expect(indexOfEndNoti, -1);
+    });
+
+    testWidgets(
+      'Notification sequence when using incorrect index with fixed item height',
+      (tester) async {
+        resetAll(isFixedHeight: true);
+        await tester.pumpWidget(widget);
+        observerController.jumpTo(index: 101);
+        await tester.pumpAndSettle();
+        expect(indexOfStartNoti, 0);
+        expect(indexOfInterruptionNoti, 1);
+        expect(indexOfDecisionNoti, -1);
+        expect(indexOfEndNoti, -1);
+      },
+    );
+  });
 
   group('dispatchOnceObserve', () {
     late ScrollController scrollController;
@@ -818,90 +758,64 @@ void main() {
 
     resetAll() {
       scrollController = ScrollController();
-      observerController = ListObserverController(
-        controller: scrollController,
-      );
-      widget = getListView(
-        scrollController: scrollController,
-        itemCount: 100,
-      );
-      widget = ListViewObserver(
-        child: widget,
-        controller: observerController,
-      );
+      observerController = ListObserverController(controller: scrollController);
+      widget = getListView(scrollController: scrollController, itemCount: 100);
+      widget = ListViewObserver(controller: observerController, child: widget);
     }
 
-    testWidgets(
-      'Check observeResult',
-      (tester) async {
-        resetAll();
-        await tester.pumpWidget(widget);
-        var result = await observerController.dispatchOnceObserve();
-        expect(result.isSuccess, isFalse);
+    testWidgets('Check observeResult', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+      var result = await observerController.dispatchOnceObserve();
+      expect(result.isSuccess, isFalse);
 
-        result = await observerController.dispatchOnceObserve(
-          isDependObserveCallback: false,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(result.observeResult, isNotNull);
-        expect(
-          result.observeResult?.displayingChildIndexList ?? [],
-          isNotEmpty,
-        );
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(result.observeResult, isNotNull);
+      expect(result.observeResult?.displayingChildIndexList ?? [], isNotEmpty);
 
-        result = await observerController.dispatchOnceObserve(
-          isDependObserveCallback: false,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(
-          result.observeResult?.displayingChildIndexList ?? [],
-          isEmpty,
-        );
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(result.observeResult?.displayingChildIndexList ?? [], isEmpty);
 
-        result = await observerController.dispatchOnceObserve(
-          isDependObserveCallback: false,
-          isForce: true,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(
-          result.observeResult?.displayingChildIndexList ?? [],
-          isNotEmpty,
-        );
-      },
-    );
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+        isForce: true,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(result.observeResult?.displayingChildIndexList ?? [], isNotEmpty);
+    });
 
-    testWidgets(
-      'Check observeAllResult',
-      (tester) async {
-        resetAll();
-        await tester.pumpWidget(widget);
-        var result = await observerController.dispatchOnceObserve();
-        expect(result.isSuccess, isFalse);
+    testWidgets('Check observeAllResult', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+      var result = await observerController.dispatchOnceObserve();
+      expect(result.isSuccess, isFalse);
 
-        result = await observerController.dispatchOnceObserve(
-          isDependObserveCallback: false,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(result.observeAllResult.values.length, 1);
-        expect(
-          result.observeAllResult.values.first,
-          result.observeResult,
-        );
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(result.observeAllResult.values.length, 1);
+      expect(result.observeAllResult.values.first, result.observeResult);
 
-        result = await observerController.dispatchOnceObserve(
-          isDependObserveCallback: false,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(result.observeAllResult, isEmpty);
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(result.observeAllResult, isEmpty);
 
-        result = await observerController.dispatchOnceObserve(
-          isDependObserveCallback: false,
-          isForce: true,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(result.observeAllResult, isNotEmpty);
-      },
-    );
+      result = await observerController.dispatchOnceObserve(
+        isDependObserveCallback: false,
+        isForce: true,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(result.observeAllResult, isNotEmpty);
+    });
   });
 
   group('ObserverListener', () {
@@ -918,9 +832,7 @@ void main() {
       scrollController.dispose();
     });
 
-    resetAll({
-      bool isResetTag = false,
-    }) {
+    resetAll({bool isResetTag = false}) {
       if (isResetTag) {
         tag1 = tag1 * 2;
         tag2 = tag2 * 2;
@@ -944,30 +856,26 @@ void main() {
           if (index == 3) {
             return const SizedBox(
               height: 50,
-              child: Center(
-                child: Icon(Icons.abc),
-              ),
+              child: Center(child: Icon(Icons.abc)),
             );
           }
           return SizedBox(
             height: 80,
-            child: Center(
-              child: Text("index -- $index"),
-            ),
+            child: Center(child: Text("index -- $index")),
           );
         },
       );
       widget = ListViewObserver(
         key: key2,
         tag: tag2,
-        child: widget,
         controller: observerController2,
+        child: widget,
       );
       widget = ListViewObserver(
         key: key1,
         tag: tag1,
-        child: widget,
         controller: observerController1,
+        child: widget,
       );
     }
 
@@ -989,9 +897,7 @@ void main() {
       resetAll(isResetTag: true);
       await tester.pumpWidget(widget);
 
-      tagManager = ObserverWidgetTagManager.maybeOf(
-        tester.element(itemFinder),
-      );
+      tagManager = ObserverWidgetTagManager.maybeOf(tester.element(itemFinder));
       tagMap = Map.from(tagManager?.tagMap ?? {});
       Set<String> newTags = {tag1, tag2};
       expect(tags != newTags, isTrue);
@@ -1010,15 +916,11 @@ void main() {
         cbResult = result;
       }
 
-      onObserveAllCallback(
-        Map<BuildContext, ListViewObserveModel> resultMap,
-      ) {
+      onObserveAllCallback(Map<BuildContext, ListViewObserveModel> resultMap) {
         cbAllResult = resultMap;
       }
 
-      final observerState = ListViewObserver.of(
-        tester.element(itemFinder),
-      );
+      final observerState = ListViewObserver.of(tester.element(itemFinder));
       expect(observerState, isNotNull);
 
       final observerStateByTag2 = ListViewObserver.of(
@@ -1068,15 +970,11 @@ void main() {
         cbResult = result;
       }
 
-      onObserveAllCallback(
-        Map<BuildContext, ListViewObserveModel> resultMap,
-      ) {
+      onObserveAllCallback(Map<BuildContext, ListViewObserveModel> resultMap) {
         cbAllResult = resultMap;
       }
 
-      observerState = ListViewObserver.maybeOf(
-        tester.element(itemFinder),
-      );
+      observerState = ListViewObserver.maybeOf(tester.element(itemFinder));
       expect(observerState, isNotNull);
 
       final observerStateByTag2 = ListViewObserver.maybeOf(
@@ -1111,50 +1009,43 @@ void main() {
     });
 
     testWidgets(
-        'innerTagChangeCount should not increase when tag remains unchanged',
-        (tester) async {
-      const String tag = 'tag1';
-      scrollController = ScrollController();
-      Widget listView = getListView(scrollController: scrollController);
+      'innerTagChangeCount should not increase when tag remains unchanged',
+      (tester) async {
+        const String tag = 'tag1';
+        scrollController = ScrollController();
+        Widget listView = getListView(scrollController: scrollController);
 
-      widget = ListViewObserver(
-        tag: tag,
-        child: listView,
-      );
+        widget = ListViewObserver(tag: tag, child: listView);
 
-      await tester.pumpWidget(widget);
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(widget);
+        await tester.pumpAndSettle();
 
-      // Get ObserverWidgetState
-      final itemFinder = find.byType(ListViewObserver);
-      final observerState = tester.state<ListViewObserverState>(itemFinder);
-      expect(observerState, isNotNull);
+        // Get ObserverWidgetState
+        final itemFinder = find.byType(ListViewObserver);
+        final observerState = tester.state<ListViewObserverState>(itemFinder);
+        expect(observerState, isNotNull);
 
-      // Record initial tagChangeCount
-      final initialTagChangeCount = observerState.innerTagChangeCount;
+        // Record initial tagChangeCount
+        final initialTagChangeCount = observerState.innerTagChangeCount;
 
-      // Refresh widget but keep tag unchanged
-      widget = ListViewObserver(
-        tag: tag,
-        child: listView,
-      );
-      await tester.pumpWidget(widget);
-      await tester.pumpAndSettle();
+        // Refresh widget but keep tag unchanged
+        widget = ListViewObserver(tag: tag, child: listView);
+        await tester.pumpWidget(widget);
+        await tester.pumpAndSettle();
 
-      // Verify that tagChangeCount has not increased
-      expect(observerState.innerTagChangeCount, initialTagChangeCount);
-      expect(observerState.innerTagChangeCount, 0);
-    });
+        // Verify that tagChangeCount has not increased
+        expect(observerState.innerTagChangeCount, initialTagChangeCount);
+        expect(observerState.innerTagChangeCount, 0);
+      },
+    );
 
-    testWidgets('No exception in _checkTagChange during refresh and dispose',
-        (tester) async {
+    testWidgets('No exception in _checkTagChange during refresh and dispose', (
+      tester,
+    ) async {
       // Regression test for https://github.com/fluttercandies/flutter_scrollview_observer/issues/143
       scrollController = ScrollController();
       Widget listView = getListView(scrollController: scrollController);
-      widget = ListViewObserver(
-        tag: 'tag1',
-        child: listView,
-      );
+      widget = ListViewObserver(tag: 'tag1', child: listView);
       await tester.pumpWidget(widget);
 
       // Get ObserverWidgetState
@@ -1165,10 +1056,7 @@ void main() {
       final completer = Completer<void>();
       observerState.innerCheckTagChangeEndOfFrame = completer.future;
 
-      widget = ListViewObserver(
-        tag: 'tag2',
-        child: listView,
-      );
+      widget = ListViewObserver(tag: 'tag2', child: listView);
       await tester.pumpWidget(widget);
 
       // Dispose widget before endOfFrame completes
@@ -1184,8 +1072,9 @@ void main() {
   });
 
   group('cancelOnceObserveNotificationBubbling', () {
-    testWidgets('cancelOnceObserveNotificationBubbling is true (default)',
-        (tester) async {
+    testWidgets('cancelOnceObserveNotificationBubbling is true (default)', (
+      tester,
+    ) async {
       final scrollController = ScrollController();
       final observerController = ListObserverController(
         controller: scrollController,
@@ -1219,8 +1108,9 @@ void main() {
       scrollController.dispose();
     });
 
-    testWidgets('cancelOnceObserveNotificationBubbling is false',
-        (tester) async {
+    testWidgets('cancelOnceObserveNotificationBubbling is false', (
+      tester,
+    ) async {
       final scrollController = ScrollController();
       final observerController = ListObserverController(
         controller: scrollController,

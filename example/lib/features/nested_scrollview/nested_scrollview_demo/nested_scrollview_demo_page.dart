@@ -4,13 +4,13 @@
  * @Date: 2023-11-27 22:05:28
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/utils/snackbar.dart';
 import 'package:scrollview_observer_example/widgets/sliver.dart';
 
 class NestedScrollViewDemoPage extends StatefulWidget {
-  const NestedScrollViewDemoPage({Key? key}) : super(key: key);
+  const NestedScrollViewDemoPage({super.key});
 
   @override
   State<NestedScrollViewDemoPage> createState() =>
@@ -40,10 +40,7 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage>
     controller: outerScrollController,
   );
 
-  late TabController tabBarController = TabController(
-    length: 3,
-    vsync: this,
-  );
+  late TabController tabBarController = TabController(length: 3, vsync: this);
 
   bool scrollToWithAnimation = false;
 
@@ -68,9 +65,9 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage>
         child: _buildNestedScrollView(),
         sliverContexts: () {
           return [
-            if (_sliverHeaderListCtx != null) _sliverHeaderListCtx!,
-            if (_sliverBodyListCtx != null) _sliverBodyListCtx!,
-            if (_sliverBodyGridCtx != null) _sliverBodyGridCtx!,
+            ?_sliverHeaderListCtx,
+            ?_sliverBodyListCtx,
+            ?_sliverBodyGridCtx,
           ];
         },
         customOverlap: (sliverContext) {
@@ -83,7 +80,8 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage>
           result.forEach((key, value) {
             if (key == _sliverHeaderListCtx) {
               debugPrint(
-                  "SliverListHeaderCtx: ${value.displayingChildIndexList}");
+                "SliverListHeaderCtx: ${value.displayingChildIndexList}",
+              );
             } else if (key == _sliverBodyListCtx) {
               final model = value as ListViewObserveModel;
               debugPrint("SliverListCtx: ${model.displayingChildIndexList}");
@@ -94,8 +92,9 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage>
             } else if (key == _sliverBodyGridCtx) {
               final model = value as GridViewObserveModel;
               debugPrint("SliverGridCtx: ${model.displayingChildIndexList}");
-              final firstGroupChildIndexList =
-                  model.firstGroupChildList.map((e) => e.index).toList();
+              final firstGroupChildIndexList = model.firstGroupChildList
+                  .map((e) => e.index)
+                  .toList();
               if (_hitIndexesForGrid != firstGroupChildIndexList) {
                 _hitIndexesForGrid = firstGroupChildIndexList;
                 setState(() {});
@@ -152,7 +151,7 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage>
           IconButton(
             icon: const Icon(Icons.restore_outlined),
             onPressed: resetAllSliverObservationData,
-          )
+          ),
         ],
       ),
     );
@@ -184,18 +183,13 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage>
             ],
           ),
           SliverFixedExtentList(
-            delegate: SliverChildBuilderDelegate(
-              (ctx, index) {
-                if (_sliverHeaderListCtx != ctx) {
-                  _sliverHeaderListCtx = ctx;
-                  nestedScrollUtil.headerSliverContexts.add(ctx);
-                }
-                return ListTile(
-                  leading: Text("Item $index"),
-                );
-              },
-              childCount: 5,
-            ),
+            delegate: SliverChildBuilderDelegate((ctx, index) {
+              if (_sliverHeaderListCtx != ctx) {
+                _sliverHeaderListCtx = ctx;
+                nestedScrollUtil.headerSliverContexts.add(ctx);
+              }
+              return ListTile(leading: Text("Item $index"));
+            }, childCount: 5),
             itemExtent: 50,
           ),
           SliverPersistentHeader(
@@ -218,47 +212,43 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage>
           ),
         ];
       },
-      body: Builder(builder: (context) {
-        // Get the inner scroll controller.
-        final innerScrollController = PrimaryScrollController.of(context);
-        if (nestedScrollUtil.bodyScrollController != innerScrollController) {
-          nestedScrollUtil.bodyScrollController = innerScrollController;
-        }
-        return CustomScrollView(
-          slivers: [
-            _buildSliverListView(),
-            _buildSliverGridView(),
-          ],
-        );
-      }),
+      body: Builder(
+        builder: (context) {
+          // Get the inner scroll controller.
+          final innerScrollController = PrimaryScrollController.of(context);
+          if (nestedScrollUtil.bodyScrollController != innerScrollController) {
+            nestedScrollUtil.bodyScrollController = innerScrollController;
+          }
+          return CustomScrollView(
+            slivers: [_buildSliverListView(), _buildSliverGridView()],
+          );
+        },
+      ),
     );
   }
 
   Widget _buildSliverListView() {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (ctx, index) {
-          if (_sliverBodyListCtx != ctx) {
-            _sliverBodyListCtx = ctx;
-            nestedScrollUtil.bodySliverContexts.add(ctx);
-          }
-          return Container(
-            height: (index % 2 == 0) ? 80 : 50,
-            color: _hitIndexForListCtx == index ? Colors.red : Colors.black12,
-            child: Center(
-              child: Text(
-                "index -- $index",
-                style: TextStyle(
-                  color: _hitIndexForListCtx == index
-                      ? Colors.white
-                      : Colors.black,
-                ),
+      delegate: SliverChildBuilderDelegate((ctx, index) {
+        if (_sliverBodyListCtx != ctx) {
+          _sliverBodyListCtx = ctx;
+          nestedScrollUtil.bodySliverContexts.add(ctx);
+        }
+        return Container(
+          height: (index % 2 == 0) ? 80 : 50,
+          color: _hitIndexForListCtx == index ? Colors.red : Colors.black12,
+          child: Center(
+            child: Text(
+              "index -- $index",
+              style: TextStyle(
+                color: _hitIndexForListCtx == index
+                    ? Colors.white
+                    : Colors.black,
               ),
             ),
-          );
-        },
-        childCount: 30,
-      ),
+          ),
+        );
+      }, childCount: 30),
     );
   }
 
@@ -270,30 +260,22 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage>
         crossAxisSpacing: 10.0,
         childAspectRatio: 2.0,
       ),
-      delegate: SliverChildBuilderDelegate(
-        (BuildContext context, int index) {
-          if (_sliverBodyGridCtx != context) {
-            _sliverBodyGridCtx = context;
-            nestedScrollUtil.bodySliverContexts.add(context);
-          }
-          return Container(
-            color: (_hitIndexesForGrid.contains(index))
-                ? Colors.green
-                : Colors.blue[100],
-            child: Center(
-              child: Text('index -- $index'),
-            ),
-          );
-        },
-        childCount: 150,
-      ),
+      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+        if (_sliverBodyGridCtx != context) {
+          _sliverBodyGridCtx = context;
+          nestedScrollUtil.bodySliverContexts.add(context);
+        }
+        return Container(
+          color: (_hitIndexesForGrid.contains(index))
+              ? Colors.green
+              : Colors.blue[100],
+          child: Center(child: Text('index -- $index')),
+        );
+      }, childCount: 150),
     );
   }
 
-  double calcPersistentHeaderExtent(
-    double offset, {
-    required bool isBody,
-  }) {
+  double calcPersistentHeaderExtent(double offset, {required bool isBody}) {
     double value = ObserverUtils.calcPersistentHeaderExtent(
       key: appBarKey,
       offset: offset,
@@ -307,7 +289,7 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage>
     return value;
   }
 
-  resetAllSliverObservationData() {
+  void resetAllSliverObservationData() {
     nestedScrollUtil.reset();
     nestedScrollViewKey = GlobalKey();
     nestedScrollUtil.outerScrollController = outerScrollController;
@@ -321,7 +303,7 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage>
     });
   }
 
-  scrollTo({
+  void scrollTo({
     required NestedScrollUtilPosition position,
     required int index,
     required BuildContext? sliverContext,
@@ -337,10 +319,7 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage>
         curve: Curves.easeInOut,
         sliverContext: sliverContext,
         offset: (targetOffset) {
-          return calcPersistentHeaderExtent(
-            targetOffset,
-            isBody: isBody,
-          );
+          return calcPersistentHeaderExtent(targetOffset, isBody: isBody);
         },
       );
     } else {
@@ -351,10 +330,7 @@ class _NestedScrollViewDemoPageState extends State<NestedScrollViewDemoPage>
         index: index,
         sliverContext: sliverContext,
         offset: (targetOffset) {
-          return calcPersistentHeaderExtent(
-            targetOffset,
-            isBody: isBody,
-          );
+          return calcPersistentHeaderExtent(targetOffset, isBody: isBody);
         },
       );
     }

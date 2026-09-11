@@ -6,7 +6,7 @@
 
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 import 'package:scrollview_observer_example/features/scene/detail/logic/detail_logic.dart';
 import 'package:scrollview_observer_example/features/scene/detail/model/detail_nav_bar_tab_model.dart';
@@ -24,9 +24,7 @@ extension DetailLogicForNavBar on DetailLogic {
     );
   }
 
-  DetailNavBarTabModel createNavBarTabModel(
-    DetailModuleType type,
-  ) {
+  DetailNavBarTabModel createNavBarTabModel(DetailModuleType type) {
     return DetailNavBarTabModel(
       type: type,
       index: state.moduleTypes.indexOf(type),
@@ -70,15 +68,10 @@ extension DetailLogicForNavBar on DetailLogic {
     final navBarHeight = state.navBarHeight;
 
     double newAlpha = 0.0;
-    newAlpha = min(
-      1.0,
-      max(0.0, scrollOffset / navBarHeight),
-    );
+    newAlpha = min(1.0, max(0.0, scrollOffset / navBarHeight));
 
     if (state.navBarAlpha == newAlpha) return;
     state.navBarAlpha = newAlpha;
-    update([
-      DetailUpdateType.navBar,
-    ]);
+    update([DetailUpdateType.navBar]);
   }
 }

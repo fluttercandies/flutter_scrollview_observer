@@ -4,7 +4,7 @@
  * @Date: 2022-05-28 12:32:34
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/common/route/route.dart';
 
 void main() {
@@ -12,12 +12,10 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: MyRoute.routerConfig,
-    );
+    return MaterialApp.router(routerConfig: MyRoute.routerConfig);
   }
 }

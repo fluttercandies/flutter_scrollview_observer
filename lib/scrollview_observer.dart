@@ -4,7 +4,7 @@
  * @Date: 2022-08-08 00:20:03
  */
 
-library scrollview_observer;
+library;
 
 export 'src/notification.dart';
 

@@ -4,7 +4,7 @@
  * @Date: 2026-02-24 22:25:39
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get/get.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/header/nested_scrollview_tab_bar_view_demo_header.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/logic/nested_scrollview_tab_bar_view_demo_logic.dart';
@@ -23,7 +23,8 @@ class _NestedScrollviewTabBarViewDemoTab1ViewState
     extends State<NestedScrollviewTabBarViewDemoTab1View>
     with
         NestedScrollviewTabBarViewDemoLogicConsumerMixin<
-            NestedScrollviewTabBarViewDemoTab1View> {
+          NestedScrollviewTabBarViewDemoTab1View
+        > {
   NestedScrollViewTabBarViewDemoState get state => logic.state;
 
   @override
@@ -40,32 +41,26 @@ class _NestedScrollviewTabBarViewDemoTab1ViewState
   Widget _buildBody() {
     return CustomScrollView(
       key: const PageStorageKey("tab1"),
-      slivers: [
-        _buildSliverList(),
-      ],
+      slivers: [_buildSliverList()],
     );
   }
 
   Widget _buildSliverList() {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (ctx, index) {
-          logic.updateNestedScrollUtilBodySliverContextsIfNeed(
-            oldCtx: state.sliverTab1ListCtx,
-            newCtx: ctx,
-            toRecordCtx: () {
-              state.sliverTab1ListCtx = ctx;
-            },
-          );
+      delegate: SliverChildBuilderDelegate((ctx, index) {
+        logic.updateNestedScrollUtilBodySliverContextsIfNeed(
+          oldCtx: state.sliverTab1ListCtx,
+          newCtx: ctx,
+          toRecordCtx: () {
+            state.sliverTab1ListCtx = ctx;
+          },
+        );
 
-          return ListTile(
-            tileColor:
-                state.hitIndexForTab1ListCtx == index ? Colors.red : null,
-            title: Text("Tab 1 - List Item $index"),
-          );
-        },
-        childCount: 30,
-      ),
+        return ListTile(
+          tileColor: state.hitIndexForTab1ListCtx == index ? Colors.red : null,
+          title: Text("Tab 1 - List Item $index"),
+        );
+      }, childCount: 30),
     );
   }
 }

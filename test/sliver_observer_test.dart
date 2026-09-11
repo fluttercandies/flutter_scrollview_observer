@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
@@ -9,8 +9,8 @@ import 'package:scrollview_observer/src/common/observer_widget_tag_manager.dart'
 void main() {
   GlobalKey sliverListKey = GlobalKey();
   GlobalKey sliverGridKey = GlobalKey();
-  BuildContext? _sliverListCtx;
-  BuildContext? _sliverGridCtx;
+  BuildContext? sliverListCtx;
+  BuildContext? sliverGridCtx;
 
   double calcPersistentHeaderExtent({
     required double offset,
@@ -22,42 +22,28 @@ void main() {
     );
   }
 
-  Widget _buildDirectionality({
-    required Widget child,
-  }) {
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: child,
-    );
+  Widget buildDirectionality({required Widget child}) {
+    return Directionality(textDirection: TextDirection.ltr, child: child);
   }
 
-  Widget _buildSliverListView({
-    NullableIndexedWidgetBuilder? builder,
-  }) {
+  Widget buildSliverListView({NullableIndexedWidgetBuilder? builder}) {
     return SliverList(
       key: sliverListKey,
-      delegate: SliverChildBuilderDelegate(
-        (ctx, index) {
-          _sliverListCtx ??= ctx;
-          if (builder != null) {
-            return builder(ctx, index);
-          }
-          return Container(
-            height: (index % 2 == 0) ? 80 : 50,
-            color: Colors.red,
-            child: Center(
-              child: Text("index -- $index"),
-            ),
-          );
-        },
-        childCount: 30,
-      ),
+      delegate: SliverChildBuilderDelegate((ctx, index) {
+        sliverListCtx ??= ctx;
+        if (builder != null) {
+          return builder(ctx, index);
+        }
+        return Container(
+          height: (index % 2 == 0) ? 80 : 50,
+          color: Colors.red,
+          child: Center(child: Text("index -- $index")),
+        );
+      }, childCount: 30),
     );
   }
 
-  Widget _buildSliverGridView({
-    NullableIndexedWidgetBuilder? builder,
-  }) {
+  Widget buildSliverGridView({NullableIndexedWidgetBuilder? builder}) {
     return SliverGrid(
       key: sliverGridKey,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -66,47 +52,38 @@ void main() {
         crossAxisSpacing: 10.0,
         childAspectRatio: 2.0,
       ),
-      delegate: SliverChildBuilderDelegate(
-        (BuildContext context, int index) {
-          _sliverGridCtx ??= context;
-          if (builder != null) {
-            return builder(context, index);
-          }
-          return Container(
-            color: Colors.green,
-            child: Center(
-              child: Text('index -- $index'),
-            ),
-          );
-        },
-        childCount: 150,
-      ),
+      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+        sliverGridCtx ??= context;
+        if (builder != null) {
+          return builder(context, index);
+        }
+        return Container(
+          color: Colors.green,
+          child: Center(child: Text('index -- $index')),
+        );
+      }, childCount: 150),
     );
   }
 
-  Widget _buildScrollView({
+  Widget buildScrollView({
     ScrollController? scrollController,
     NullableIndexedWidgetBuilder? listItemBuilder,
     NullableIndexedWidgetBuilder? gridItemBuilder,
   }) {
-    return _buildDirectionality(
+    return buildDirectionality(
       child: CustomScrollView(
         controller: scrollController,
         slivers: [
-          _buildSliverListView(
-            builder: listItemBuilder,
-          ),
-          _buildSliverGridView(
-            builder: gridItemBuilder,
-          ),
+          buildSliverListView(builder: listItemBuilder),
+          buildSliverGridView(builder: gridItemBuilder),
         ],
       ),
     );
   }
 
   tearDown(() {
-    _sliverListCtx = null;
-    _sliverGridCtx = null;
+    sliverListCtx = null;
+    sliverGridCtx = null;
   });
 
   testWidgets('Check isForbidObserveCallback', (tester) async {
@@ -115,34 +92,32 @@ void main() {
       controller: scrollController,
     );
 
-    Widget widget = _buildScrollView(
-      scrollController: scrollController,
-    );
+    Widget widget = buildScrollView(scrollController: scrollController);
 
     bool isCalledOnObserve = false;
     widget = SliverViewObserver(
-      child: widget,
       controller: observerController,
       sliverContexts: () {
         return [
-          if (_sliverListCtx != null) _sliverListCtx!,
-          if (_sliverGridCtx != null) _sliverGridCtx!,
+          if (sliverListCtx != null) sliverListCtx!,
+          if (sliverGridCtx != null) sliverGridCtx!,
         ];
       },
       onObserveAll: (result) {
         isCalledOnObserve = true;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
 
     observerController.isForbidObserveCallback = true;
-    observerController.jumpTo(index: 10, sliverContext: _sliverListCtx);
+    observerController.jumpTo(index: 10, sliverContext: sliverListCtx);
     await tester.pumpAndSettle();
     await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserve, false);
 
     observerController.isForbidObserveCallback = false;
-    observerController.jumpTo(index: 20, sliverContext: _sliverListCtx);
+    observerController.jumpTo(index: 20, sliverContext: sliverListCtx);
     await tester.pumpAndSettle();
     await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserve, true);
@@ -156,13 +131,10 @@ void main() {
       controller: scrollController,
     );
 
-    Widget widget = _buildScrollView(
-      scrollController: scrollController,
-    );
+    Widget widget = buildScrollView(scrollController: scrollController);
 
     bool isCalledOnObserveViewport = false;
     widget = SliverViewObserver(
-      child: widget,
       controller: observerController,
       sliverContexts: () {
         return [
@@ -175,17 +147,18 @@ void main() {
       onObserveViewport: (result) {
         isCalledOnObserveViewport = true;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
 
     observerController.isForbidObserveViewportCallback = true;
-    observerController.jumpTo(index: 10, sliverContext: _sliverListCtx);
+    observerController.jumpTo(index: 10, sliverContext: sliverListCtx);
     await tester.pumpAndSettle();
     await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserveViewport, false);
 
     observerController.isForbidObserveViewportCallback = false;
-    observerController.jumpTo(index: 20, sliverContext: _sliverGridCtx);
+    observerController.jumpTo(index: 20, sliverContext: sliverGridCtx);
     await tester.pumpAndSettle();
     await tester.pump(observerController.observeIntervalForScrolling);
     expect(isCalledOnObserveViewport, true);
@@ -201,12 +174,9 @@ void main() {
     int observeCountForOnObserveAll = 0;
     int observeCountForOnObserveViewport = 0;
 
-    Widget widget = _buildScrollView(
-      scrollController: scrollController,
-    );
+    Widget widget = buildScrollView(scrollController: scrollController);
 
     widget = SliverViewObserver(
-      child: widget,
       controller: observerController,
       sliverContexts: () {
         return [
@@ -228,6 +198,7 @@ void main() {
       onObserveViewport: (_) {
         observeCountForOnObserveViewport++;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
     final finder = find.byWidget(widget);
@@ -265,7 +236,7 @@ void main() {
     final pageController = PageController();
     bool isCalledOnObserve = false;
 
-    Widget widget = _buildScrollView(
+    Widget widget = buildScrollView(
       scrollController: scrollController,
       listItemBuilder: (context, index) {
         if (index == 0) {
@@ -285,18 +256,18 @@ void main() {
       },
     );
     widget = SliverViewObserver(
-      child: widget,
       controller: observerController,
       scrollNotificationPredicate: defaultScrollNotificationPredicate,
       sliverContexts: () {
         return [
-          if (_sliverListCtx != null) _sliverListCtx!,
-          if (_sliverGridCtx != null) _sliverGridCtx!,
+          if (sliverListCtx != null) sliverListCtx!,
+          if (sliverGridCtx != null) sliverGridCtx!,
         ];
       },
       onObserveAll: (result) {
         isCalledOnObserve = true;
       },
+      child: widget,
     );
     await tester.pumpWidget(widget);
 
@@ -323,92 +294,81 @@ void main() {
     pageController.dispose();
   });
 
-  group(
-    'ObserverScrollNotification',
-    () {
-      late ScrollController scrollController;
-      late SliverObserverController observerController;
-      late Widget widget;
+  group('ObserverScrollNotification', () {
+    late ScrollController scrollController;
+    late SliverObserverController observerController;
+    late Widget widget;
 
-      int indexOfStartNoti = -1;
-      int indexOfInterruptionNoti = -1;
-      int indexOfDecisionNoti = -1;
-      int indexOfEndNoti = -1;
+    int indexOfStartNoti = -1;
+    int indexOfInterruptionNoti = -1;
+    int indexOfDecisionNoti = -1;
+    int indexOfEndNoti = -1;
 
-      resetAll({
-        bool isFixedHeight = false,
-      }) {
-        indexOfStartNoti = -1;
-        indexOfInterruptionNoti = -1;
-        indexOfDecisionNoti = -1;
-        indexOfEndNoti = -1;
-        scrollController = ScrollController();
-        observerController = SliverObserverController(
-          controller: scrollController,
-        );
-
-        widget = _buildScrollView(
-          scrollController: scrollController,
-        );
-
-        widget = SliverViewObserver(
-          child: widget,
-          controller: observerController,
-        );
-        int count = 0;
-        widget = NotificationListener<ObserverScrollNotification>(
-          child: widget,
-          onNotification: (notification) {
-            if (notification is ObserverScrollStartNotification) {
-              indexOfStartNoti = count;
-            } else if (notification is ObserverScrollInterruptionNotification) {
-              indexOfInterruptionNoti = count;
-            } else if (notification is ObserverScrollDecisionNotification) {
-              indexOfDecisionNoti = count;
-            } else if (notification is ObserverScrollEndNotification) {
-              indexOfEndNoti = count;
-            }
-            count += 1;
-            return true;
-          },
-        );
-      }
-
-      tearDown(() {
-        scrollController.dispose();
-      });
-
-      testWidgets(
-        'Notification sequence in normal scenarios',
-        (tester) async {
-          resetAll();
-          await tester.pumpWidget(widget);
-          observerController.jumpTo(index: 10);
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          expect(indexOfStartNoti, 0);
-          expect(indexOfInterruptionNoti, -1);
-          expect(indexOfDecisionNoti, 1);
-          expect(indexOfEndNoti, 2);
-        },
+    resetAll({bool isFixedHeight = false}) {
+      indexOfStartNoti = -1;
+      indexOfInterruptionNoti = -1;
+      indexOfDecisionNoti = -1;
+      indexOfEndNoti = -1;
+      scrollController = ScrollController();
+      observerController = SliverObserverController(
+        controller: scrollController,
       );
 
-      testWidgets(
-        'Notification sequence when using incorrect index',
-        (tester) async {
-          resetAll();
-          await tester.pumpWidget(widget);
-          observerController.jumpTo(index: 101);
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          expect(indexOfStartNoti, 0);
-          expect(indexOfInterruptionNoti, 1);
-          expect(indexOfDecisionNoti, -1);
-          expect(indexOfEndNoti, -1);
+      widget = buildScrollView(scrollController: scrollController);
+
+      widget = SliverViewObserver(
+        controller: observerController,
+        child: widget,
+      );
+      int count = 0;
+      widget = NotificationListener<ObserverScrollNotification>(
+        child: widget,
+        onNotification: (notification) {
+          if (notification is ObserverScrollStartNotification) {
+            indexOfStartNoti = count;
+          } else if (notification is ObserverScrollInterruptionNotification) {
+            indexOfInterruptionNoti = count;
+          } else if (notification is ObserverScrollDecisionNotification) {
+            indexOfDecisionNoti = count;
+          } else if (notification is ObserverScrollEndNotification) {
+            indexOfEndNoti = count;
+          }
+          count += 1;
+          return true;
         },
       );
-    },
-  );
+    }
+
+    tearDown(() {
+      scrollController.dispose();
+    });
+
+    testWidgets('Notification sequence in normal scenarios', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+      observerController.jumpTo(index: 10);
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      expect(indexOfStartNoti, 0);
+      expect(indexOfInterruptionNoti, -1);
+      expect(indexOfDecisionNoti, 1);
+      expect(indexOfEndNoti, 2);
+    });
+
+    testWidgets('Notification sequence when using incorrect index', (
+      tester,
+    ) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+      observerController.jumpTo(index: 101);
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      expect(indexOfStartNoti, 0);
+      expect(indexOfInterruptionNoti, 1);
+      expect(indexOfDecisionNoti, -1);
+      expect(indexOfEndNoti, -1);
+    });
+  });
 
   group('dispatchOnceObserve', () {
     late ScrollController scrollController;
@@ -424,243 +384,215 @@ void main() {
       observerController = SliverObserverController(
         controller: scrollController,
       );
-      widget = _buildScrollView(
-        scrollController: scrollController,
-      );
+      widget = buildScrollView(scrollController: scrollController);
       widget = SliverViewObserver(
         sliverContexts: () => [
-          if (_sliverListCtx != null) _sliverListCtx!,
-          if (_sliverGridCtx != null) _sliverGridCtx!
+          if (sliverListCtx != null) sliverListCtx!,
+          if (sliverGridCtx != null) sliverGridCtx!,
         ],
-        child: widget,
         controller: observerController,
+        child: widget,
       );
     }
 
-    testWidgets(
-      'Check observeAllResult',
-      (tester) async {
-        resetAll();
-        await tester.pumpWidget(widget);
-        var result = await observerController.dispatchOnceObserve(
-          sliverContext: _sliverListCtx!,
-        );
-        expect(result.isSuccess, isFalse);
+    testWidgets('Check observeAllResult', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+      var result = await observerController.dispatchOnceObserve(
+        sliverContext: sliverListCtx!,
+      );
+      expect(result.isSuccess, isFalse);
 
-        result = await observerController.dispatchOnceObserve(
-          sliverContext: _sliverListCtx!,
-          isDependObserveCallback: false,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(result.observeAllResult[_sliverListCtx], isNotNull);
-        expect(
-          result.observeAllResult[_sliverListCtx]?.displayingChildIndexList ??
-              [],
-          isNotEmpty,
-        );
-        expect(result.observeAllResult[_sliverGridCtx], isNotNull);
+      result = await observerController.dispatchOnceObserve(
+        sliverContext: sliverListCtx!,
+        isDependObserveCallback: false,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(result.observeAllResult[sliverListCtx], isNotNull);
+      expect(
+        result.observeAllResult[sliverListCtx]?.displayingChildIndexList ?? [],
+        isNotEmpty,
+      );
+      expect(result.observeAllResult[sliverGridCtx], isNotNull);
 
-        result = await observerController.dispatchOnceObserve(
-          sliverContext: _sliverListCtx!,
-          isDependObserveCallback: false,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(
-          result.observeAllResult[_sliverListCtx]?.displayingChildIndexList ??
-              [],
-          isEmpty,
-        );
+      result = await observerController.dispatchOnceObserve(
+        sliverContext: sliverListCtx!,
+        isDependObserveCallback: false,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(
+        result.observeAllResult[sliverListCtx]?.displayingChildIndexList ?? [],
+        isEmpty,
+      );
 
-        result = await observerController.dispatchOnceObserve(
-          sliverContext: _sliverListCtx!,
-          isDependObserveCallback: false,
-          isForce: true,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(
-          result.observeAllResult[_sliverListCtx]?.displayingChildIndexList ??
-              [],
-          isNotEmpty,
-        );
-      },
-    );
+      result = await observerController.dispatchOnceObserve(
+        sliverContext: sliverListCtx!,
+        isDependObserveCallback: false,
+        isForce: true,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(
+        result.observeAllResult[sliverListCtx]?.displayingChildIndexList ?? [],
+        isNotEmpty,
+      );
+    });
 
-    testWidgets(
-      'Check observeViewportResultModel',
-      (tester) async {
-        resetAll();
-        await tester.pumpWidget(widget);
-        var result = await observerController.dispatchOnceObserve(
-          sliverContext: _sliverListCtx!,
-        );
-        expect(result.isSuccess, isFalse);
-        result = await observerController.dispatchOnceObserve(
-          sliverContext: _sliverListCtx!,
-          isDependObserveCallback: false,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(
-          result.observeViewportResultModel?.firstChild.sliverContext,
-          _sliverListCtx,
-        );
-        expect(
-          result.observeViewportResultModel?.displayingChildModelList ?? [],
-          isNotEmpty,
-        );
-        result = await observerController.dispatchOnceObserve(
-          sliverContext: _sliverListCtx!,
-          isDependObserveCallback: false,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(
-          result.observeViewportResultModel?.displayingChildModelList ?? [],
-          isEmpty,
-        );
-        result = await observerController.dispatchOnceObserve(
-          sliverContext: _sliverListCtx!,
-          isDependObserveCallback: false,
-          isForce: true,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(
-          result.observeViewportResultModel?.displayingChildModelList ?? [],
-          isNotEmpty,
-        );
+    testWidgets('Check observeViewportResultModel', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+      var result = await observerController.dispatchOnceObserve(
+        sliverContext: sliverListCtx!,
+      );
+      expect(result.isSuccess, isFalse);
+      result = await observerController.dispatchOnceObserve(
+        sliverContext: sliverListCtx!,
+        isDependObserveCallback: false,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(
+        result.observeViewportResultModel?.firstChild.sliverContext,
+        sliverListCtx,
+      );
+      expect(
+        result.observeViewportResultModel?.displayingChildModelList ?? [],
+        isNotEmpty,
+      );
+      result = await observerController.dispatchOnceObserve(
+        sliverContext: sliverListCtx!,
+        isDependObserveCallback: false,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(
+        result.observeViewportResultModel?.displayingChildModelList ?? [],
+        isEmpty,
+      );
+      result = await observerController.dispatchOnceObserve(
+        sliverContext: sliverListCtx!,
+        isDependObserveCallback: false,
+        isForce: true,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(
+        result.observeViewportResultModel?.displayingChildModelList ?? [],
+        isNotEmpty,
+      );
 
-        expect(_sliverGridCtx, isNotNull);
-        observerController.jumpTo(
-          index: 0,
-          sliverContext: _sliverGridCtx,
-        );
-        await tester.pumpAndSettle();
-        await tester.pump(observerController.observeIntervalForScrolling);
-        result = await observerController.dispatchOnceObserve(
-          sliverContext: _sliverGridCtx!,
-          isDependObserveCallback: false,
-        );
-        expect(result.isSuccess, isTrue);
-        expect(
-          result.observeViewportResultModel?.firstChild.sliverContext,
-          _sliverGridCtx,
-        );
-      },
-    );
+      expect(sliverGridCtx, isNotNull);
+      observerController.jumpTo(index: 0, sliverContext: sliverGridCtx);
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      result = await observerController.dispatchOnceObserve(
+        sliverContext: sliverGridCtx!,
+        isDependObserveCallback: false,
+      );
+      expect(result.isSuccess, isTrue);
+      expect(
+        result.observeViewportResultModel?.firstChild.sliverContext,
+        sliverGridCtx,
+      );
+    });
   });
 
-  group(
-    'NestedScrollView',
-    () {
-      late ScrollController outerScrollController;
-      ScrollController? bodyScrollController;
-      late SliverObserverController observerController;
-      late Widget widget;
-      BuildContext? _sliverHeaderListCtx;
-      BuildContext? _sliverHeaderGridCtx;
-      BuildContext? _sliverBodyListCtx;
-      BuildContext? _sliverBodyGridCtx;
-      GlobalKey appBarKey = GlobalKey();
-      GlobalKey nestedScrollViewKey = GlobalKey();
-      NestedScrollUtil? nestedScrollUtil;
-      Map<BuildContext, ObserveModel> resultMap = {};
-      int sliverListItemCount = 30;
-      int sliverGridItemCount = 150;
+  group('NestedScrollView', () {
+    late ScrollController outerScrollController;
+    ScrollController? bodyScrollController;
+    late SliverObserverController observerController;
+    late Widget widget;
+    BuildContext? sliverHeaderListCtx;
+    BuildContext? sliverHeaderGridCtx;
+    BuildContext? sliverBodyListCtx;
+    BuildContext? sliverBodyGridCtx;
+    GlobalKey appBarKey = GlobalKey();
+    GlobalKey nestedScrollViewKey = GlobalKey();
+    NestedScrollUtil? nestedScrollUtil;
+    Map<BuildContext, ObserveModel> resultMap = {};
+    int sliverListItemCount = 30;
+    int sliverGridItemCount = 150;
 
-      Widget _buildSliverGridView() {
-        return SliverGrid(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 10.0,
-            crossAxisSpacing: 10.0,
-            childAspectRatio: 2.0,
-          ),
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              if (_sliverBodyGridCtx != context) {
-                _sliverBodyGridCtx = context;
-                nestedScrollUtil?.bodySliverContexts.add(context);
-              }
-              return Container(
-                color: Colors.green,
-                child: Center(
-                  child: Text('index -- $index'),
-                ),
-              );
-            },
-            childCount: sliverGridItemCount,
-          ),
-        );
-      }
+    Widget buildSliverGridView() {
+      return SliverGrid(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 10.0,
+          crossAxisSpacing: 10.0,
+          childAspectRatio: 2.0,
+        ),
+        delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+          if (sliverBodyGridCtx != context) {
+            sliverBodyGridCtx = context;
+            nestedScrollUtil?.bodySliverContexts.add(context);
+          }
+          return Container(
+            color: Colors.green,
+            child: Center(child: Text('index -- $index')),
+          );
+        }, childCount: sliverGridItemCount),
+      );
+    }
 
-      Widget _buildSliverListView() {
-        return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (ctx, index) {
-              if (_sliverBodyListCtx != ctx) {
-                _sliverBodyListCtx = ctx;
-                nestedScrollUtil?.bodySliverContexts.add(ctx);
-              }
-              return Container(
-                height: (index % 2 == 0) ? 80 : 50,
-                color: Colors.red,
-                child: Center(
-                  child: Text(
-                    "index -- $index",
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-              );
-            },
-            childCount: sliverListItemCount,
-          ),
-        );
-      }
+    Widget buildSliverListView() {
+      return SliverList(
+        delegate: SliverChildBuilderDelegate((ctx, index) {
+          if (sliverBodyListCtx != ctx) {
+            sliverBodyListCtx = ctx;
+            nestedScrollUtil?.bodySliverContexts.add(ctx);
+          }
+          return Container(
+            height: (index % 2 == 0) ? 80 : 50,
+            color: Colors.red,
+            child: Center(
+              child: Text(
+                "index -- $index",
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          );
+        }, childCount: sliverListItemCount),
+      );
+    }
 
-      Widget _buildNestedScrollView() {
-        return NestedScrollView(
-          key: nestedScrollViewKey,
-          controller: outerScrollController,
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              SliverAppBar(
-                key: appBarKey,
-                title: const Text("NestedScrollView"),
-                pinned: true,
-                forceElevated: innerBoxIsScrolled,
+    Widget buildNestedScrollView() {
+      return NestedScrollView(
+        key: nestedScrollViewKey,
+        controller: outerScrollController,
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              key: appBarKey,
+              title: const Text("NestedScrollView"),
+              pinned: true,
+              forceElevated: innerBoxIsScrolled,
+            ),
+            SliverFixedExtentList(
+              delegate: SliverChildBuilderDelegate((ctx, index) {
+                if (sliverHeaderListCtx != ctx) {
+                  sliverHeaderListCtx = ctx;
+                  nestedScrollUtil?.headerSliverContexts.add(ctx);
+                }
+                return ListTile(leading: Text("Item $index"));
+              }, childCount: 5),
+              itemExtent: 50,
+            ),
+            SliverGrid.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 10.0,
+                crossAxisSpacing: 10.0,
+                childAspectRatio: 2.0,
               ),
-              SliverFixedExtentList(
-                delegate: SliverChildBuilderDelegate(
-                  (ctx, index) {
-                    if (_sliverHeaderListCtx != ctx) {
-                      _sliverHeaderListCtx = ctx;
-                      nestedScrollUtil?.headerSliverContexts.add(ctx);
-                    }
-                    return ListTile(
-                      leading: Text("Item $index"),
-                    );
-                  },
-                  childCount: 5,
-                ),
-                itemExtent: 50,
-              ),
-              SliverGrid.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 10.0,
-                  crossAxisSpacing: 10.0,
-                  childAspectRatio: 2.0,
-                ),
-                itemBuilder: (context, index) {
-                  if (_sliverHeaderGridCtx != context) {
-                    _sliverHeaderGridCtx = context;
-                    nestedScrollUtil?.headerSliverContexts.add(context);
-                  }
-                  return Text("Item $index");
-                },
-                itemCount: 10,
-              ),
-            ];
-          },
-          body: Builder(builder: (context) {
+              itemBuilder: (context, index) {
+                if (sliverHeaderGridCtx != context) {
+                  sliverHeaderGridCtx = context;
+                  nestedScrollUtil?.headerSliverContexts.add(context);
+                }
+                return Text("Item $index");
+              },
+              itemCount: 10,
+            ),
+          ];
+        },
+        body: Builder(
+          builder: (context) {
             final innerScrollController = PrimaryScrollController.of(context);
             if (bodyScrollController != innerScrollController) {
               bodyScrollController = innerScrollController;
@@ -668,768 +600,700 @@ void main() {
               nestedScrollUtil?.outerScrollController = outerScrollController;
             }
             return CustomScrollView(
-              slivers: [
-                _buildSliverListView(),
-                _buildSliverGridView(),
-              ],
-            );
-          }),
-        );
-      }
-
-      Widget resetAll({
-        int listItemCount = 30,
-        int gridItemCount = 150,
-      }) {
-        sliverListItemCount = listItemCount;
-        sliverGridItemCount = gridItemCount;
-        resultMap = {};
-        nestedScrollUtil = NestedScrollUtil();
-        outerScrollController = ScrollController();
-        bodyScrollController = null;
-        observerController = SliverObserverController(
-          controller: outerScrollController,
-        );
-
-        widget = _buildNestedScrollView();
-
-        widget = SliverViewObserver(
-          controller: observerController,
-          child: widget,
-          sliverContexts: () {
-            return [
-              if (_sliverHeaderListCtx != null) _sliverHeaderListCtx!,
-              if (_sliverHeaderGridCtx != null) _sliverHeaderGridCtx!,
-              if (_sliverBodyListCtx != null) _sliverBodyListCtx!,
-              if (_sliverBodyGridCtx != null) _sliverBodyGridCtx!,
-            ];
-          },
-          customOverlap: (sliverContext) {
-            return nestedScrollUtil?.calcOverlap(
-              nestedScrollViewKey: nestedScrollViewKey,
-              sliverContext: sliverContext,
+              slivers: [buildSliverListView(), buildSliverGridView()],
             );
           },
-          onObserveAll: (result) {
-            resultMap = result;
-          },
-        );
-        widget = MaterialApp(
-          home: Material(child: widget),
-        );
-        return widget;
-      }
+        ),
+      );
+    }
 
-      tearDown(() {
-        outerScrollController.dispose();
-        _sliverHeaderListCtx = null;
-        _sliverHeaderGridCtx = null;
-        _sliverBodyListCtx = null;
-        _sliverBodyGridCtx = null;
-      });
-
-      testWidgets(
-        'Scroll to index',
-        (tester) async {
-          resetAll();
-          await tester.pumpWidget(widget);
-
-          observerController.controller = outerScrollController;
-          nestedScrollUtil?.jumpTo(
-            nestedScrollViewKey: nestedScrollViewKey,
-            observerController: observerController,
-            sliverContext: _sliverHeaderListCtx,
-            position: NestedScrollUtilPosition.header,
-            index: 1,
-            offset: (targetOffset) {
-              return calcPersistentHeaderExtent(
-                offset: targetOffset,
-                widgetKey: appBarKey,
-              );
-            },
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          var headerListObservationResult =
-              (resultMap[_sliverHeaderListCtx] as ListViewObserveModel);
-          expect(headerListObservationResult.firstChild?.index, 1);
-
-          observerController.controller = outerScrollController;
-          nestedScrollUtil?.animateTo(
-            nestedScrollViewKey: nestedScrollViewKey,
-            observerController: observerController,
-            sliverContext: _sliverHeaderListCtx,
-            position: NestedScrollUtilPosition.header,
-            index: 2,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            offset: (targetOffset) {
-              return calcPersistentHeaderExtent(
-                offset: targetOffset,
-                widgetKey: appBarKey,
-              );
-            },
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          headerListObservationResult =
-              (resultMap[_sliverHeaderListCtx] as ListViewObserveModel);
-          expect(headerListObservationResult.firstChild?.index, 2);
-
-          expect(bodyScrollController != null, true);
-          nestedScrollUtil?.jumpTo(
-            nestedScrollViewKey: nestedScrollViewKey,
-            observerController: observerController,
-            sliverContext: _sliverBodyListCtx,
-            position: NestedScrollUtilPosition.body,
-            index: 5,
-            offset: (targetOffset) {
-              return calcPersistentHeaderExtent(
-                offset: targetOffset,
-                widgetKey: appBarKey,
-              );
-            },
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          var bodyListObservationResult =
-              (resultMap[_sliverBodyListCtx] as ListViewObserveModel);
-          expect(bodyListObservationResult.firstChild?.index, 5);
-
-          nestedScrollUtil?.animateTo(
-            nestedScrollViewKey: nestedScrollViewKey,
-            observerController: observerController,
-            sliverContext: _sliverBodyListCtx,
-            position: NestedScrollUtilPosition.body,
-            index: 20,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            offset: (targetOffset) {
-              return calcPersistentHeaderExtent(
-                offset: targetOffset,
-                widgetKey: appBarKey,
-              );
-            },
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          bodyListObservationResult =
-              (resultMap[_sliverBodyListCtx] as ListViewObserveModel);
-          expect(bodyListObservationResult.firstChild?.index, 20);
-
-          nestedScrollUtil?.jumpTo(
-            nestedScrollViewKey: nestedScrollViewKey,
-            observerController: observerController,
-            sliverContext: _sliverBodyGridCtx,
-            position: NestedScrollUtilPosition.body,
-            index: 10,
-            offset: (targetOffset) {
-              return calcPersistentHeaderExtent(
-                offset: targetOffset,
-                widgetKey: appBarKey,
-              );
-            },
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          var bodyGridObservationResult =
-              (resultMap[_sliverBodyGridCtx] as GridViewObserveModel);
-          var bodyGridFirstGroupChildIndexList = bodyGridObservationResult
-              .firstGroupChildList
-              .map((e) => e.index)
-              .toList();
-          expect(bodyGridFirstGroupChildIndexList.contains(10), true);
-
-          nestedScrollUtil?.animateTo(
-            nestedScrollViewKey: nestedScrollViewKey,
-            observerController: observerController,
-            sliverContext: _sliverBodyGridCtx,
-            position: NestedScrollUtilPosition.body,
-            index: 20,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            offset: (targetOffset) {
-              return calcPersistentHeaderExtent(
-                offset: targetOffset,
-                widgetKey: appBarKey,
-              );
-            },
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          bodyGridObservationResult =
-              (resultMap[_sliverBodyGridCtx] as GridViewObserveModel);
-          bodyGridFirstGroupChildIndexList = bodyGridObservationResult
-              .firstGroupChildList
-              .map((e) => e.index)
-              .toList();
-          expect(bodyGridFirstGroupChildIndexList.contains(20), true);
-        },
+    Widget resetAll({int listItemCount = 30, int gridItemCount = 150}) {
+      sliverListItemCount = listItemCount;
+      sliverGridItemCount = gridItemCount;
+      resultMap = {};
+      nestedScrollUtil = NestedScrollUtil();
+      outerScrollController = ScrollController();
+      bodyScrollController = null;
+      observerController = SliverObserverController(
+        controller: outerScrollController,
       );
 
-      testWidgets(
-        'Check method reset of NestedScrollUtil',
-        (tester) async {
-          resetAll();
-          await tester.pumpWidget(widget);
-          expect(nestedScrollUtil?.headerSliverContexts.length, 2);
-          expect(nestedScrollUtil?.bodySliverContexts.length, 2);
-          expect(nestedScrollUtil?.remainingSliverContext == null, true);
-          expect(nestedScrollUtil?.remainingSliverRenderObj == null, true);
-          nestedScrollUtil?.fetchRemainingSliverContext(
+      widget = buildNestedScrollView();
+
+      widget = SliverViewObserver(
+        controller: observerController,
+        child: widget,
+        sliverContexts: () {
+          return [
+            if (sliverHeaderListCtx != null) sliverHeaderListCtx!,
+            if (sliverHeaderGridCtx != null) sliverHeaderGridCtx!,
+            if (sliverBodyListCtx != null) sliverBodyListCtx!,
+            if (sliverBodyGridCtx != null) sliverBodyGridCtx!,
+          ];
+        },
+        customOverlap: (sliverContext) {
+          return nestedScrollUtil?.calcOverlap(
             nestedScrollViewKey: nestedScrollViewKey,
+            sliverContext: sliverContext,
           );
-          expect(nestedScrollUtil?.remainingSliverContext != null, true);
-          expect(nestedScrollUtil?.remainingSliverRenderObj != null, true);
-          nestedScrollUtil?.reset();
-          expect(nestedScrollUtil?.headerSliverContexts.length, 0);
-          expect(nestedScrollUtil?.bodySliverContexts.length, 0);
-          expect(nestedScrollUtil?.remainingSliverContext, null);
-          expect(nestedScrollUtil?.remainingSliverRenderObj, null);
+        },
+        onObserveAll: (result) {
+          resultMap = result;
         },
       );
+      widget = MaterialApp(home: Material(child: widget));
+      return widget;
+    }
 
-      testWidgets(
-        'Check the observed data when the sliver in the header is not visible',
-        (tester) async {
-          resetAll();
-          await tester.pumpWidget(widget);
-          await observerController.dispatchOnceObserve(
-            sliverContext: _sliverHeaderListCtx!,
-          );
-          var headerListObservationResult =
-              (resultMap[_sliverHeaderListCtx] as ListViewObserveModel);
-          expect(
-            headerListObservationResult.displayingChildIndexList,
-            isNotEmpty,
-          );
+    tearDown(() {
+      outerScrollController.dispose();
+      sliverHeaderListCtx = null;
+      sliverHeaderGridCtx = null;
+      sliverBodyListCtx = null;
+      sliverBodyGridCtx = null;
+    });
 
-          nestedScrollUtil?.jumpTo(
-            nestedScrollViewKey: nestedScrollViewKey,
-            observerController: observerController,
-            sliverContext: _sliverHeaderGridCtx,
-            position: NestedScrollUtilPosition.header,
-            index: 0,
-            offset: (targetOffset) {
-              return calcPersistentHeaderExtent(
-                offset: targetOffset,
-                widgetKey: appBarKey,
-              );
-            },
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
+    testWidgets('Scroll to index', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
 
-          headerListObservationResult =
-              (resultMap[_sliverHeaderListCtx] as ListViewObserveModel);
-          expect(
-            headerListObservationResult.displayingChildIndexList,
-            isEmpty,
-          );
-
-          var headerGridObservationResult =
-              (resultMap[_sliverHeaderGridCtx] as GridViewObserveModel);
-          expect(
-            headerGridObservationResult.firstGroupChildList.first.index,
-            0,
-          );
-
-          nestedScrollUtil?.jumpTo(
-            nestedScrollViewKey: nestedScrollViewKey,
-            observerController: observerController,
-            sliverContext: _sliverBodyListCtx,
-            position: NestedScrollUtilPosition.body,
-            index: 0,
-            offset: (targetOffset) {
-              return calcPersistentHeaderExtent(
-                offset: targetOffset,
-                widgetKey: appBarKey,
-              );
-            },
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-
-          var bodyListObservationResult =
-              (resultMap[_sliverBodyListCtx] as ListViewObserveModel);
-          expect(
-            bodyListObservationResult.firstChild?.index,
-            0,
-          );
-
-          headerGridObservationResult =
-              (resultMap[_sliverHeaderGridCtx] as GridViewObserveModel);
-          expect(
-            headerGridObservationResult.displayingChildIndexList,
-            isEmpty,
+      observerController.controller = outerScrollController;
+      nestedScrollUtil?.jumpTo(
+        nestedScrollViewKey: nestedScrollViewKey,
+        observerController: observerController,
+        sliverContext: sliverHeaderListCtx,
+        position: NestedScrollUtilPosition.header,
+        index: 1,
+        offset: (targetOffset) {
+          return calcPersistentHeaderExtent(
+            offset: targetOffset,
+            widgetKey: appBarKey,
           );
         },
       );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      var headerListObservationResult =
+          (resultMap[sliverHeaderListCtx] as ListViewObserveModel);
+      expect(headerListObservationResult.firstChild?.index, 1);
 
-      testWidgets('Check animateTo Future completion', (tester) async {
+      observerController.controller = outerScrollController;
+      nestedScrollUtil?.animateTo(
+        nestedScrollViewKey: nestedScrollViewKey,
+        observerController: observerController,
+        sliverContext: sliverHeaderListCtx,
+        position: NestedScrollUtilPosition.header,
+        index: 2,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        offset: (targetOffset) {
+          return calcPersistentHeaderExtent(
+            offset: targetOffset,
+            widgetKey: appBarKey,
+          );
+        },
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      headerListObservationResult =
+          (resultMap[sliverHeaderListCtx] as ListViewObserveModel);
+      expect(headerListObservationResult.firstChild?.index, 2);
+
+      expect(bodyScrollController != null, true);
+      nestedScrollUtil?.jumpTo(
+        nestedScrollViewKey: nestedScrollViewKey,
+        observerController: observerController,
+        sliverContext: sliverBodyListCtx,
+        position: NestedScrollUtilPosition.body,
+        index: 5,
+        offset: (targetOffset) {
+          return calcPersistentHeaderExtent(
+            offset: targetOffset,
+            widgetKey: appBarKey,
+          );
+        },
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      var bodyListObservationResult =
+          (resultMap[sliverBodyListCtx] as ListViewObserveModel);
+      expect(bodyListObservationResult.firstChild?.index, 5);
+
+      nestedScrollUtil?.animateTo(
+        nestedScrollViewKey: nestedScrollViewKey,
+        observerController: observerController,
+        sliverContext: sliverBodyListCtx,
+        position: NestedScrollUtilPosition.body,
+        index: 20,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        offset: (targetOffset) {
+          return calcPersistentHeaderExtent(
+            offset: targetOffset,
+            widgetKey: appBarKey,
+          );
+        },
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      bodyListObservationResult =
+          (resultMap[sliverBodyListCtx] as ListViewObserveModel);
+      expect(bodyListObservationResult.firstChild?.index, 20);
+
+      nestedScrollUtil?.jumpTo(
+        nestedScrollViewKey: nestedScrollViewKey,
+        observerController: observerController,
+        sliverContext: sliverBodyGridCtx,
+        position: NestedScrollUtilPosition.body,
+        index: 10,
+        offset: (targetOffset) {
+          return calcPersistentHeaderExtent(
+            offset: targetOffset,
+            widgetKey: appBarKey,
+          );
+        },
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      var bodyGridObservationResult =
+          (resultMap[sliverBodyGridCtx] as GridViewObserveModel);
+      var bodyGridFirstGroupChildIndexList = bodyGridObservationResult
+          .firstGroupChildList
+          .map((e) => e.index)
+          .toList();
+      expect(bodyGridFirstGroupChildIndexList.contains(10), true);
+
+      nestedScrollUtil?.animateTo(
+        nestedScrollViewKey: nestedScrollViewKey,
+        observerController: observerController,
+        sliverContext: sliverBodyGridCtx,
+        position: NestedScrollUtilPosition.body,
+        index: 20,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        offset: (targetOffset) {
+          return calcPersistentHeaderExtent(
+            offset: targetOffset,
+            widgetKey: appBarKey,
+          );
+        },
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      bodyGridObservationResult =
+          (resultMap[sliverBodyGridCtx] as GridViewObserveModel);
+      bodyGridFirstGroupChildIndexList = bodyGridObservationResult
+          .firstGroupChildList
+          .map((e) => e.index)
+          .toList();
+      expect(bodyGridFirstGroupChildIndexList.contains(20), true);
+    });
+
+    testWidgets('Check method reset of NestedScrollUtil', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
+      expect(nestedScrollUtil?.headerSliverContexts.length, 2);
+      expect(nestedScrollUtil?.bodySliverContexts.length, 2);
+      expect(nestedScrollUtil?.remainingSliverContext == null, true);
+      expect(nestedScrollUtil?.remainingSliverRenderObj == null, true);
+      nestedScrollUtil?.fetchRemainingSliverContext(
+        nestedScrollViewKey: nestedScrollViewKey,
+      );
+      expect(nestedScrollUtil?.remainingSliverContext != null, true);
+      expect(nestedScrollUtil?.remainingSliverRenderObj != null, true);
+      nestedScrollUtil?.reset();
+      expect(nestedScrollUtil?.headerSliverContexts.length, 0);
+      expect(nestedScrollUtil?.bodySliverContexts.length, 0);
+      expect(nestedScrollUtil?.remainingSliverContext, null);
+      expect(nestedScrollUtil?.remainingSliverRenderObj, null);
+    });
+
+    testWidgets(
+      'Check the observed data when the sliver in the header is not visible',
+      (tester) async {
         resetAll();
         await tester.pumpWidget(widget);
-
-        bool isFutureCompleted = false;
-        const Duration duration = Duration(seconds: 2);
-
-        // Start to scroll
-        Future future = nestedScrollUtil!.animateTo(
-          nestedScrollViewKey: nestedScrollViewKey,
-          observerController: observerController,
-          sliverContext: _sliverBodyListCtx,
-          position: NestedScrollUtilPosition.body,
-          index: 5,
-          duration: duration,
-          curve: Curves.linear,
+        await observerController.dispatchOnceObserve(
+          sliverContext: sliverHeaderListCtx!,
         );
-
-        future.whenComplete(() {
-          isFutureCompleted = true;
-        });
-
-        // Wait for scroll to start
-        await tester.pump();
-
-        // Verify scroll hasn't completed
-        expect(isFutureCompleted, false);
-
-        // Wait for scroll to complete
-        const intervalDuration = Duration(milliseconds: 100);
-        int intervalTime = 0;
-        while (tester.binding.hasScheduledFrame) {
-          await tester.pump(intervalDuration);
-          intervalTime++;
-        }
-        // Make sure the scroll executes and completes correctly.
+        var headerListObservationResult =
+            (resultMap[sliverHeaderListCtx] as ListViewObserveModel);
         expect(
-          intervalTime,
-          greaterThanOrEqualTo(
-            duration.inMilliseconds ~/ intervalDuration.inMilliseconds,
-          ),
+          headerListObservationResult.displayingChildIndexList,
+          isNotEmpty,
         );
-        expect(isFutureCompleted, true);
 
-        // Scroll back to index 0
-        isFutureCompleted = false;
-        intervalTime = 0;
-        future = nestedScrollUtil!.animateTo(
+        nestedScrollUtil?.jumpTo(
           nestedScrollViewKey: nestedScrollViewKey,
           observerController: observerController,
-          sliverContext: _sliverBodyListCtx,
+          sliverContext: sliverHeaderGridCtx,
+          position: NestedScrollUtilPosition.header,
+          index: 0,
+          offset: (targetOffset) {
+            return calcPersistentHeaderExtent(
+              offset: targetOffset,
+              widgetKey: appBarKey,
+            );
+          },
+        );
+        await tester.pumpAndSettle();
+        await tester.pump(observerController.observeIntervalForScrolling);
+
+        headerListObservationResult =
+            (resultMap[sliverHeaderListCtx] as ListViewObserveModel);
+        expect(headerListObservationResult.displayingChildIndexList, isEmpty);
+
+        var headerGridObservationResult =
+            (resultMap[sliverHeaderGridCtx] as GridViewObserveModel);
+        expect(headerGridObservationResult.firstGroupChildList.first.index, 0);
+
+        nestedScrollUtil?.jumpTo(
+          nestedScrollViewKey: nestedScrollViewKey,
+          observerController: observerController,
+          sliverContext: sliverBodyListCtx,
           position: NestedScrollUtilPosition.body,
           index: 0,
-          duration: duration,
-          curve: Curves.easeInOut,
+          offset: (targetOffset) {
+            return calcPersistentHeaderExtent(
+              offset: targetOffset,
+              widgetKey: appBarKey,
+            );
+          },
         );
+        await tester.pumpAndSettle();
+        await tester.pump(observerController.observeIntervalForScrolling);
 
-        future.whenComplete(() {
-          isFutureCompleted = true;
-        });
+        var bodyListObservationResult =
+            (resultMap[sliverBodyListCtx] as ListViewObserveModel);
+        expect(bodyListObservationResult.firstChild?.index, 0);
 
-        // Wait for scroll to start
-        await tester.pump();
+        headerGridObservationResult =
+            (resultMap[sliverHeaderGridCtx] as GridViewObserveModel);
+        expect(headerGridObservationResult.displayingChildIndexList, isEmpty);
+      },
+    );
 
-        // Verify scroll hasn't completed
-        expect(isFutureCompleted, false);
+    testWidgets('Check animateTo Future completion', (tester) async {
+      resetAll();
+      await tester.pumpWidget(widget);
 
-        // Wait for scroll to complete
-        while (tester.binding.hasScheduledFrame) {
-          await tester.pump(intervalDuration);
-          intervalTime++;
-        }
-        // Make sure the scroll executes and completes correctly.
-        expect(
-          intervalTime,
-          greaterThanOrEqualTo(
-            duration.inMilliseconds ~/ intervalDuration.inMilliseconds,
-          ),
-        );
-        expect(isFutureCompleted, true);
+      bool isFutureCompleted = false;
+      const Duration duration = Duration(seconds: 2);
+
+      // Start to scroll
+      Future future = nestedScrollUtil!.animateTo(
+        nestedScrollViewKey: nestedScrollViewKey,
+        observerController: observerController,
+        sliverContext: sliverBodyListCtx,
+        position: NestedScrollUtilPosition.body,
+        index: 5,
+        duration: duration,
+        curve: Curves.linear,
+      );
+
+      future.whenComplete(() {
+        isFutureCompleted = true;
       });
 
-      testWidgets('Check jumpTo Future completion', (tester) async {
-        int listItemCount = 100;
-        resetAll(
-          listItemCount: listItemCount,
-        );
-        await tester.pumpWidget(widget);
+      // Wait for scroll to start
+      await tester.pump();
 
-        bool isFutureCompleted = false;
+      // Verify scroll hasn't completed
+      expect(isFutureCompleted, false);
 
-        // Start to scroll
-        Future future = nestedScrollUtil!.jumpTo(
-          nestedScrollViewKey: nestedScrollViewKey,
-          observerController: observerController,
-          sliverContext: _sliverBodyListCtx,
-          position: NestedScrollUtilPosition.body,
-          // Need to use an unrendered item's index to force paging to find it.
-          index: listItemCount - 1,
-        );
+      // Wait for scroll to complete
+      const intervalDuration = Duration(milliseconds: 100);
+      int intervalTime = 0;
+      while (tester.binding.hasScheduledFrame) {
+        await tester.pump(intervalDuration);
+        intervalTime++;
+      }
+      // Make sure the scroll executes and completes correctly.
+      expect(
+        intervalTime,
+        greaterThanOrEqualTo(
+          duration.inMilliseconds ~/ intervalDuration.inMilliseconds,
+        ),
+      );
+      expect(isFutureCompleted, true);
 
-        future.whenComplete(() {
-          isFutureCompleted = true;
-        });
+      // Scroll back to index 0
+      isFutureCompleted = false;
+      intervalTime = 0;
+      future = nestedScrollUtil!.animateTo(
+        nestedScrollViewKey: nestedScrollViewKey,
+        observerController: observerController,
+        sliverContext: sliverBodyListCtx,
+        position: NestedScrollUtilPosition.body,
+        index: 0,
+        duration: duration,
+        curve: Curves.easeInOut,
+      );
 
-        // Wait for scroll to start
-        await tester.pump();
-
-        // Verify scroll hasn't completed
-        expect(isFutureCompleted, false);
-
-        // Wait for scroll to complete
-        const intervalDuration = Duration(milliseconds: 100);
-        int intervalTime = 0;
-        while (tester.binding.hasScheduledFrame) {
-          await tester.pump(intervalDuration);
-          intervalTime++;
-        }
-        // Make sure the scroll executes and completes correctly.
-        expect(
-          intervalTime,
-          greaterThanOrEqualTo(0),
-        );
-        expect(isFutureCompleted, true);
-
-        // Scroll back to index 0
-        isFutureCompleted = false;
-        intervalTime = 0;
-        future = nestedScrollUtil!.jumpTo(
-          nestedScrollViewKey: nestedScrollViewKey,
-          observerController: observerController,
-          sliverContext: _sliverBodyListCtx,
-          position: NestedScrollUtilPosition.body,
-          index: 0,
-        );
-
-        future.whenComplete(() {
-          isFutureCompleted = true;
-        });
-
-        // Wait for scroll to start
-        await tester.pump();
-
-        // Verify scroll hasn't completed
-        expect(isFutureCompleted, false);
-
-        // Wait for scroll to complete
-        while (tester.binding.hasScheduledFrame) {
-          await tester.pump(intervalDuration);
-          intervalTime++;
-        }
-        // Make sure the scroll executes and completes correctly.
-        expect(
-          intervalTime,
-          greaterThanOrEqualTo(0),
-        );
-        expect(isFutureCompleted, true);
+      future.whenComplete(() {
+        isFutureCompleted = true;
       });
-    },
-  );
 
-  group(
-    'Configure center in CustomScrollView',
-    () {
-      late Widget widget;
-      BuildContext? _sliverListCtx1;
-      BuildContext? _sliverListCtx2;
-      BuildContext? _sliverListCtx3;
-      BuildContext? _sliverListCtx4;
-      final _centerKey = GlobalKey();
-      ScrollController scrollController = ScrollController();
-      late SliverObserverController observerController;
-      Map<BuildContext, ObserveModel> resultMap = {};
+      // Wait for scroll to start
+      await tester.pump();
 
-      Widget _buildSliverListView({
-        required Color color,
-        Function(BuildContext)? onBuild,
-      }) {
-        return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (ctx, index) {
-              onBuild?.call(ctx);
-              final int itemIndex = index ~/ 2;
-              return Container(
-                height: (itemIndex % 2 == 0) ? 80 : 50,
-                color: color,
-                child: Center(
-                  child: Text(
-                    "index -- $index",
-                  ),
-                ),
-              );
+      // Verify scroll hasn't completed
+      expect(isFutureCompleted, false);
+
+      // Wait for scroll to complete
+      while (tester.binding.hasScheduledFrame) {
+        await tester.pump(intervalDuration);
+        intervalTime++;
+      }
+      // Make sure the scroll executes and completes correctly.
+      expect(
+        intervalTime,
+        greaterThanOrEqualTo(
+          duration.inMilliseconds ~/ intervalDuration.inMilliseconds,
+        ),
+      );
+      expect(isFutureCompleted, true);
+    });
+
+    testWidgets('Check jumpTo Future completion', (tester) async {
+      int listItemCount = 100;
+      resetAll(listItemCount: listItemCount);
+      await tester.pumpWidget(widget);
+
+      bool isFutureCompleted = false;
+
+      // Start to scroll
+      Future future = nestedScrollUtil!.jumpTo(
+        nestedScrollViewKey: nestedScrollViewKey,
+        observerController: observerController,
+        sliverContext: sliverBodyListCtx,
+        position: NestedScrollUtilPosition.body,
+        // Need to use an unrendered item's index to force paging to find it.
+        index: listItemCount - 1,
+      );
+
+      future.whenComplete(() {
+        isFutureCompleted = true;
+      });
+
+      // Wait for scroll to start
+      await tester.pump();
+
+      // Verify scroll hasn't completed
+      expect(isFutureCompleted, false);
+
+      // Wait for scroll to complete
+      const intervalDuration = Duration(milliseconds: 100);
+      int intervalTime = 0;
+      while (tester.binding.hasScheduledFrame) {
+        await tester.pump(intervalDuration);
+        intervalTime++;
+      }
+      // Make sure the scroll executes and completes correctly.
+      expect(intervalTime, greaterThanOrEqualTo(0));
+      expect(isFutureCompleted, true);
+
+      // Scroll back to index 0
+      isFutureCompleted = false;
+      intervalTime = 0;
+      future = nestedScrollUtil!.jumpTo(
+        nestedScrollViewKey: nestedScrollViewKey,
+        observerController: observerController,
+        sliverContext: sliverBodyListCtx,
+        position: NestedScrollUtilPosition.body,
+        index: 0,
+      );
+
+      future.whenComplete(() {
+        isFutureCompleted = true;
+      });
+
+      // Wait for scroll to start
+      await tester.pump();
+
+      // Verify scroll hasn't completed
+      expect(isFutureCompleted, false);
+
+      // Wait for scroll to complete
+      while (tester.binding.hasScheduledFrame) {
+        await tester.pump(intervalDuration);
+        intervalTime++;
+      }
+      // Make sure the scroll executes and completes correctly.
+      expect(intervalTime, greaterThanOrEqualTo(0));
+      expect(isFutureCompleted, true);
+    });
+  });
+
+  group('Configure center in CustomScrollView', () {
+    late Widget widget;
+    BuildContext? sliverListCtx1;
+    BuildContext? sliverListCtx2;
+    BuildContext? sliverListCtx3;
+    BuildContext? sliverListCtx4;
+    final centerKey = GlobalKey();
+    ScrollController scrollController = ScrollController();
+    late SliverObserverController observerController;
+    Map<BuildContext, ObserveModel> resultMap = {};
+
+    Widget buildSliverListView({
+      required Color color,
+      Function(BuildContext)? onBuild,
+    }) {
+      return SliverList(
+        delegate: SliverChildBuilderDelegate((ctx, index) {
+          onBuild?.call(ctx);
+          final int itemIndex = index ~/ 2;
+          return Container(
+            height: (itemIndex % 2 == 0) ? 80 : 50,
+            color: color,
+            child: Center(child: Text("index -- $index")),
+          );
+        }, childCount: 100),
+      );
+    }
+
+    Widget buildScrollView({required double anchor}) {
+      return CustomScrollView(
+        center: centerKey,
+        anchor: anchor,
+        controller: scrollController,
+        slivers: [
+          buildSliverListView(
+            color: Colors.redAccent,
+            onBuild: (ctx) {
+              sliverListCtx1 = ctx;
             },
-            childCount: 100,
           ),
-        );
-      }
+          buildSliverListView(
+            color: Colors.blueGrey,
+            onBuild: (ctx) {
+              sliverListCtx2 = ctx;
+            },
+          ),
+          SliverPadding(padding: EdgeInsets.zero, key: centerKey),
+          buildSliverListView(
+            color: Colors.teal,
+            onBuild: (ctx) {
+              sliverListCtx3 = ctx;
+            },
+          ),
+          buildSliverListView(
+            color: Colors.purple,
+            onBuild: (ctx) {
+              sliverListCtx4 = ctx;
+            },
+          ),
+        ],
+      );
+    }
 
-      Widget _buildScrollView({
-        required double anchor,
-      }) {
-        return CustomScrollView(
-          center: _centerKey,
-          anchor: anchor,
-          controller: scrollController,
-          slivers: [
-            _buildSliverListView(
-              color: Colors.redAccent,
-              onBuild: (ctx) {
-                _sliverListCtx1 = ctx;
-              },
-            ),
-            _buildSliverListView(
-              color: Colors.blueGrey,
-              onBuild: (ctx) {
-                _sliverListCtx2 = ctx;
-              },
-            ),
-            SliverPadding(padding: EdgeInsets.zero, key: _centerKey),
-            _buildSliverListView(
-              color: Colors.teal,
-              onBuild: (ctx) {
-                _sliverListCtx3 = ctx;
-              },
-            ),
-            _buildSliverListView(
-              color: Colors.purple,
-              onBuild: (ctx) {
-                _sliverListCtx4 = ctx;
-              },
-            ),
-          ],
-        );
-      }
-
-      Widget resetAll({
-        required double anchor,
-      }) {
-        resultMap = {};
-        scrollController = ScrollController();
-        observerController = SliverObserverController(
-          controller: scrollController,
-        );
-
-        widget = _buildScrollView(anchor: anchor);
-
-        widget = SliverViewObserver(
-          controller: observerController,
-          child: widget,
-          sliverContexts: () {
-            return [
-              if (_sliverListCtx1 != null) _sliverListCtx1!,
-              if (_sliverListCtx2 != null) _sliverListCtx2!,
-              if (_sliverListCtx3 != null) _sliverListCtx3!,
-              if (_sliverListCtx4 != null) _sliverListCtx4!,
-            ];
-          },
-          onObserveAll: (result) {
-            resultMap = result;
-          },
-        );
-        widget = MaterialApp(
-          home: Material(child: widget),
-        );
-        return widget;
-      }
-
-      tearDown(() {
-        scrollController.dispose();
-        _sliverListCtx1 = null;
-        _sliverListCtx2 = null;
-        _sliverListCtx3 = null;
-        _sliverListCtx4 = null;
-      });
-
-      testWidgets('Check isForwardGrowthDirection', (tester) async {
-        resetAll(anchor: 0.5);
-        await tester.pumpWidget(widget);
-
-        final _sliverListObj1 = ObserverUtils.findRenderObject(_sliverListCtx1);
-        expect(_sliverListObj1 is RenderSliverMultiBoxAdaptor, true);
-        _sliverListObj1 as RenderSliverMultiBoxAdaptor;
-        expect(_sliverListObj1.isForwardGrowthDirection, false);
-
-        final _sliverListObj2 = ObserverUtils.findRenderObject(_sliverListCtx2);
-        expect(_sliverListObj2 is RenderSliverMultiBoxAdaptor, true);
-        _sliverListObj2 as RenderSliverMultiBoxAdaptor;
-        expect(_sliverListObj2.isForwardGrowthDirection, false);
-
-        final _sliverListObj3 = ObserverUtils.findRenderObject(_sliverListCtx3);
-        expect(_sliverListObj3 is RenderSliverMultiBoxAdaptor, true);
-        _sliverListObj3 as RenderSliverMultiBoxAdaptor;
-        expect(_sliverListObj3.isForwardGrowthDirection, true);
-
-        final _sliverListObj4 = ObserverUtils.findRenderObject(_sliverListCtx4);
-        expect(_sliverListObj4 is RenderSliverMultiBoxAdaptor, true);
-        _sliverListObj4 as RenderSliverMultiBoxAdaptor;
-        expect(_sliverListObj4.isForwardGrowthDirection, true);
-      });
-
-      testWidgets('Check viewportExtremeScrollExtent and rectify',
-          (tester) async {
-        resetAll(anchor: 0.5);
-        await tester.pumpWidget(widget);
-
-        final _sliverListObj1 = ObserverUtils.findRenderObject(_sliverListCtx1);
-        expect(_sliverListObj1 != null, true);
-        expect(_sliverListObj1 is RenderSliverMultiBoxAdaptor, true);
-        _sliverListObj1 as RenderSliverMultiBoxAdaptor;
-        var extremeScrollExtent =
-            observerController.viewportExtremeScrollExtent(
-          viewport: ObserverUtils.findViewport(_sliverListObj1)!,
-          obj: _sliverListObj1,
-        );
-        expect(extremeScrollExtent <= 0, true);
-        expect(extremeScrollExtent.rectify(_sliverListObj1) >= 0, true);
-
-        final _sliverListObj2 = ObserverUtils.findRenderObject(_sliverListCtx2);
-        expect(_sliverListObj2 != null, true);
-        expect(_sliverListObj2 is RenderSliverMultiBoxAdaptor, true);
-        _sliverListObj2 as RenderSliverMultiBoxAdaptor;
-        extremeScrollExtent = observerController.viewportExtremeScrollExtent(
-          viewport: ObserverUtils.findViewport(_sliverListObj2)!,
-          obj: _sliverListObj2,
-        );
-        expect(extremeScrollExtent <= 0, true);
-        expect(extremeScrollExtent.rectify(_sliverListObj2) >= 0, true);
-
-        final _sliverListObj3 = ObserverUtils.findRenderObject(_sliverListCtx3);
-        expect(_sliverListObj3 != null, true);
-        expect(_sliverListObj3 is RenderSliverMultiBoxAdaptor, true);
-        _sliverListObj3 as RenderSliverMultiBoxAdaptor;
-        extremeScrollExtent = observerController.viewportExtremeScrollExtent(
-          viewport: ObserverUtils.findViewport(_sliverListObj3)!,
-          obj: _sliverListObj3,
-        );
-        expect(extremeScrollExtent >= 0, true);
-        expect(extremeScrollExtent.rectify(_sliverListObj3) >= 0, true);
-
-        final _sliverListObj4 = ObserverUtils.findRenderObject(_sliverListCtx4);
-        expect(_sliverListObj4 != null, true);
-        expect(_sliverListObj4 is RenderSliverMultiBoxAdaptor, true);
-        _sliverListObj4 as RenderSliverMultiBoxAdaptor;
-        extremeScrollExtent = observerController.viewportExtremeScrollExtent(
-          viewport: ObserverUtils.findViewport(_sliverListObj4)!,
-          obj: _sliverListObj4,
-        );
-        expect(extremeScrollExtent >= 0, true);
-        expect(extremeScrollExtent.rectify(_sliverListObj4) >= 0, true);
-      });
-
-      testWidgets(
-        'Scroll to index with anchor 1.0',
-        (tester) async {
-          resetAll(anchor: 1.0);
-          await tester.pumpWidget(widget);
-
-          observerController.jumpTo(
-            index: 1,
-            sliverContext: _sliverListCtx1,
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          final sliverList1ObservationResult =
-              (resultMap[_sliverListCtx1] as ListViewObserveModel);
-          expect(sliverList1ObservationResult.firstChild?.index, 1);
-
-          observerController.jumpTo(
-            index: 5,
-            sliverContext: _sliverListCtx2,
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          final sliverList2ObservationResult =
-              (resultMap[_sliverListCtx2] as ListViewObserveModel);
-          expect(sliverList2ObservationResult.firstChild?.index, 5);
-
-          observerController.jumpTo(
-            index: 10,
-            sliverContext: _sliverListCtx3,
-            alignment: 1,
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          final sliverList3ObservationResult =
-              (resultMap[_sliverListCtx3] as ListViewObserveModel);
-          expect(
-            sliverList3ObservationResult.displayingChildModelList.last.index,
-            10,
-          );
-
-          observerController.jumpTo(
-            index: 8,
-            sliverContext: _sliverListCtx4,
-            alignment: 1,
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          final sliverList4ObservationResult =
-              (resultMap[_sliverListCtx4] as ListViewObserveModel);
-          expect(
-            sliverList4ObservationResult.displayingChildModelList.last.index,
-            8,
-          );
-        },
+    Widget resetAll({required double anchor}) {
+      resultMap = {};
+      scrollController = ScrollController();
+      observerController = SliverObserverController(
+        controller: scrollController,
       );
 
-      testWidgets(
-        'Scroll to index with anchor 0.0',
-        (tester) async {
-          resetAll(anchor: 0.0);
-          await tester.pumpWidget(widget);
+      widget = buildScrollView(anchor: anchor);
 
-          observerController.jumpTo(
-            index: 1,
-            sliverContext: _sliverListCtx1,
-            alignment: 1,
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          final sliverList1ObservationResult =
-              (resultMap[_sliverListCtx1] as ListViewObserveModel);
-          expect(
-            sliverList1ObservationResult.displayingChildModelList.last.index,
-            1,
-          );
-
-          observerController.jumpTo(
-            index: 5,
-            sliverContext: _sliverListCtx2,
-            alignment: 1,
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          final sliverList2ObservationResult =
-              (resultMap[_sliverListCtx2] as ListViewObserveModel);
-          expect(
-            sliverList2ObservationResult.displayingChildModelList.last.index,
-            5,
-          );
-
-          observerController.jumpTo(
-            index: 10,
-            sliverContext: _sliverListCtx3,
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          final sliverList3ObservationResult =
-              (resultMap[_sliverListCtx3] as ListViewObserveModel);
-          expect(sliverList3ObservationResult.firstChild?.index, 10);
-
-          observerController.jumpTo(
-            index: 8,
-            sliverContext: _sliverListCtx4,
-          );
-          await tester.pumpAndSettle();
-          await tester.pump(observerController.observeIntervalForScrolling);
-          final sliverList4ObservationResult =
-              (resultMap[_sliverListCtx4] as ListViewObserveModel);
-          expect(sliverList4ObservationResult.firstChild?.index, 8);
+      widget = SliverViewObserver(
+        controller: observerController,
+        child: widget,
+        sliverContexts: () {
+          return [
+            if (sliverListCtx1 != null) sliverListCtx1!,
+            if (sliverListCtx2 != null) sliverListCtx2!,
+            if (sliverListCtx3 != null) sliverListCtx3!,
+            if (sliverListCtx4 != null) sliverListCtx4!,
+          ];
+        },
+        onObserveAll: (result) {
+          resultMap = result;
         },
       );
-    },
-  );
+      widget = MaterialApp(home: Material(child: widget));
+      return widget;
+    }
+
+    tearDown(() {
+      scrollController.dispose();
+      sliverListCtx1 = null;
+      sliverListCtx2 = null;
+      sliverListCtx3 = null;
+      sliverListCtx4 = null;
+    });
+
+    testWidgets('Check isForwardGrowthDirection', (tester) async {
+      resetAll(anchor: 0.5);
+      await tester.pumpWidget(widget);
+
+      final sliverListObj1 = ObserverUtils.findRenderObject(sliverListCtx1);
+      expect(sliverListObj1 is RenderSliverMultiBoxAdaptor, true);
+      sliverListObj1 as RenderSliverMultiBoxAdaptor;
+      expect(sliverListObj1.isForwardGrowthDirection, false);
+
+      final sliverListObj2 = ObserverUtils.findRenderObject(sliverListCtx2);
+      expect(sliverListObj2 is RenderSliverMultiBoxAdaptor, true);
+      sliverListObj2 as RenderSliverMultiBoxAdaptor;
+      expect(sliverListObj2.isForwardGrowthDirection, false);
+
+      final sliverListObj3 = ObserverUtils.findRenderObject(sliverListCtx3);
+      expect(sliverListObj3 is RenderSliverMultiBoxAdaptor, true);
+      sliverListObj3 as RenderSliverMultiBoxAdaptor;
+      expect(sliverListObj3.isForwardGrowthDirection, true);
+
+      final sliverListObj4 = ObserverUtils.findRenderObject(sliverListCtx4);
+      expect(sliverListObj4 is RenderSliverMultiBoxAdaptor, true);
+      sliverListObj4 as RenderSliverMultiBoxAdaptor;
+      expect(sliverListObj4.isForwardGrowthDirection, true);
+    });
+
+    testWidgets('Check viewportExtremeScrollExtent and rectify', (
+      tester,
+    ) async {
+      resetAll(anchor: 0.5);
+      await tester.pumpWidget(widget);
+
+      final sliverListObj1 = ObserverUtils.findRenderObject(sliverListCtx1);
+      expect(sliverListObj1 != null, true);
+      expect(sliverListObj1 is RenderSliverMultiBoxAdaptor, true);
+      sliverListObj1 as RenderSliverMultiBoxAdaptor;
+      var extremeScrollExtent = observerController.viewportExtremeScrollExtent(
+        viewport: ObserverUtils.findViewport(sliverListObj1)!,
+        obj: sliverListObj1,
+      );
+      expect(extremeScrollExtent <= 0, true);
+      expect(extremeScrollExtent.rectify(sliverListObj1) >= 0, true);
+
+      final sliverListObj2 = ObserverUtils.findRenderObject(sliverListCtx2);
+      expect(sliverListObj2 != null, true);
+      expect(sliverListObj2 is RenderSliverMultiBoxAdaptor, true);
+      sliverListObj2 as RenderSliverMultiBoxAdaptor;
+      extremeScrollExtent = observerController.viewportExtremeScrollExtent(
+        viewport: ObserverUtils.findViewport(sliverListObj2)!,
+        obj: sliverListObj2,
+      );
+      expect(extremeScrollExtent <= 0, true);
+      expect(extremeScrollExtent.rectify(sliverListObj2) >= 0, true);
+
+      final sliverListObj3 = ObserverUtils.findRenderObject(sliverListCtx3);
+      expect(sliverListObj3 != null, true);
+      expect(sliverListObj3 is RenderSliverMultiBoxAdaptor, true);
+      sliverListObj3 as RenderSliverMultiBoxAdaptor;
+      extremeScrollExtent = observerController.viewportExtremeScrollExtent(
+        viewport: ObserverUtils.findViewport(sliverListObj3)!,
+        obj: sliverListObj3,
+      );
+      expect(extremeScrollExtent >= 0, true);
+      expect(extremeScrollExtent.rectify(sliverListObj3) >= 0, true);
+
+      final sliverListObj4 = ObserverUtils.findRenderObject(sliverListCtx4);
+      expect(sliverListObj4 != null, true);
+      expect(sliverListObj4 is RenderSliverMultiBoxAdaptor, true);
+      sliverListObj4 as RenderSliverMultiBoxAdaptor;
+      extremeScrollExtent = observerController.viewportExtremeScrollExtent(
+        viewport: ObserverUtils.findViewport(sliverListObj4)!,
+        obj: sliverListObj4,
+      );
+      expect(extremeScrollExtent >= 0, true);
+      expect(extremeScrollExtent.rectify(sliverListObj4) >= 0, true);
+    });
+
+    testWidgets('Scroll to index with anchor 1.0', (tester) async {
+      resetAll(anchor: 1.0);
+      await tester.pumpWidget(widget);
+
+      observerController.jumpTo(index: 1, sliverContext: sliverListCtx1);
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      final sliverList1ObservationResult =
+          (resultMap[sliverListCtx1] as ListViewObserveModel);
+      expect(sliverList1ObservationResult.firstChild?.index, 1);
+
+      observerController.jumpTo(index: 5, sliverContext: sliverListCtx2);
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      final sliverList2ObservationResult =
+          (resultMap[sliverListCtx2] as ListViewObserveModel);
+      expect(sliverList2ObservationResult.firstChild?.index, 5);
+
+      observerController.jumpTo(
+        index: 10,
+        sliverContext: sliverListCtx3,
+        alignment: 1,
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      final sliverList3ObservationResult =
+          (resultMap[sliverListCtx3] as ListViewObserveModel);
+      expect(
+        sliverList3ObservationResult.displayingChildModelList.last.index,
+        10,
+      );
+
+      observerController.jumpTo(
+        index: 8,
+        sliverContext: sliverListCtx4,
+        alignment: 1,
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      final sliverList4ObservationResult =
+          (resultMap[sliverListCtx4] as ListViewObserveModel);
+      expect(
+        sliverList4ObservationResult.displayingChildModelList.last.index,
+        8,
+      );
+    });
+
+    testWidgets('Scroll to index with anchor 0.0', (tester) async {
+      resetAll(anchor: 0.0);
+      await tester.pumpWidget(widget);
+
+      observerController.jumpTo(
+        index: 1,
+        sliverContext: sliverListCtx1,
+        alignment: 1,
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      final sliverList1ObservationResult =
+          (resultMap[sliverListCtx1] as ListViewObserveModel);
+      expect(
+        sliverList1ObservationResult.displayingChildModelList.last.index,
+        1,
+      );
+
+      observerController.jumpTo(
+        index: 5,
+        sliverContext: sliverListCtx2,
+        alignment: 1,
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      final sliverList2ObservationResult =
+          (resultMap[sliverListCtx2] as ListViewObserveModel);
+      expect(
+        sliverList2ObservationResult.displayingChildModelList.last.index,
+        5,
+      );
+
+      observerController.jumpTo(index: 10, sliverContext: sliverListCtx3);
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      final sliverList3ObservationResult =
+          (resultMap[sliverListCtx3] as ListViewObserveModel);
+      expect(sliverList3ObservationResult.firstChild?.index, 10);
+
+      observerController.jumpTo(index: 8, sliverContext: sliverListCtx4);
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      final sliverList4ObservationResult =
+          (resultMap[sliverListCtx4] as ListViewObserveModel);
+      expect(sliverList4ObservationResult.firstChild?.index, 8);
+    });
+  });
 
   group('ObserverListener', () {
     late String tag1;
@@ -1445,9 +1309,7 @@ void main() {
       scrollController.dispose();
     });
 
-    resetAll({
-      bool isResetTag = false,
-    }) {
+    resetAll({bool isResetTag = false}) {
       if (isResetTag) {
         tag1 = tag1 * 2;
         tag2 = tag2 * 2;
@@ -1464,24 +1326,20 @@ void main() {
           controller: scrollController,
         );
       }
-      widget = _buildScrollView(
+      widget = buildScrollView(
         scrollController: scrollController,
         listItemBuilder: (context, index) {
           if (index == 3) {
             return const SizedBox(
               height: 50,
-              child: Center(
-                child: Icon(Icons.list),
-              ),
+              child: Center(child: Icon(Icons.list)),
             );
           }
           return Container(height: 50);
         },
         gridItemBuilder: (context, index) {
           if (index == 3) {
-            return const Center(
-              child: Icon(Icons.grid_view),
-            );
+            return const Center(child: Icon(Icons.grid_view));
           }
           return Container();
         },
@@ -1490,21 +1348,21 @@ void main() {
         key: key2,
         tag: tag2,
         sliverContexts: () => [
-          if (_sliverListCtx != null) _sliverListCtx!,
-          if (_sliverGridCtx != null) _sliverGridCtx!
+          if (sliverListCtx != null) sliverListCtx!,
+          if (sliverGridCtx != null) sliverGridCtx!,
         ],
-        child: widget,
         controller: observerController2,
+        child: widget,
       );
       widget = SliverViewObserver(
         key: key1,
         tag: tag1,
         sliverContexts: () => [
-          if (_sliverListCtx != null) _sliverListCtx!,
-          if (_sliverGridCtx != null) _sliverGridCtx!
+          if (sliverListCtx != null) sliverListCtx!,
+          if (sliverGridCtx != null) sliverGridCtx!,
         ],
-        child: widget,
         controller: observerController1,
+        child: widget,
       );
     }
 
@@ -1549,9 +1407,7 @@ void main() {
         cbResult = result;
       }
 
-      onObserveAllCallback(
-        Map<BuildContext, ObserveModel> resultMap,
-      ) {
+      onObserveAllCallback(Map<BuildContext, ObserveModel> resultMap) {
         cbAllResult = resultMap;
       }
 
@@ -1587,9 +1443,9 @@ void main() {
 
       ScrollViewOnceObserveNotificationResult? result =
           await observerController2.dispatchOnceObserve(
-        sliverContext: _sliverListCtx!,
-        isDependObserveCallback: false,
-      );
+            sliverContext: sliverListCtx!,
+            isDependObserveCallback: false,
+          );
       expect(result.observeResult, cbResult);
       expect(result.observeAllResult, cbAllResult);
       expect(result.observeViewportResultModel, cbObserveViewportResult);
@@ -1601,10 +1457,7 @@ void main() {
       );
       expect(listObserverState.innerListeners?.length, 0);
 
-      observerController2.jumpTo(
-        index: 0,
-        sliverContext: _sliverGridCtx,
-      );
+      observerController2.jumpTo(index: 0, sliverContext: sliverGridCtx);
       await tester.pumpAndSettle();
       await tester.pump(observerController2.observeIntervalForScrolling);
       cbResult = null;
@@ -1639,7 +1492,7 @@ void main() {
       expect(gridObserverState.innerListeners?.length, 1);
 
       result = await observerController2.dispatchOnceObserve(
-        sliverContext: _sliverListCtx!,
+        sliverContext: sliverListCtx!,
       );
       expect(result.observeResult, cbResult);
       expect(result.observeAllResult, cbAllResult);
@@ -1672,9 +1525,7 @@ void main() {
         cbResult = result;
       }
 
-      onObserveAllCallback(
-        Map<BuildContext, ObserveModel> resultMap,
-      ) {
+      onObserveAllCallback(Map<BuildContext, ObserveModel> resultMap) {
         cbAllResult = resultMap;
       }
 
@@ -1711,9 +1562,9 @@ void main() {
 
       ScrollViewOnceObserveNotificationResult? result =
           await observerController2.dispatchOnceObserve(
-        sliverContext: _sliverListCtx!,
-        isDependObserveCallback: false,
-      );
+            sliverContext: sliverListCtx!,
+            isDependObserveCallback: false,
+          );
       expect(result.observeResult, cbResult);
       expect(result.observeAllResult, cbAllResult);
       expect(result.observeViewportResultModel, cbObserveViewportResult);
@@ -1726,10 +1577,7 @@ void main() {
       expect(listObserverState?.innerSliverListeners?.length, 0);
       expect(listObserverState?.innerListeners?.length, 0);
 
-      observerController2.jumpTo(
-        index: 0,
-        sliverContext: _sliverGridCtx,
-      );
+      observerController2.jumpTo(index: 0, sliverContext: sliverGridCtx);
       await tester.pumpAndSettle();
       await tester.pump(observerController2.observeIntervalForScrolling);
       cbResult = null;
@@ -1764,7 +1612,7 @@ void main() {
       expect(gridObserverState?.innerListeners?.length, 1);
 
       result = await observerController2.dispatchOnceObserve(
-        sliverContext: _sliverListCtx!,
+        sliverContext: sliverListCtx!,
         isDependObserveCallback: false,
       );
       expect(result.observeResult, cbResult);
@@ -1782,67 +1630,61 @@ void main() {
 
     // Regression test for https://github.com/fluttercandies/flutter_scrollview_observer/issues/120
     testWidgets(
-        'No exception when MixViewObserverState is disposed during scrolling',
-        (tester) async {
-      resetAll();
-      await tester.pumpWidget(widget);
+      'No exception when MixViewObserverState is disposed during scrolling',
+      (tester) async {
+        resetAll();
+        await tester.pumpWidget(widget);
 
-      observerController1.animateTo(
-        index: 60,
-        sliverContext: _sliverListCtx,
-        duration: const Duration(seconds: 3),
-        curve: Curves.easeInOut,
-      );
-      await tester.pump();
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pumpWidget(Container());
-    });
+        observerController1.animateTo(
+          index: 60,
+          sliverContext: sliverListCtx,
+          duration: const Duration(seconds: 3),
+          curve: Curves.easeInOut,
+        );
+        await tester.pump();
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pumpWidget(Container());
+      },
+    );
 
     testWidgets(
-        'innerTagChangeCount should not increase when tag remains unchanged',
-        (tester) async {
-      const String tag = 'tag1';
-      scrollController = ScrollController();
-      Widget scrollView = _buildScrollView(scrollController: scrollController);
+      'innerTagChangeCount should not increase when tag remains unchanged',
+      (tester) async {
+        const String tag = 'tag1';
+        scrollController = ScrollController();
+        Widget scrollView = buildScrollView(scrollController: scrollController);
 
-      widget = SliverViewObserver(
-        tag: tag,
-        child: scrollView,
-      );
+        widget = SliverViewObserver(tag: tag, child: scrollView);
 
-      await tester.pumpWidget(widget);
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(widget);
+        await tester.pumpAndSettle();
 
-      // Get ObserverWidgetState
-      final itemFinder = find.byType(SliverViewObserver);
-      final observerState = tester.state<MixViewObserverState>(itemFinder);
-      expect(observerState, isNotNull);
+        // Get ObserverWidgetState
+        final itemFinder = find.byType(SliverViewObserver);
+        final observerState = tester.state<MixViewObserverState>(itemFinder);
+        expect(observerState, isNotNull);
 
-      // Record initial tagChangeCount
-      final initialTagChangeCount = observerState.innerTagChangeCount;
+        // Record initial tagChangeCount
+        final initialTagChangeCount = observerState.innerTagChangeCount;
 
-      // Refresh widget but keep tag unchanged
-      widget = SliverViewObserver(
-        tag: tag,
-        child: scrollView,
-      );
-      await tester.pumpWidget(widget);
-      await tester.pumpAndSettle();
+        // Refresh widget but keep tag unchanged
+        widget = SliverViewObserver(tag: tag, child: scrollView);
+        await tester.pumpWidget(widget);
+        await tester.pumpAndSettle();
 
-      // Verify that tagChangeCount has not increased
-      expect(observerState.innerTagChangeCount, initialTagChangeCount);
-      expect(observerState.innerTagChangeCount, 0);
-    });
+        // Verify that tagChangeCount has not increased
+        expect(observerState.innerTagChangeCount, initialTagChangeCount);
+        expect(observerState.innerTagChangeCount, 0);
+      },
+    );
 
-    testWidgets('No exception in _checkTagChange during refresh and dispose',
-        (tester) async {
+    testWidgets('No exception in _checkTagChange during refresh and dispose', (
+      tester,
+    ) async {
       // Regression test for https://github.com/fluttercandies/flutter_scrollview_observer/issues/143
       scrollController = ScrollController();
-      Widget scrollView = _buildScrollView(scrollController: scrollController);
-      widget = SliverViewObserver(
-        tag: 'tag1',
-        child: scrollView,
-      );
+      Widget scrollView = buildScrollView(scrollController: scrollController);
+      widget = SliverViewObserver(tag: 'tag1', child: scrollView);
       await tester.pumpWidget(widget);
 
       // Get ObserverWidgetState
@@ -1853,10 +1695,7 @@ void main() {
       final completer = Completer<void>();
       observerState.innerCheckTagChangeEndOfFrame = completer.future;
 
-      widget = SliverViewObserver(
-        tag: 'tag2',
-        child: scrollView,
-      );
+      widget = SliverViewObserver(tag: 'tag2', child: scrollView);
       await tester.pumpWidget(widget);
 
       // Dispose widget before endOfFrame completes
@@ -1872,8 +1711,9 @@ void main() {
   });
 
   group('cancelOnceObserveNotificationBubbling', () {
-    testWidgets('cancelOnceObserveNotificationBubbling is true (default)',
-        (tester) async {
+    testWidgets('cancelOnceObserveNotificationBubbling is true (default)', (
+      tester,
+    ) async {
       final scrollController = ScrollController();
       final observerController = SliverObserverController(
         controller: scrollController,
@@ -1915,8 +1755,9 @@ void main() {
       scrollController.dispose();
     });
 
-    testWidgets('cancelOnceObserveNotificationBubbling is false',
-        (tester) async {
+    testWidgets('cancelOnceObserveNotificationBubbling is false', (
+      tester,
+    ) async {
       final scrollController = ScrollController();
       final observerController = SliverObserverController(
         controller: scrollController,

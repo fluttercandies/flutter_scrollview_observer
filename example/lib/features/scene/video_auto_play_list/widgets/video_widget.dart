@@ -3,16 +3,13 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-05-28 14:08:53
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoWidget extends StatefulWidget {
   final String url;
 
-  const VideoWidget({
-    Key? key,
-    required this.url,
-  }) : super(key: key);
+  const VideoWidget({super.key, required this.url});
 
   @override
   State<VideoWidget> createState() => _VideoWidgetState();

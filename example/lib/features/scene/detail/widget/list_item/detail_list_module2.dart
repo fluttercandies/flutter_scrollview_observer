@@ -4,7 +4,7 @@
  * @Date: 2025-08-02 21:32:08
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 import 'package:scrollview_observer_example/features/scene/detail/widget/detail_list_item_wrapper.dart';
 
@@ -20,10 +20,7 @@ class _DetailListModule2State extends State<DetailListModule2>
   @override
   Widget build(BuildContext context) {
     Widget resultWidget = _buildListView();
-    resultWidget = SizedBox(
-      height: 300,
-      child: resultWidget,
-    );
+    resultWidget = SizedBox(height: 300, child: resultWidget);
     resultWidget = DetailListItemWrapper(
       title: 'Module 2',
       child: resultWidget,
@@ -52,11 +49,7 @@ class _DetailListModule2State extends State<DetailListModule2>
         Stack(
           children: [
             _buildItemCover(index),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: _buildItemFavoriteIcon(),
-            ),
+            Positioned(top: 8, right: 8, child: _buildItemFavoriteIcon()),
           ],
         ),
         Padding(
@@ -70,25 +63,17 @@ class _DetailListModule2State extends State<DetailListModule2>
               const SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildItemPrice(),
-                  _buildItemAddBtn(),
-                ],
+                children: [_buildItemPrice(), _buildItemAddBtn()],
               ),
             ],
           ),
         ),
       ],
     );
-    resultWidget = SizedBox(
-      width: 200,
-      child: resultWidget,
-    );
+    resultWidget = SizedBox(width: 200, child: resultWidget);
     resultWidget = Card(
       margin: const EdgeInsets.symmetric(vertical: 5),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
       elevation: 2,
       child: resultWidget,
     );
@@ -98,20 +83,14 @@ class _DetailListModule2State extends State<DetailListModule2>
   Widget _buildItemBrand() {
     return const Text(
       'NIKE',
-      style: TextStyle(
-        color: Colors.grey,
-        fontSize: 12,
-      ),
+      style: TextStyle(color: Colors.grey, fontSize: 12),
     );
   }
 
   Widget _buildItemTitle() {
     return const Text(
       'Air Force 1',
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-      ),
+      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
     );
   }
 
@@ -121,21 +100,14 @@ class _DetailListModule2State extends State<DetailListModule2>
         color: Colors.blue,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Icon(
-        Icons.add,
-        color: Colors.white,
-        size: 24,
-      ),
+      child: const Icon(Icons.add, color: Colors.white, size: 24),
     );
   }
 
   Widget _buildItemPrice() {
     return const Text(
       '\$90.00',
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 16,
-      ),
+      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
     );
   }
 
@@ -163,9 +135,7 @@ class _DetailListModule2State extends State<DetailListModule2>
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         color: Colors.green.shade50,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(16.0),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16.0)),
       ),
     );
   }

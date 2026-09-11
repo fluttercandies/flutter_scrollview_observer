@@ -4,7 +4,7 @@
  * @Date: 2025-08-10 12:50:51
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:get/get.dart';
 import 'package:scrollview_observer_example/features/scene/detail/header/detail_header.dart';
 import 'package:scrollview_observer_example/features/scene/detail/logic/detail_logic.dart';
@@ -30,28 +30,18 @@ class _DetailConfigViewState extends State<DetailConfigView>
       builder: (_) {
         Widget resultWidget = Column(
           children: [
-            Expanded(
-              child: _buildListView(),
-            ),
+            Expanded(child: _buildListView()),
             _buildConfirmBtn(),
           ],
         );
-        resultWidget = SafeArea(
-          top: false,
-          child: resultWidget,
-        );
+        resultWidget = SafeArea(top: false, child: resultWidget);
         return resultWidget;
       },
     );
   }
 
   Widget _buildListView() {
-    return ListView(
-      children: [
-        _buildDefaultAnchor(),
-        _buildRefreshPosition(),
-      ],
-    );
+    return ListView(children: [_buildDefaultAnchor(), _buildRefreshPosition()]);
   }
 
   Widget _buildDefaultAnchor() {
@@ -103,8 +93,6 @@ class _DetailConfigViewState extends State<DetailConfigView>
   }
 
   InputDecorationTheme inputDecorationTheme() {
-    return const InputDecorationTheme(
-      isCollapsed: true,
-    );
+    return const InputDecorationTheme(isCollapsed: true);
   }
 }

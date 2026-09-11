@@ -11,9 +11,7 @@ extension ObserverDouble on double {
   ///
   /// If the growthDirection is [GrowthDirection.forward], the value is
   /// returned directly, otherwise the opposite value is returned.
-  double rectify(
-    RenderSliver obj,
-  ) {
+  double rectify(RenderSliver obj) {
     return obj.isForwardGrowthDirection ? this : -this;
   }
 }

@@ -15,9 +15,7 @@ extension NestedScrollViewTabBarViewDemoLogicForScrollTypeSwitch
     if (context == null) return;
 
     state.scrollToWithAnimation = value;
-    update([
-      NestedScrollviewTabBarViewDemoUpdateType.scrollTypeSwitch,
-    ]);
+    update([NestedScrollviewTabBarViewDemoUpdateType.scrollTypeSwitch]);
     SnackBarUtil.showSnackBar(
       context: context,
       text:

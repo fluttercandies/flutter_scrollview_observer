@@ -3,12 +3,12 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
 
 class SliverListViewDemoPage extends StatefulWidget {
-  const SliverListViewDemoPage({Key? key}) : super(key: key);
+  const SliverListViewDemoPage({super.key});
 
   @override
   State<SliverListViewDemoPage> createState() => _SliverListViewDemoPageState();
@@ -39,16 +39,10 @@ class _SliverListViewDemoPageState extends State<SliverListViewDemoPage> {
       appBar: AppBar(title: const Text("SliverListView")),
       body: ListViewObserver(
         child: CustomScrollView(
-          slivers: [
-            _buildSliverListView1(),
-            _buildSliverListView2(),
-          ],
+          slivers: [_buildSliverListView1(), _buildSliverListView2()],
         ),
         sliverListContexts: () {
-          return [
-            if (_sliverListViewCtx1 != null) _sliverListViewCtx1!,
-            if (_sliverListViewCtx2 != null) _sliverListViewCtx2!,
-          ];
+          return [?_sliverListViewCtx1, ?_sliverListViewCtx2];
         },
         onObserveAll: (resultMap) {
           final model1 = resultMap[_sliverListViewCtx1];
@@ -77,51 +71,43 @@ class _SliverListViewDemoPageState extends State<SliverListViewDemoPage> {
 
   SliverList _buildSliverListView1() {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (ctx, index) {
-          if (_sliverListViewCtx1 != ctx) {
-            _sliverListViewCtx1 = ctx;
-          }
-          return Container(
-            height: (index % 2 == 0) ? 80 : 50,
-            color: _hitIndexForCtx1 == index ? Colors.red : Colors.black12,
-            child: Center(
-              child: Text(
-                "index -- $index",
-                style: TextStyle(
-                  color:
-                      _hitIndexForCtx1 == index ? Colors.white : Colors.black,
-                ),
+      delegate: SliverChildBuilderDelegate((ctx, index) {
+        if (_sliverListViewCtx1 != ctx) {
+          _sliverListViewCtx1 = ctx;
+        }
+        return Container(
+          height: (index % 2 == 0) ? 80 : 50,
+          color: _hitIndexForCtx1 == index ? Colors.red : Colors.black12,
+          child: Center(
+            child: Text(
+              "index -- $index",
+              style: TextStyle(
+                color: _hitIndexForCtx1 == index ? Colors.white : Colors.black,
               ),
             ),
-          );
-        },
-        childCount: 30,
-      ),
+          ),
+        );
+      }, childCount: 30),
     );
   }
 
   SliverList _buildSliverListView2() {
     return SliverList(
       key: _sliverListView2Key,
-      delegate: SliverChildBuilderDelegate(
-        (ctx, index) {
-          return Container(
-            height: (index % 2 == 0) ? 80 : 50,
-            color: _hitIndexForCtx2 == index ? Colors.amber : Colors.blue[50],
-            child: Center(
-              child: Text(
-                "index -- $index",
-                style: TextStyle(
-                  color:
-                      _hitIndexForCtx2 == index ? Colors.white : Colors.black,
-                ),
+      delegate: SliverChildBuilderDelegate((ctx, index) {
+        return Container(
+          height: (index % 2 == 0) ? 80 : 50,
+          color: _hitIndexForCtx2 == index ? Colors.amber : Colors.blue[50],
+          child: Center(
+            child: Text(
+              "index -- $index",
+              style: TextStyle(
+                color: _hitIndexForCtx2 == index ? Colors.white : Colors.black,
               ),
             ),
-          );
-        },
-        childCount: 30,
-      ),
+          ),
+        );
+      }, childCount: 30),
     );
   }
 }

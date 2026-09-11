@@ -3,13 +3,13 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-08-08 00:20:03
  */
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer_example/typedefs.dart';
 import 'package:scrollview_observer_example/utils/snackbar.dart';
 
 class ListViewDemoPage extends StatefulWidget {
-  const ListViewDemoPage({Key? key}) : super(key: key);
+  const ListViewDemoPage({super.key});
 
   @override
   State<ListViewDemoPage> createState() => _ListViewDemoPageState();
@@ -24,8 +24,9 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
   );
   int _hitIndex = 0;
 
-  ScrollController scrollController =
-      ScrollController(initialScrollOffset: _leadingPadding);
+  ScrollController scrollController = ScrollController(
+    initialScrollOffset: _leadingPadding,
+  );
 
   late ListObserverController observerController;
 
@@ -40,14 +41,12 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
       );
 
     // Trigger an observation manually
-    ambiguate(WidgetsBinding.instance)?.endOfFrame.then(
-      (_) {
-        // After layout
-        if (mounted) {
-          observerController.dispatchOnceObserve();
-        }
-      },
-    );
+    ambiguate(WidgetsBinding.instance)?.endOfFrame.then((_) {
+      // After layout
+      if (mounted) {
+        observerController.dispatchOnceObserve();
+      }
+    });
   }
 
   @override
@@ -61,7 +60,6 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
     return Scaffold(
       appBar: AppBar(title: const Text("ListView")),
       body: ListViewObserver(
-        child: _buildListView(),
         autoTriggerObserveTypes: const [
           ObserverAutoTriggerObserveType.scrollEnd,
         ],
@@ -74,25 +72,21 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
 
           for (var item in resultModel.displayingChildModelList) {
             debugPrint(
-                'item - ${item.index} - ${item.leadingMarginToViewport} - ${item.trailingMarginToViewport}');
+              'item - ${item.index} - ${item.leadingMarginToViewport} - ${item.trailingMarginToViewport}',
+            );
           }
 
           setState(() {
             _hitIndex = resultModel.firstChild?.index ?? 0;
           });
         },
+        child: _buildListView(),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.airline_stops_outlined),
         onPressed: () {
-          SnackBarUtil.showSnackBar(
-            context: context,
-            text: 'Jump to row 50',
-          );
-          observerController.jumpTo(
-            index: 50,
-            padding: _padding,
-          );
+          SnackBarUtil.showSnackBar(context: context, text: 'Jump to row 50');
+          observerController.jumpTo(index: 50, padding: _padding);
           // observerController.animateTo(
           //   index: 50,
           //   duration: const Duration(seconds: 1),
@@ -144,9 +138,6 @@ class _ListViewDemoPageState extends State<ListViewDemoPage> {
   }
 
   Container _buildSeparatorView() {
-    return Container(
-      color: Colors.white,
-      height: 5,
-    );
+    return Container(color: Colors.white, height: 5);
   }
 }
