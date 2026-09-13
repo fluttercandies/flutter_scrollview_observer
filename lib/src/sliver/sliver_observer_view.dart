@@ -29,7 +29,7 @@ class SliverViewObserver extends ObserverWidget<SliverObserverController,
   final OnObserveViewportCallback? onObserveViewport;
 
   /// It's used to handle the observation logic for other types of Sliver
-  /// besides [RenderSliverList], [RenderSliverFixedExtentList] and
+  /// besides [RenderSliverList], [RenderSliverFixedExtentBoxAdaptor] and
   /// [RenderSliverGrid].
   final ObserveModel? Function(BuildContext context)? extendedHandleObserve;
 

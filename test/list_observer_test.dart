@@ -52,6 +52,7 @@ void main() {
     int itemCount = 100,
     double? cacheExtent,
     bool useItemExtentBuilder = false,
+    bool usePrototypeItem = false,
   }) {
     const double height = 80;
     return Directionality(
@@ -66,7 +67,8 @@ void main() {
             ),
           );
         },
-        itemExtent: useItemExtentBuilder ? null : height,
+        itemExtent: useItemExtentBuilder || usePrototypeItem ? null : height,
+        prototypeItem: usePrototypeItem ? const SizedBox(height: height) : null,
         itemExtentBuilder: useItemExtentBuilder
             ? (index, dimensions) {
                 return height;
@@ -320,6 +322,129 @@ void main() {
       expect(observeResult?.firstChild?.index, targeItemIndex);
 
       scrollController.dispose();
+    });
+
+    testWidgets('Fixed height with prototypeItem', (tester) async {
+      final scrollController = ScrollController();
+      final observerController =
+          ListObserverController(controller: scrollController);
+
+      Widget widget = getFixedHeightListView(
+        scrollController: scrollController,
+        usePrototypeItem: true,
+      );
+      ListViewObserveModel? observeResult;
+      widget = ListViewObserver(
+        child: widget,
+        controller: observerController,
+        onObserve: (result) {
+          observeResult = result;
+        },
+      );
+      await tester.pumpWidget(widget);
+      expect(observerController.sliverContexts.length, 1);
+
+      int targeItemIndex = 30;
+      observerController.jumpTo(
+        index: targeItemIndex,
+        isFixedHeight: true,
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      expect(observeResult?.firstChild?.index, targeItemIndex);
+
+      targeItemIndex = 60;
+      observerController.animateTo(
+        index: targeItemIndex,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(observerController.observeIntervalForScrolling);
+      expect(observeResult?.firstChild?.index, targeItemIndex);
+
+      scrollController.dispose();
+    });
+
+    // https://github.com/fluttercandies/flutter_scrollview_observer/issues/158
+    group('ReorderableListView', () {
+      Future<void> testReorderableListView(
+        WidgetTester tester, {
+        bool isFixedHeight = false,
+        bool usePrototypeItem = false,
+      }) async {
+        final scrollController = ScrollController();
+        final observerController = ListObserverController(
+          controller: scrollController,
+        );
+        ListViewObserveModel? observeResult;
+
+        Widget widget = MaterialApp(
+          home: ReorderableListView.builder(
+            scrollController: scrollController,
+            header: const SizedBox(height: 100),
+            prototypeItem: usePrototypeItem ? const SizedBox(height: 80) : null,
+            itemBuilder: (ctx, index) {
+              double height = 80;
+              if (!isFixedHeight) {
+                height = (index % 2 == 0) ? 80 : 50;
+              }
+              return SizedBox(
+                key: ValueKey(index),
+                height: height,
+                child: Center(child: Text("index -- $index")),
+              );
+            },
+            itemCount: 100,
+            // ignore: deprecated_member_use
+            onReorder: (oldIndex, newIndex) {},
+          ),
+        );
+        widget = ListViewObserver(
+          child: widget,
+          controller: observerController,
+          onObserve: (result) {
+            observeResult = result;
+          },
+        );
+        await tester.pumpWidget(widget);
+        await tester.pumpAndSettle();
+        expect(observerController.sliverContexts.length, 1);
+
+        int targeItemIndex = 30;
+        observerController.jumpTo(
+          index: targeItemIndex,
+          isFixedHeight: isFixedHeight,
+        );
+        await tester.pumpAndSettle();
+        await tester.pump(observerController.observeIntervalForScrolling);
+        expect(observeResult?.firstChild?.index, targeItemIndex);
+
+        targeItemIndex = 60;
+        observerController.animateTo(
+          index: targeItemIndex,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          isFixedHeight: isFixedHeight,
+        );
+        await tester.pumpAndSettle();
+        await tester.pump(observerController.observeIntervalForScrolling);
+        expect(observeResult?.firstChild?.index, targeItemIndex);
+
+        scrollController.dispose();
+      }
+
+      testWidgets('Dynamic height', (tester) async {
+        await testReorderableListView(tester);
+      });
+
+      testWidgets('Fixed height with prototypeItem', (tester) async {
+        await testReorderableListView(
+          tester,
+          isFixedHeight: true,
+          usePrototypeItem: true,
+        );
+      });
     });
 
     // Regression test for https://github.com/fluttercandies/flutter_scrollview_observer/issues/123

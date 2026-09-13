@@ -22,7 +22,7 @@ class ListViewObserveDisplayingChildModel extends ObserveDisplayingChildModel
         );
 
   /// The target sliverList.
-  /// It would be [RenderSliverList] or [RenderSliverFixedExtentList].
+  /// It would be [RenderSliverList] or [RenderSliverFixedExtentBoxAdaptor].
   RenderSliverMultiBoxAdaptor sliverList;
 
   @override
