@@ -1,3 +1,7 @@
+## 1.27.2
+- ListViewObserver
+  - Support `SliverPrototypeExtentList` (`prototypeItem` of `ListView` and `ReorderableListView`) by @LinXunFeng in [#158](https://github.com/fluttercandies/flutter_scrollview_observer/issues/158).
+
 ## 1.27.1
 - ObserverController
   - Correct the scrolling clamped by an outdated `scrollExtent` by @LinXunFeng in [#150](https://github.com/fluttercandies/flutter_scrollview_observer/issues/150).
