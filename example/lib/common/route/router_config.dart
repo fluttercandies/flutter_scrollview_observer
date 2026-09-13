@@ -26,6 +26,7 @@ import 'package:scrollview_observer_example/features/listview/listview_custom_de
 import 'package:scrollview_observer_example/features/listview/listview_demo/listview_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_dynamic_offset/listview_dynamic_offset_page.dart';
 import 'package:scrollview_observer_example/features/listview/listview_fixed_height_demo/listview_fixed_height_demo_page.dart';
+import 'package:scrollview_observer_example/features/listview/reorderable_listview_demo/reorderable_listview_demo_page.dart';
 import 'package:scrollview_observer_example/features/listview/sliver_list_demo/sliver_list_demo_page.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_demo/nested_scrollview_demo_page.dart';
 import 'package:scrollview_observer_example/features/nested_scrollview/nested_scrollview_tab_bar_view_demo/page/nested_scrollview_tab_bar_view_demo_page.dart';
@@ -57,6 +58,7 @@ class MyPage {
   static const listViewDynamicOffset = '/list_view_dynamic_offset';
   static const listViewCustom = '/list_view_custom';
   static const listViewInfinite = '/list_view_infinite';
+  static const listViewReorderable = '/list_view_reorderable';
   static const sliverListView = '/sliver_list_view';
   // GridView
   static const gridView = '/grid_view';
@@ -140,6 +142,10 @@ class MyRoute {
     GoRoute(
       path: MyPage.listViewInfinite,
       builder: (context, state) => const InfiniteListViewPage(),
+    ),
+    GoRoute(
+      path: MyPage.listViewReorderable,
+      builder: (context, state) => const ReorderableListViewDemoPage(),
     ),
     GoRoute(
       path: MyPage.sliverListView,

@@ -64,6 +64,12 @@ class HomePage extends StatelessWidget {
           },
         ),
         ListTile(
+          title: const Text("ListView - Reorderable"),
+          onTap: () {
+            NavigationService.push(MyPage.listViewReorderable);
+          },
+        ),
+        ListTile(
           title: const Text("SliverListView"),
           onTap: () {
             NavigationService.push(MyPage.sliverListView);
