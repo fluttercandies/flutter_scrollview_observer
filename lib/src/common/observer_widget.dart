@@ -83,8 +83,8 @@ class ObserverWidget<C extends ObserverController, M extends ObserveModel,
 
   /// Used to find the target RenderSliver.
   ///
-  /// The default is to find [RenderSliverList], [RenderSliverFixedExtentList]
-  /// and [RenderSliverGrid].
+  /// The default is to find [RenderSliverList],
+  /// [RenderSliverFixedExtentBoxAdaptor] and [RenderSliverGrid].
   final bool Function(RenderObject?)? customTargetRenderSliverType;
 
   /// It allows you to customize observation logic when original logic doesn't
