@@ -4,7 +4,7 @@
  * @Date: 2023-08-12 20:09:46
  */
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
 import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';

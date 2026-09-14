@@ -3,7 +3,7 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-09-29 22:47:10
  */
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/typedefs.dart';
 

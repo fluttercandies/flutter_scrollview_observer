@@ -4,7 +4,7 @@
  * @Date: 2022-12-04 15:57:38
  */
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
 import 'package:scrollview_observer/src/common/models/observe_scroll_to_index_result_model.dart';
 import 'package:scrollview_observer/src/sliver/models/sliver_viewport_observe_model.dart';
