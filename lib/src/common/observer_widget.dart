@@ -8,7 +8,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:scrollview_observer/src/common/models/observer_handle_contexts_result_model.dart';

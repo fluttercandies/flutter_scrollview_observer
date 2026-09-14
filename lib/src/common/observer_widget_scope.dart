@@ -4,7 +4,7 @@
  * @Date: 2024-10-19 11:49:39
  */
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:scrollview_observer/scrollview_observer.dart';
 import 'package:scrollview_observer/src/common/observer_controller.dart';

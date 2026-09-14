@@ -3,7 +3,7 @@
  * @Repo: https://github.com/LinXunFeng/flutter_scrollview_observer
  * @Date: 2022-05-28 12:37:41
  */
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:scrollview_observer/src/common/observer_controller.dart';
 
 class ScrollViewOnceObserveNotification extends Notification {

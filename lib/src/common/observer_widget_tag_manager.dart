@@ -4,7 +4,7 @@
  * @Date: 2024-11-03 14:40:40
  */
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class ObserverWidgetTagManager extends InheritedWidget {
   final Map<String, BuildContext> _tagMap = {};

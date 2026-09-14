@@ -1,3 +1,7 @@
+## 1.27.3
+- Others
+  - Import `package:flutter/widgets.dart` instead of `package:flutter/material.dart` so the package no longer depends on the Material library, compatible with apps migrated to `material_ui` in Flutter 3.47 by @LinXunFeng in [#156](https://github.com/fluttercandies/flutter_scrollview_observer/issues/156).
+
 ## 1.27.2
 - ListViewObserver
   - Support `SliverPrototypeExtentList` (`prototypeItem` of `ListView` and `ReorderableListView`) by @LinXunFeng in [#158](https://github.com/fluttercandies/flutter_scrollview_observer/issues/158).

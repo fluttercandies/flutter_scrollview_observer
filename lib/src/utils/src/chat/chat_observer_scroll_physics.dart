@@ -4,7 +4,7 @@
  * @Date: 2022-09-27 23:12:45
  */
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'chat_observer_scroll_physics_mixin.dart';
 import 'chat_scroll_observer.dart';
 

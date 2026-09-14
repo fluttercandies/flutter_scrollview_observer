@@ -4,7 +4,7 @@
  * @Date: 2022-08-21 00:53:44
  */
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/rendering.dart';
 import 'package:scrollview_observer/src/common/models/observe_model.dart';
 import 'package:scrollview_observer/src/gridview/models/gridview_observe_displaying_child_model.dart';
@@ -18,7 +18,7 @@ class ObserverUtils {
 
   /// Calculate current extent of [RenderSliverPersistentHeader] base on
   /// target layout offset.
-  /// Such as [SliverAppBar]
+  /// Such as `SliverAppBar`
   ///
   /// You must pass either [key] or [context]
   static double calcPersistentHeaderExtent({
